@@ -85,6 +85,7 @@ const Header = () => {
                 <Link to="/products" onClick={handleLinkClick}>Produits</Link>
               </li>
               <li><Link to="/contact" onClick={handleLinkClick}>Contact</Link></li>
+              <li><Link to="/dashboard" onClick={handleLinkClick}>Dashboard Admin</Link></li>
             </ul>
 
             {isMobile && (
