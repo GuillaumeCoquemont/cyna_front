@@ -1,0 +1,118 @@
+.topSection {
+    background-color: var(--primary-color);
+    padding: 5rem 0;
+}
+
+.sectionHeader {
+    position: relative;
+    background-color: var(--tertiary-color);
+    padding: 2rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--white-color);
+}
+
+.sectionPill {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    background-color: var(--tertiary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.title {
+    font-size: 2.5rem;
+    color: var(--white-color);
+    margin-bottom: 1rem;
+}
+
+.productsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 3rem;
+    max-width: 1200px;
+    padding-top: 3rem;
+    margin: 0 auto;
+}
+
+.productCard {
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.productCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.productImage {
+    height: 200px;
+    background-color: var(--white-color);
+    position: relative;
+}
+
+.label {
+    position: absolute;
+    background-color: var(--tertiary-color);
+    top: 0.5rem;
+    left: 0.5rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.labelNew {
+    background-color: var(--tertiary-color);
+}
+
+.labelTrending {
+    background-color: var(--tertiary-color);
+}
+
+.productInfo {
+    padding: 1.5rem;
+}
+
+.productTitle {
+    font-size: 1.25rem;
+    margin: 0 0 0.5rem;
+    color: var(--text-color);
+}
+
+.productDesc {
+    margin: 0 0 1rem;
+    color: var(--text-color-light);
+    line-height: 1.5;
+}
+
+.price {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .topSection {
+        padding: 3rem 1rem;
+    }
+    .title {
+        font-size: 2rem;
+    }
+    .productsGrid {
+        grid-template-columns: 1fr;
+    }
+}
