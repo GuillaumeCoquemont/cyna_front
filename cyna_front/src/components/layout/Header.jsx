@@ -80,11 +80,12 @@ const Header = () => {
         <div ref={menuRef} className={`${styles.navMenu} ${isMobileMenuOpen ? styles.open : ''}`}>
           <div className={styles.menuContent}>
             <ul className={styles.navLinks}>
-              <li><Link to="/" onClick={handleLinkClick}>Home</Link></li>
+              <li><Link to="/" onClick={handleLinkClick}>Accueil</Link></li>
               <li>
                 <Link to="/products" onClick={handleLinkClick}>Produits</Link>
               </li>
               <li><Link to="/contact" onClick={handleLinkClick}>Contact</Link></li>
+              <li><Link to="/dashboard" onClick={handleLinkClick}>Dashboard Admin</Link></li>
             </ul>
 
             {isMobile && (
@@ -103,9 +104,9 @@ const Header = () => {
           <a href="#" onClick={toggleSearchBar} aria-label="Recherche">
             <i className="fas fa-search"></i>
           </a>
-          <a href="#login" aria-label="Connexion">
+          <Link to="/auth" onClick={handleLinkClick} aria-label="Connexion">
             <i className="fas fa-user"></i>
-          </a>
+          </Link>
           <a href="#cart" aria-label="Panier">
             <i className="fas fa-shopping-cart"></i>
           </a>

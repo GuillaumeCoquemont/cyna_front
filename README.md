@@ -1,2 +1,0 @@
-# CYNA
-je suis bo
