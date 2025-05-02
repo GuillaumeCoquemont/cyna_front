@@ -17,6 +17,7 @@ const ProductsSection = () => {
         <h2 className={styles.bannerTitle}>
           Découvrez <span className={styles.highlight}>nos solutions 360 de cybersécurité </span>pour les PME
         </h2>
+        <h4 className={styles.subtitle}>Cyna s’adapte à vos besoins et vous propose un accompagnement dans la protection globale de votre SI.</h4>
       </div>
 
       <div className={styles.carouselContainer}>

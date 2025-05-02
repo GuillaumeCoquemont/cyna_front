@@ -7,10 +7,11 @@
   padding: 2rem 0;
   margin-bottom: 3rem;
   text-align: center;
-  align-items: center;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   min-height: 200px;
-  
 }
 
 .bannerTitle {
@@ -30,7 +31,6 @@
   width: 100%;
   margin: 0;
   padding: 1rem;
-  border: 2px solid green;
   position: relative;
   overflow: visible;
 }
@@ -46,7 +46,6 @@
   overflow: hidden;
   height: 100%;
   margin-bottom: 4rem;
-  border: 2px solid red;
   display: flex;
   flex-direction: column;
 }
@@ -101,6 +100,11 @@
   font-size: 0.9rem;
   color: var(--success-color);
   margin-bottom: 1rem;
+}
+
+.subtitle {
+  margin-top: 1rem;
+  color: var(--white-color);
 }
 
 .addToCartButton {

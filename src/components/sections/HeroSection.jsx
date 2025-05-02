@@ -8,9 +8,9 @@ const HeroSection = () => {
       <div className={styles.heroContent}>
         <h1 className={styles.title}>
           CYNA : <br />
-          <span className={styles.subtitle}>Protection contre les cyberattaques</span>
+          <span className={styles.subtitle}>Pure player en cybersécurité pour PME et MSP</span>
         </h1>
-        <p className={styles.description}>Pure player en cybersécurité pour PME et MSP</p>
+        <p className={styles.description}>Cyna protège les entreprises contre les cyberattaques</p>
         <div className={styles.buttonGroup}>
           <Link to="/contact" className={`${styles.button} ${styles.primaryButton}`}>
             Contact

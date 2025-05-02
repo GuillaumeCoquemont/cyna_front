@@ -5,10 +5,9 @@ import Footer from '../components/layout/Footer';
 
 const ProductsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPriceRange, setSelectedPriceRange] = useState('20-50');
-  const [selectedCategories, setSelectedCategories] = useState(['Catégorie 1']);
-  const [availability, setAvailability] = useState('en-stock');
-  const [visibleProducts, setVisibleProducts] = useState(6); // Nombre initial de produits affichés
+  const [selectedPriceRange, setSelectedPriceRange] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [visibleProducts, setVisibleProducts] = useState(6);
   const [isLoading, setIsLoading] = useState(false);
 
   const priceRanges = [
@@ -27,53 +26,38 @@ const ProductsPage = () => {
     { id: 'cat6', name: 'Lorem ipsum (3)' }
   ];
 
-  // Simulons une liste de produits (à remplacer par vos vrais produits)
+  // Liste explicite de produits de cybersécurité
   const allProducts = [
-    {
-      id: 1,
-      title: 'Antivirus Pro',
-      price: 199.99,
-      discount: 15,
-      image: '/path/to/image1.jpg'
-    },
-    {
-      id: 2,
-      title: 'Firewall Enterprise',
-      price: 299.99,
-      discount: 10,
-      image: '/path/to/image2.jpg'
-    },
-    {
-      id: 3,
-      title: 'VPN Secure',
-      price: 149.99,
-      discount: 20,
-      image: '/path/to/image3.jpg'
-    },
-    // ... ajoutez plus de produits ici
-  ].concat(Array(15).fill(null).map((_, i) => ({
-    id: i + 4,
-    title: `Produit ${i + 4}`,
-    price: 199.99,
-    discount: 15,
-    image: '/path/to/default.jpg'
-  })));
+    { id: 1, title: 'Antivirus Pro',           price: 199.99, discount: 15, image: '/path/to/image1.jpg' },
+    { id: 2, title: 'Firewall Enterprise',      price: 299.99, discount: 10, image: '/path/to/image2.jpg' },
+    { id: 3, title: 'VPN Secure',               price: 149.99, discount: 20, image: '/path/to/image3.jpg' },
+    { id: 4, title: 'Vulnerability Scanner',    price: 249.99, discount: 20, image: '/path/to/vulnerability.jpg' },
+    { id: 5, title: 'SIEM Analytics',           price: 399.99, discount: 10, image: '/path/to/siem.jpg' },
+    { id: 6, title: 'Endpoint Protection',      price: 179.99, discount: 5,  image: '/path/to/endpoint.jpg' },
+    { id: 7, title: 'Secure Email Gateway',     price: 129.99, discount: 15, image: '/path/to/email.jpg' },
+    { id: 8, title: 'DDoS Mitigation Service',  price: 499.99, discount: 25, image: '/path/to/ddos.jpg' },
+    { id: 9, title: 'Threat Intelligence Feed', price: 299.99, discount: 15, image: '/path/to/threat.jpg' },
+    { id: 10, title: 'Multi-Factor Auth',       price: 99.99,  discount: 0,  image: '/path/to/mfa.jpg' },
+  ];
+
+  // Filtrage selon la requête de recherche
+  const filteredProducts = allProducts.filter(product =>
+    product.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleLoadMore = () => {
     setIsLoading(true);
-    // Simulons un chargement asynchrone
     setTimeout(() => {
       setVisibleProducts(prev => Math.min(prev + 6, allProducts.length));
       setIsLoading(false);
     }, 500);
   };
 
-  const displayedProducts = allProducts.slice(0, visibleProducts);
-  const hasMoreProducts = visibleProducts < allProducts.length;
+  const displayedProducts = filteredProducts.slice(0, visibleProducts);
+  const hasMoreProducts = visibleProducts < filteredProducts.length;
 
   return (
     <div className={styles.productsPage}>
-      <Header />
       <main className={styles.main}>
         <aside className={styles.sidebar}>
           <div className={styles.filterSection}>
@@ -98,7 +82,9 @@ const ProductsPage = () => {
                   <input
                     type="checkbox"
                     checked={selectedPriceRange === range.id}
-                    onChange={() => setSelectedPriceRange(range.id)}
+                    onChange={() =>
+                      setSelectedPriceRange(prev => prev === range.id ? '' : range.id)
+                    }
                   />
                   <span className={styles.checkboxText}>{range.label}</span>
                 </label>
@@ -109,54 +95,33 @@ const ProductsPage = () => {
           <div className={styles.filterSection}>
             <h2 className={styles.filterTitle}>Catégorie</h2>
             <div className={styles.categoryCheckboxList}>
-              <label className={styles.checkboxLabel}>
-                <input type="checkbox" checked />
-                <span className={styles.checkboxText}>Catégorie 1</span>
-              </label>
-              <label className={styles.checkboxLabel}>
-                <input type="checkbox" />
-                <span className={styles.checkboxText}>Catégorie 2</span>
-              </label>
-              <label className={styles.checkboxLabel}>
-                <input type="checkbox" />
-                <span className={styles.checkboxText}>Catégorie 3</span>
-              </label>
-              <label className={styles.checkboxLabel}>
-                <input type="checkbox" />
-                <span className={styles.checkboxText}>Catégorie 4</span>
-              </label>
+              {categories.map(category => (
+                <label key={category.id} className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(category.id)}
+                    onChange={() => {
+                      setSelectedCategories(prev =>
+                        prev.includes(category.id)
+                          ? prev.filter(id => id !== category.id)
+                          : [...prev, category.id]
+                      );
+                    }}
+                  />
+                  <span className={styles.checkboxText}>{category.name}</span>
+                </label>
+              ))}
             </div>
           </div>
 
-          <div className={styles.filterSection}>
-            <h2 className={styles.filterTitle}>Disponibilité</h2>
-            <div className={styles.availabilityList}>
-              <label className={styles.radioLabel}>
-                <input
-                  type="radio"
-                  name="availability"
-                  checked={availability === 'en-stock'}
-                  onChange={() => setAvailability('en-stock')}
-                />
-                <span className={styles.radioText}>En stock</span>
-              </label>
-            </div>
-          </div>
 
-          <button className={styles.searchButton}>
-            Rechercher par caractéristique
+          <button
+            className={styles.searchButton}
+            onClick={() => setVisibleProducts(filteredProducts.length > 6 ? 6 : filteredProducts.length)}
+          >
+            Rechercher
           </button>
 
-          <div className={styles.searchContainer}>
-            <input
-              type="text"
-              placeholder="Recherche par nom ou desc"
-              className={styles.searchInput}
-            />
-            <button className={styles.searchIconButton}>
-              <i className="fas fa-search"></i>
-            </button>
-          </div>
         </aside>
 
         <section className={styles.productSection}>
@@ -210,7 +175,6 @@ const ProductsPage = () => {
           </div>
         </section>
       </main>
-      <Footer />
     </div>
   );
 };
