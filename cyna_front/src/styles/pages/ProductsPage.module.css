@@ -14,7 +14,6 @@
   width: 100%;
 }
 
-/* Sidebar Styles */
 .sidebar {
   width: 280px;
   flex-shrink: 0;
@@ -87,7 +86,7 @@
 }
 
 .searchButton:hover {
-  background-color: var(--tertiary-color-dark);
+  background-color: var(--white-color);
 }
 
 .searchContainer {

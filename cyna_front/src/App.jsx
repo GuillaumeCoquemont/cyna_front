@@ -6,6 +6,8 @@ import ProductsPage from "./pages/ProductsPage";
 import DashboardAdmin from "./pages/DashboardAdmin";
 import AuthPage from "./pages/AuthPage";
 import Layout from "./components/layout/Layout";
+import Contact from "./pages/Contact";
+import Discover from "./pages/Discover";
 
 const App = () => {
   return (
@@ -15,7 +17,9 @@ const App = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/dashboard" element={<DashboardAdmin />} />
+          <Route path="/discover" element={<Discover />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="contact" element={<Contact />} />
         </Routes>
       </Layout>
     </BrowserRouter>

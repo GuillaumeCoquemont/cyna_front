@@ -23,6 +23,8 @@ import React, { useState } from 'react';
 import styles from '../styles/pages/DashboardAdmin.module.css';
 import { Link } from 'react-router-dom';
 import DashboardMessage from '../components/dashboard/DashboardMessage';
+import DashboardProducts from '../components/dashboard/DashboardProducts';
+import { CarrouselEditor } from '../components/dashboard/CarrousselElements';
 
 export default function DashboardAdmin() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -39,9 +41,7 @@ export default function DashboardAdmin() {
     { key: 'messages', label: 'Messages' },
     { key: 'produits', label: 'Produits' },
     { key: 'favoris', label: 'Favoris' },
-    { key: 'liste', label: 'Liste produits' },
-    { key: 'stock', label: 'Stock de produits' },
-    { key: 'ui', label: 'UI Elements' },
+    { key: 'ui', label: 'Carroussel' },
     { key: 'team', label: 'Team' },
     { key: 'params', label: 'Paramètres' },
   ];
@@ -136,6 +136,18 @@ export default function DashboardAdmin() {
         );
       case 'messages':
         return <DashboardMessage />;
+      case 'produits':
+        return (
+          <div className={styles.dashboardContent}>
+            <DashboardProducts />
+          </div>
+        );
+        case 'ui':
+          return (
+            <div className={styles.dashboardContent}>
+              <CarrouselEditor />
+            </div>
+          );
       default:
         return (
           <div className={styles.dashboardContent}>

@@ -1,6 +1,5 @@
 import React from "react";
 import Header from "../components/layout/Header";
-import Footer from "../components/layout/Footer";
 import HeroSection from "../components/sections/HeroSection";
 import ProductsPreviewSection from "../components/sections/ProductsPreviewSection";
 import styles from "../styles/components/Landing/LandingPage.module.css";
@@ -10,7 +9,6 @@ import ProductsTop from "../components/sections/ProductsTop";
 const LandingPage = () => {
   return (
     <div className={styles.landingPage}>
-      <Header />
       <main className={styles.mainContent}>
         <HeroSection />
         <ProductsSection />
@@ -19,7 +17,6 @@ const LandingPage = () => {
 
         {/* Autres sections à venir */}
       </main>
-      <Footer />
     </div>
   );
 };

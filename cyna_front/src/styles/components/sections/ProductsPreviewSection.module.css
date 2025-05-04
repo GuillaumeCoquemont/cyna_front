@@ -122,7 +122,10 @@
 }
 
 .viewAllButton:hover {
-  background-color: var(--tertiary-color-dark);
+  border: 2px solid var(--tertiary-color);
+  background-color: transparent;
+  color: var(--tertiary-color);
+  transform: translateY(-2px);
 }
 
 .arrow {
@@ -174,5 +177,8 @@
 }
 
 .filterBtn:hover {
-  background-color: var(--tertiary-color-dark);
+  border: 2px solid var(--tertiary-color);
+  background-color: transparent;
+  color: var(--tertiary-color);
+  transform: translateY(-2px);
 }

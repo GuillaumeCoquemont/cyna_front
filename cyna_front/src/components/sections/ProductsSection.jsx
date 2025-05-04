@@ -5,65 +5,11 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import carrouselElements from '../dashboard/CarrousselElements';
 
 // Carousel de produits
 const ProductsSection = () => {
-  const products = [
-    {
-      id: 1,
-      image: '/path/to/product1.jpg',
-      name: 'Solution Antivirus Pro',
-      description: 'Protection avancée contre les malwares',
-      characteristic: 'Détection en temps réel',
-      price: '£95.00',
-      availability: 'En stock'
-    },
-    {
-      id: 2,
-      image: '/path/to/product2.jpg',
-      name: 'Firewall Enterprise',
-      description: 'Sécurité réseau complète',
-      characteristic: 'Protection périmétrique avancée',
-      price: '£120.00',
-      availability: 'En stock'
-    },
-    {
-      id: 3,
-      image: '/path/to/product3.jpg',
-      name: 'Audit de Sécurité',
-      description: 'Analyse complète de votre infrastructure',
-      characteristic: 'Rapport détaillé et recommandations',
-      price: '£150.00',
-      availability: 'Sur demande'
-    },
-    {
-      id: 4,
-      image: '/path/to/product4.jpg',
-      name: 'VPN Secure Connect',
-      description: 'Navigation anonyme et sécurisée',
-      characteristic: 'Chiffrement 256-bit',
-      price: '£80.00',
-      availability: 'En stock'
-    },
-    {
-      id: 5,
-      image: '/path/to/product5.jpg',
-      name: 'Gestionnaire de mots de passe',
-      description: 'Sécurisez et centralisez vos identifiants',
-      characteristic: 'Authentification multi-facteurs',
-      price: '£50.00',
-      availability: 'En stock'
-    },
-    {
-      id: 6,
-      image: '/path/to/product6.jpg',
-      name: 'Formation cybersécurité',
-      description: 'Sensibilisation des équipes aux risques',
-      characteristic: 'Modules interactifs en ligne',
-      price: '£200.00',
-      availability: 'Sur demande'
-    }
-  ];
+  const products = carrouselElements;
 
   return (
     <section className={styles.productsSection}>
@@ -71,6 +17,7 @@ const ProductsSection = () => {
         <h2 className={styles.bannerTitle}>
           Découvrez <span className={styles.highlight}>nos solutions 360 de cybersécurité </span>pour les PME
         </h2>
+        <h4 className={styles.subtitle}>Cyna s’adapte à vos besoins et vous propose un accompagnement dans la protection globale de votre SI.</h4>
       </div>
 
       <div className={styles.carouselContainer}>
