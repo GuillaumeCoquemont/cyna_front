@@ -1,0 +1,163 @@
+.servicesSection {
+  color: #ffffff;
+  text-align: left;
+  background-color: var(--primary-color);
+  color: #ffffff;
+  padding: 0 1rem 2rem 1rem;
+}
+
+.title {
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.75);
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media(min-width: 768px) {
+  .cards {
+    flex-direction: row;
+  }
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  background-color: var(--primary-color);
+  color: #ffffff;
+  padding: 1rem;
+}
+
+.cardIcon {
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.cardHeader h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+}
+
+@media(min-width: 768px) {
+  .cardContent {
+    flex-direction: row;
+    min-height: 200px;
+  }
+}
+
+.text {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.subtitleItem {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.text p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.image {
+  flex: 1;
+  overflow: hidden;
+}
+
+.image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.serviceRow {
+  border: 1px solid #ffffff;
+  margin-bottom: 1.5rem;
+}
+
+.serviceHeader {
+  background-color: #ffffff;
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+}
+
+.serviceContent {
+  display: flex;
+  flex-wrap: nowrap;
+  min-height: 200px;
+}
+
+.textBlock {
+  flex: 1;
+  background-color: var(--primary-color);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.textBlock p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.imageBlock {
+  flex: 1;
+  overflow: hidden;
+}
+
+.imageBlock img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .serviceContent {
+    flex-direction: column;
+  }
+}
+
+.headerGroup {
+  text-align: center;
+  background-color: var(--tertiary-color);
+  margin: 0 -1rem 1rem -1rem;
+  padding: 1rem 0;
+}
