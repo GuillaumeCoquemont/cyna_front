@@ -7,7 +7,7 @@
 }
 
 .sidebar {
-  background-color: #FFFFFF;
+  background-color: var(--white-color);
   padding: 2rem 1rem;
   border-right: 1px solid #E3E6F0;
 }
@@ -30,7 +30,7 @@
   padding: 0.75rem 1rem;
   border-radius: 0.35rem;
   cursor: pointer;
-  color: #5A5C69;
+  color: var(--text-color);
   font-size: 0.9rem;
   transition: background-color 0.2s, color 0.2s;
 }
@@ -60,7 +60,7 @@
 
 .statCard {
   position: relative;
-  background-color: #FFFFFF;
+  background-color: var(--white-color);
   padding: 1.5rem;
   border-radius: 0.35rem;
   box-shadow: 0 0 15px rgba(58, 59, 69, 0.15);
@@ -68,7 +68,7 @@
 
 .statCard h3 {
   font-size: 0.8rem;
-  color: #858796;
+  color: var(--text-color-light);
   margin: 0;
   text-transform: uppercase;
 }
@@ -82,7 +82,7 @@
 
 /* Graph */
 .chartContainer {
-  background-color: #FFFFFF;
+  background-color: var(--white-color);
   padding: 1.5rem;
   border: 1px solid #E3E6F0;
   border-radius: 0.35rem;
@@ -97,7 +97,7 @@
 table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #FFFFFF;
+  background-color: var(--white-color);
 }
 
 thead {
@@ -106,7 +106,7 @@ thead {
 
 th, td {
   padding: 1rem 0.75rem;
-  color: #5A5C69;
+  color: var(--text-color);
   font-size: 0.85rem;
   text-align: left;
 }
