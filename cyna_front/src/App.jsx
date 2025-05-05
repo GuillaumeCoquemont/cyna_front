@@ -8,6 +8,7 @@ import AuthPage from "./pages/AuthPage";
 import Layout from "./components/layout/Layout";
 import Contact from "./pages/Contact";
 import Discover from "./pages/Discover";
+import DashboardClient from "./pages/DashboardClient";
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/dashboard" element={<DashboardAdmin />} />
+          <Route path ="/dashboardClient" element={<DashboardClient/>} />
           <Route path="/discover" element={<Discover />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="contact" element={<Contact />} />
