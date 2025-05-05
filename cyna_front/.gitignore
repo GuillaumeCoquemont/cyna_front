@@ -22,4 +22,5 @@ yarn-error.log*
 
 # IDE
 .idea/
-.vscode/ 
+.vscode/ .DS_Store
+.DS_Store
