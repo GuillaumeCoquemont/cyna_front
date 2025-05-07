@@ -1,0 +1,41 @@
+/* src/styles/components/produitDetails/ProductTabs.module.css */
+.tabs {
+    margin-top: 2rem;
+  }
+  
+  .headers {
+    display: flex;
+    gap: 1rem;
+    border-bottom: 2px solid var(--border-color);
+  }
+  
+  .headers button {
+    background: none;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--text-muted);
+  }
+  
+  .headers button.active {
+    color: var(--primary-color);
+    border-bottom: 3px solid var(--primary-color);
+  }
+  
+  .content {
+    padding: 1rem 0;
+    color: var(--text-color);
+  }
+  
+  .reviewList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .reviewList li {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+  }

@@ -24,7 +24,8 @@ import styles from '../styles/pages/DashboardAdmin.module.css';
 import { Link } from 'react-router-dom';
 import DashboardMessage from '../components/dashboard/DashboardMessage';
 import DashboardProducts from '../components/dashboard/DashboardProducts';
-import { CarrouselEditor } from '../components/dashboard/CarrousselElements';
+import { CarrouselEditor } from '../components/dashboard/DashboardCarrousselElements';
+import DashboardCodePromo from '../components/dashboard/DashboardCodePromo';
 
 export default function DashboardAdmin() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -44,6 +45,7 @@ export default function DashboardAdmin() {
     { key: 'ui', label: 'Carroussel' },
     { key: 'team', label: 'Team' },
     { key: 'params', label: 'Paramètres' },
+    { key: 'code', label: 'Code Promo' },
   ];
 
   const chartData = {
@@ -146,6 +148,12 @@ export default function DashboardAdmin() {
           return (
             <div className={styles.dashboardContent}>
               <CarrouselEditor />
+            </div>
+          );
+          case 'code':
+          return (
+            <div className={styles.dashboardContent}>
+              <DashboardCodePromo />
             </div>
           );
       default:

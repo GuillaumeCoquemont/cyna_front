@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "../components/layout/Header";
 import HeroSection from "../components/sections/HeroSection";
 import ProductsPreviewSection from "../components/sections/ProductsPreviewSection";
 import styles from "../styles/components/Landing/LandingPage.module.css";

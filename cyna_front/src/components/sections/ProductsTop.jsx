@@ -19,7 +19,12 @@ const ProductsTop = () => {
 
       <div className={styles.productsGrid}>
         {topProducts.map((product) => (
-          <div key={product.id} className={styles.productCard}>
+          <Link
+            key={product.id}
+            to={`/product/${product.id}`}
+            className={styles.productLink}
+          >
+            <div className={styles.productCard}>
             <div className={styles.productImage}>
               {product.isNew && (
                 <span className={`${styles.label} ${styles.labelNew}`}>Nouveau</span>
@@ -34,7 +39,8 @@ const ProductsTop = () => {
               <p className={styles.productDesc}>{product.description}</p>
               <p className={styles.price}>${product.price.toFixed(2)}</p>
             </div>
-          </div>
+            </div>
+          </Link>
         ))}
       </div>
     </section>

@@ -1,11 +1,12 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styles from '../../styles/components/sections/ProductsSection.module.css';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import carrouselElements from '../dashboard/CarrousselElements';
+import carrouselElements from '../dashboard/DashboardCarrousselElements';
 
 // Carousel de produits
 const ProductsSection = () => {
@@ -44,21 +45,26 @@ const ProductsSection = () => {
         >
           {products.map((product) => (
             <SwiperSlide key={product.id}>
-              <div className={styles.productCard}>
-                <div className={styles.productImage}>
-                  <img src={product.image} alt={product.name} />
+              <Link
+                to={`/product/${product.id}`}
+                className={styles.productLink}
+              >
+                <div className={styles.productCard}>
+                  <div className={styles.productImage}>
+                    <img src={product.image} alt={product.name} />
+                  </div>
+                  <div className={styles.productInfo}>
+                    <h3 className={styles.productName}>{product.name}</h3>
+                    <p className={styles.productDescription}>{product.description}</p>
+                    <p className={styles.productCharacteristic}>{product.characteristic}</p>
+                    <p className={styles.productPrice}>{product.price}</p>
+                    <p className={styles.productAvailability}>{product.availability}</p>
+                    <button className={styles.addToCartButton}>
+                      Ajouter au panier
+                    </button>
+                  </div>
                 </div>
-                <div className={styles.productInfo}>
-                  <h3 className={styles.productName}>{product.name}</h3>
-                  <p className={styles.productDescription}>{product.description}</p>
-                  <p className={styles.productCharacteristic}>{product.characteristic}</p>
-                  <p className={styles.productPrice}>{product.price}</p>
-                  <p className={styles.productAvailability}>{product.availability}</p>
-                  <button className={styles.addToCartButton}>
-                    Ajouter au panier
-                  </button>
-                </div>
-              </div>
+              </Link>
             </SwiperSlide>
           ))}
         </Swiper>

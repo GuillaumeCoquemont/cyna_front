@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import styles from '../styles/pages/ProductsPage.module.css';
-import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
+
 
 const ProductsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -142,20 +142,30 @@ const ProductsPage = () => {
 
           <div className={styles.productsGrid}>
             {displayedProducts.map((product) => (
-              <div key={product.id} className={styles.productCard}>
-                <div className={styles.productImage}>
-                  {product.discount && (
-                    <span className={styles.saleTag}>-{product.discount}%</span>
-                  )}
+              <Link
+                key={product.id}
+                to={`/product/${product.id}`}
+                className={styles.productLink}
+              >
+                <div className={styles.productCard}>
+                  <div className={styles.productImage}>
+                    {product.discount && (
+                      <span className={styles.saleTag}>-{product.discount}%</span>
+                    )}
+                  </div>
+                  <div className={styles.productInfo}>
+                    <h3 className={styles.productTitle}>{product.title}</h3>
+                    <p className={styles.productPrice}>${product.price.toFixed(2)}</p>
+                    <button
+                      className={styles.addToCartButton}
+                      onClick={e => e.stopPropagation()}
+                      aria-label="Ajouter au panier"
+                    >
+                      <i className="fas fa-shopping-cart"></i>
+                    </button>
+                  </div>
                 </div>
-                <div className={styles.productInfo}>
-                  <h3 className={styles.productTitle}>{product.title}</h3>
-                  <p className={styles.productPrice}>${product.price.toFixed(2)}</p>
-                  <button className={styles.addToCartButton}>
-                    <i className="fas fa-shopping-cart"></i>
-                  </button>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
 
@@ -179,4 +189,4 @@ const ProductsPage = () => {
   );
 };
 
-export default ProductsPage; 
+export default ProductsPage;

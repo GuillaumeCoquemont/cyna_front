@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from '../../styles/components/sections/ProductsPreviewSection.module.css';
-import carrouselElements from '../dashboard/CarrousselElements';
 
 const ProductsPreviewSection = () => {
   const [searchTerm, setSearchTerm] = useState("");

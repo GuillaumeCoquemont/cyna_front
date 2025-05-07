@@ -9,6 +9,7 @@ import Layout from "./components/layout/Layout";
 import Contact from "./pages/Contact";
 import Discover from "./pages/Discover";
 import DashboardClient from "./pages/DashboardClient";
+import ProductDetails from "./pages/ProductDetails";
 
 const App = () => {
   return (
@@ -20,8 +21,9 @@ const App = () => {
           <Route path="/dashboard" element={<DashboardAdmin />} />
           <Route path ="/dashboardClient" element={<DashboardClient/>} />
           <Route path="/discover" element={<Discover />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/auth" element={<AuthPage />} />
-          <Route path="contact" element={<Contact />} />
+          <Route path="/contact" element={<Contact />} />
         </Routes>
       </Layout>
     </BrowserRouter>
