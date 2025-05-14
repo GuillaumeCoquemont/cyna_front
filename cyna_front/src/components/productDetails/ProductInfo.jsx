@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   FaStar,
@@ -7,9 +6,11 @@ import {
   FaShoppingCart,
   FaCreditCard
 } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import styles from '../../styles/components/productDetails/ProductInfo.module.css';
 
-const ProductInfo = ({ product, quantity, setQuantity }) => {
+const ProductInfo = ({ product, quantity, setQuantity, addToCart }) => {
+  const navigate = useNavigate();
   return (
     <div className={styles.info}>
       <h1 className={styles.title}>{product.name}</h1>
@@ -45,10 +46,21 @@ const ProductInfo = ({ product, quantity, setQuantity }) => {
             <FaPlus />
           </button>
         </div>
-        <button className={styles.addToCart}>
+        <button
+          className={styles.addToCart}
+          onClick={() => {
+            addToCart(product, quantity);
+          }}
+        >
           <FaShoppingCart /> Ajouter au panier
         </button>
-        <button className={styles.buyNow}>
+        <button
+          className={styles.buyNow}
+          onClick={() => {
+            addToCart(product, quantity);
+            navigate('/checkout');
+          }}
+        >
           <FaCreditCard /> Acheter maintenant
         </button>
       </div>

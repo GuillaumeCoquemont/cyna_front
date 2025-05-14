@@ -1,15 +1,19 @@
+/* Footer.module.css */
+
+/* Partie haute du footer */
 .footer {
   background-color: var(--primary-color);
   color: white;
-  padding: 60px 40px 20px;
-  display: block;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .footerContent {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--secondary-color);
+  grid-template-columns: repeat(4, 1fr);
+  padding: 20px 80px;
   gap: 40px;
-  margin-bottom: 40px;
 }
 
 .footerSection h3 {
@@ -39,6 +43,7 @@
   color: #E6A17B;
 }
 
+/* Newsletter */
 .newsletterForm {
   display: flex;
   gap: 10px;
@@ -62,60 +67,67 @@
   background-color: var(--tertiary-color);
   border: none;
   border-radius: 4px;
-  color: white;
+  color: var(--secondary-color);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: border 0.3s ease;
 }
 
 .submitButton:hover {
-  background-color: none;
   border: 2px solid var(--tertiary-color);
 }
 
+/* Partie basse du footer */
 .footerBottom {
+  background-color: var(--secondary-color); /* blanc */
+  color: var(--primary-color);               /* bleu principal */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 2rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* Logo */
 .footerLogo img {
   height: 40px;
 }
 
-.footerLinks {
+/* Liens CGU / Mentions Légales */
+.footerBottom .footerLinks {
   display: flex;
   gap: 20px;
 }
 
-.footerLinks a {
-  color: white;
+.footerBottom .footerLinks a {
+  color: var(--primary-color);
   text-decoration: none;
   font-size: 14px;
+  font-weight: 500;
   transition: color 0.3s ease;
 }
 
-.footerLinks a:hover {
-  color: #E6A17B;
+.footerBottom .footerLinks a:hover {
+  text-decoration: underline;
 }
 
-.socialLinks {
+/* Réseaux sociaux */
+.footerBottom .socialLinks {
   display: flex;
   gap: 15px;
 }
 
-.socialLinks a {
-  color: white;
-  text-decoration: none;
+.footerBottom .socialLinks a {
+  color: var(--primary-color);
   font-size: 20px;
-  transition: color 0.3s ease;
+  transition: opacity 0.3s ease;
 }
 
-.socialLinks a:hover {
-  color: #E6A17B;
+.footerBottom .socialLinks a:hover {
+  opacity: 0.7;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
   .footerContent {
     grid-template-columns: repeat(2, 1fr);
@@ -127,14 +139,11 @@
     text-align: center;
   }
   
-  .footerLinks {
+  .footerBottom .footerLinks {
     flex-direction: column;
     gap: 10px;
   }
 
-  .footer {
-    display: none; /* Cache le footer en version mobile */
-  }
 }
 
 @media (max-width: 480px) {

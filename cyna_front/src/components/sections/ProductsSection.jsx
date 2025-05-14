@@ -1,4 +1,5 @@
 import React from 'react';
+import { useCart } from '../../context/CartContext';
 import { Link } from 'react-router-dom';
 import styles from '../../styles/components/sections/ProductsSection.module.css';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -11,6 +12,7 @@ import carrouselElements from '../dashboard/DashboardCarrousselElements';
 // Carousel de produits
 const ProductsSection = () => {
   const products = carrouselElements;
+  const { addToCart } = useCart();
 
   return (
     <section className={styles.productsSection}>
@@ -59,7 +61,14 @@ const ProductsSection = () => {
                     <p className={styles.productCharacteristic}>{product.characteristic}</p>
                     <p className={styles.productPrice}>{product.price}</p>
                     <p className={styles.productAvailability}>{product.availability}</p>
-                    <button className={styles.addToCartButton}>
+                    <button
+                      className={styles.addToCartButton}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        addToCart(product, 1);
+                      }}
+                    >
                       Ajouter au panier
                     </button>
                   </div>

@@ -1,5 +1,6 @@
 .productsSection {
   background-color: var(--white-color);
+  
 }
 
 .banner {
@@ -195,5 +196,9 @@
   }
 }
 
-
-
+.productLink {
+  text-decoration: none;
+}
+.productLink:hover {
+  text-decoration: none;
+}

@@ -1,4 +1,5 @@
 import React from "react";
+import { CartProvider } from "./context/CartContext";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import "./styles/global.css";
@@ -10,22 +11,26 @@ import Contact from "./pages/Contact";
 import Discover from "./pages/Discover";
 import DashboardClient from "./pages/DashboardClient";
 import ProductDetails from "./pages/ProductDetails";
+import CheckoutPage from "./pages/CheckoutPage";
 
 const App = () => {
   return (
     <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/dashboard" element={<DashboardAdmin />} />
-          <Route path ="/dashboardClient" element={<DashboardClient/>} />
-          <Route path="/discover" element={<Discover />} />
-          <Route path="/product/:id" element={<ProductDetails />} />
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/contact" element={<Contact />} />
-        </Routes>
-      </Layout>
+      <CartProvider>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/dashboard" element={<DashboardAdmin />} />
+            <Route path ="/dashboardClient" element={<DashboardClient/>} />
+            <Route path="/discover" element={<Discover />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/contact" element={<Contact />} />
+          </Routes>
+        </Layout>
+      </CartProvider>
     </BrowserRouter>
   );
 };

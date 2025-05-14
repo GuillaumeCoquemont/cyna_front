@@ -16,18 +16,28 @@ const Footer = () => {
     <footer className={styles.footer}>
       <div className={styles.footerContent}>
         <div className={styles.footerSection}>
-          <h3>Catégories</h3>
+          <h3>Services</h3>
           <ul>
-            <li><Link to="/categorie-1">Catégorie 1</Link></li>
-            <li><Link to="/categorie-2">Catégorie 2</Link></li>
-            <li><Link to="/categorie-3">Catégorie 3</Link></li>
-            <li><Link to="/categorie-4">Catégorie 4</Link></li>
+            <li><Link to="/categorie-1">Services 1</Link></li>
+            <li><Link to="/categorie-2">Services 2</Link></li>
+            <li><Link to="/categorie-3">Services 3</Link></li>
+            <li><Link to="/categorie-4">Services 4</Link></li>
+          </ul>
+        </div>
+        <div className={styles.footerSection}>
+          <h3>Produits</h3>
+          <ul>
+            <li><Link to="/categorie-1">Produits 1</Link></li>
+            <li><Link to="/categorie-2">Produits 2</Link></li>
+            <li><Link to="/categorie-3">Produits 3</Link></li>
+            <li><Link to="/categorie-4">Produits 4</Link></li>
           </ul>
         </div>
         <div className={styles.footerSection}>
           <h3>Entreprise</h3>
           <ul>
-            <li><Link to="/notre-equipe">Notre équipe</Link></li>
+            <li><Link to="/discover">Découvrir</Link></li>
+            <li><Link to="/products">Nos produits</Link></li>
             <li><Link to="/contact">Contact us</Link></li>
           </ul>
         </div>

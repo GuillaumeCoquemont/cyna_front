@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
+import CartDropdown from "./CartDropDown";
 import styles from "../../styles/components/Header/Header.module.css";
 
 const Header = () => {
+  const { totalItems } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const toggleCart = () => setIsCartOpen(o => !o);
   const menuRef = useRef(null);
   const dropdownRef = useRef(null);
 
@@ -109,9 +114,13 @@ const Header = () => {
           <Link to="/auth" onClick={handleLinkClick} aria-label="Connexion">
             <i className="fas fa-user"></i>
           </Link>
-          <a href="#cart" aria-label="Panier">
+          <div className={styles.cartLink} onClick={toggleCart} aria-label="Panier">
             <i className="fas fa-shopping-cart"></i>
-          </a>
+            {totalItems > 0 && (
+              <span className={styles.cartBadge}>{totalItems}</span>
+            )}
+          </div>
+          {isCartOpen && <CartDropdown />}
         </div>
 
         <div className={`${styles.searchBarContainer} ${isSearchVisible ? styles.visible : ''}`}>

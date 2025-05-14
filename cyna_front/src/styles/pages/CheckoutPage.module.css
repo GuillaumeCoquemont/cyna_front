@@ -1,0 +1,32 @@
+
+.container > h1 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.container {
+  width: 100%;
+  padding: 2rem;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  min-height: calc(100vh - var(--header-height) - 100px); /* adjust for header/footer */
+  border-radius: 8px;
+}
+.layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+.left  { flex: 2; 
+         padding: 1.5rem;
+         background: var(--primary-color);
+         border-radius: 8px;
+}
+.right { flex: 1; 
+         padding: 1.5rem;
+         background: var(--primary-color);
+         border-radius: 8px;
+}
+@media (max-width: 768px) {
+  .layout { flex-direction: column; }
+}

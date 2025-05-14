@@ -1,5 +1,6 @@
 // src/pages/ProductDetails.jsx
 import React, { useState } from 'react';
+import { useCart } from '../context/CartContext';
 import ProductGallery from '../components/productDetails/ProductGallery';
 import ProductInfo    from '../components/productDetails/ProductInfo';
 import ProductTabs    from '../components/productDetails/ProductTabs';
@@ -11,11 +12,12 @@ import prod2 from '../assets/images/prod2.jpg';
 import prod3 from '../assets/images/prod3.jpg';
 
 const ProductDetails = () => {
+  const { addToCart } = useCart();
   const sampleProduct = {
     name: 'Nom du produit',
     price: '54,98€',
     rating: 4.5,
-    reviews: 32,
+    reviews: 2,
     shortDescription: 'Courte description du produit ici.',
     features: ['Lorem ipsum dolor sit amet, consectetuer adipi ', 'Lorem ipsum dolor sit amet, consectetuer adipi scing elit', 'Lorem ipsum dolor sit amet, consectetuer adipi scing elit, '],
     longDescription: `Lorem ipsum dolor sit amet, consectetuer adipi scing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magn. Lorem ipsum dolor sit amet, consectetuer adipi scing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magn.`,
@@ -40,6 +42,7 @@ const ProductDetails = () => {
           product={sampleProduct}
           quantity={quantity}
           setQuantity={setQuantity}
+          addToCart={addToCart}
         />
       </section>
       <section className={styles.tabsSection}>

@@ -116,3 +116,13 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Remove link underlines in top products section */
+.productsGrid a,
+.sectionHeader a {
+  text-decoration: none;
+}
+.productsGrid a:hover,
+.sectionHeader a:hover {
+  text-decoration: none;
+}

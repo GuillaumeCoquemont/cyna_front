@@ -15,7 +15,7 @@ const HeroSection = () => {
           <Link to="/contact" className={`${styles.button} ${styles.primaryButton}`}>
             Contact
           </Link>
-          <Link to="/decouvrir" className={`${styles.button} ${styles.primaryButton}`}>
+          <Link to="/discover" className={`${styles.button} ${styles.primaryButton}`}>
             Découvrir
           </Link>
         </div>

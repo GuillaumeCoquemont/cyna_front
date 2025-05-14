@@ -1,0 +1,132 @@
+/* CartSummary.module.css */
+
+.cartSummary {
+  border: 1px solid var(--white-color);
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  color: var(--white-color);
+}
+
+.cartSummary ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cartSummary .item {
+  display: grid;
+  grid-template-columns: 80px 2fr 1fr 1fr 1fr 40px;
+  align-items: center;
+  justify-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.cartSummary .item:last-child {
+  border-bottom: none;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.cartSummary .thumb {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.cartSummary .details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cartSummary .name {
+  justify-self: start;
+  font-weight: 500;
+    color: var(--white-color);
+  margin-bottom: 0.25rem;
+}
+
+.cartSummary .qty {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.cartSummary .total {
+  font-weight: 600;
+  color: var(--white-color);
+  min-width: 60px;
+  text-align: right;
+}
+
+.headerRow {
+  display: grid;
+  grid-template-columns: 80px 2fr 1fr 1fr 1fr 40px;
+  align-items: center;
+  justify-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  background-color: var(--white-color);
+  color: var(--primary-color);
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cartSummary {
+    padding: 1rem;
+  }
+  .cartSummary .item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .cartSummary .thumb {
+    margin-bottom: 0.5rem;
+  }
+  .cartSummary .total {
+    margin-left: 0;
+    margin-top: 0.5rem;
+    text-align: left;
+  }
+}
+/* Quantity controls - pill-shaped white outline buttons */
+.qtyControls {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.25rem 1rem;
+  border: 2px solid var(--white-color);
+  border-radius: 999px;
+}
+
+.qtyControls button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--white-color);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+/* Remove (delete) button styling */
+.removeBtn {
+  background: none;
+  border: none;
+  color: var(--tertiary-color);
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.removeBtn:hover {
+  color: var(--text-color);
+}
+
+.qtyValue {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
