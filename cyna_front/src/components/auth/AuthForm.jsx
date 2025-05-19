@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from '../../styles/components/auth/AuthForm.module.css';
+import { AuthContext } from '../../context/AuthContext';
+import { login as apiLogin, register as apiRegister } from '../../api/auth';
 
 const AuthForm = () => {
+  const { signIn } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('login');
   const [formData, setFormData] = useState({
     email: '',
@@ -18,14 +23,40 @@ const AuthForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (activeTab === 'register' && formData.password !== formData.confirmPassword) {
-      alert('Les mots de passe ne correspondent pas');
-      return;
+    if (activeTab === 'register') {
+      if (formData.password !== formData.confirmPassword) {
+        alert('Les mots de passe ne correspondent pas');
+        return;
+      }
+      try {
+        // Register the user
+        await apiRegister({
+          username: formData.email,
+          password: formData.password
+        });
+        // Then log in
+        const me = await signIn({ username: formData.email, password: formData.password });
+        // Redirect based on role
+        if (me.role === 'admin') navigate('/dashboard');
+        else navigate('/dashboardClient');
+      } catch (err) {
+        console.error('Erreur lors de l\'inscription :', err);
+        alert('Échec de l\'inscription');
+      }
+    } else {
+      try {
+        // Log in the user
+        const me = await signIn({ username: formData.email, password: formData.password });
+        // Redirect based on role
+        if (me.role === 'admin') navigate('/dashboard');
+        else navigate('/dashboardClient');
+      } catch (err) {
+        console.error('Erreur lors de la connexion :', err);
+        alert('Identifiants invalides');
+      }
     }
-    // Ici, vous ajouterez la logique d'authentification
-    console.log('Form submitted:', formData);
   };
 
   return (
@@ -59,7 +90,6 @@ const AuthForm = () => {
             />
           </div>
         )}
-
         <div className={styles.formGroup}>
           <label htmlFor="email">Email</label>
           <input
@@ -71,7 +101,6 @@ const AuthForm = () => {
             required
           />
         </div>
-
         <div className={styles.formGroup}>
           <label htmlFor="password">Mot de passe</label>
           <input
@@ -83,7 +112,6 @@ const AuthForm = () => {
             required
           />
         </div>
-
         {activeTab === 'register' && (
           <div className={styles.formGroup}>
             <label htmlFor="confirmPassword">Confirmer le mot de passe</label>
@@ -97,7 +125,6 @@ const AuthForm = () => {
             />
           </div>
         )}
-
         <button type="submit" className={styles.submitButton}>
           {activeTab === 'login' ? 'Se connecter' : "S'inscrire"}
         </button>
@@ -106,4 +133,4 @@ const AuthForm = () => {
   );
 };
 
-export default AuthForm; 
+export default AuthForm;

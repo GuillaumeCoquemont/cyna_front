@@ -1,0 +1,38 @@
+[
+  {
+    "product_id": 1,
+    "order": 4
+  },
+  {
+    "product_id": 2,
+    "order": 2
+  },
+  {
+    "product_id": 3,
+    "order": 3
+  },
+  {
+    "product_id": 4,
+    "order": 1
+  },
+  {
+    "product_id": 5,
+    "order": 5
+  },
+  {
+    "product_id": 6,
+    "order": 6
+  },
+  {
+    "product_id": 7,
+    "order": 7
+  },
+  {
+    "product_id": 8,
+    "order": 8
+  },
+  {
+    "product_id": 9,
+    "order": 9
+  }
+]

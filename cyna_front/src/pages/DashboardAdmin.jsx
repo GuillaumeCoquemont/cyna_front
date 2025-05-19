@@ -26,6 +26,7 @@ import DashboardMessage from '../components/dashboard/DashboardMessage';
 import DashboardProducts from '../components/dashboard/DashboardProducts';
 import { CarrouselEditor } from '../components/dashboard/DashboardCarrousselElements';
 import DashboardCodePromo from '../components/dashboard/DashboardCodePromo';
+import DashboardServices from '../components/dashboard/DashboardServices';
 
 export default function DashboardAdmin() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -46,6 +47,7 @@ export default function DashboardAdmin() {
     { key: 'team', label: 'Team' },
     { key: 'params', label: 'Paramètres' },
     { key: 'code', label: 'Code Promo' },
+    { key: 'services', label: 'Services' },
   ];
 
   const chartData = {
@@ -156,6 +158,12 @@ export default function DashboardAdmin() {
               <DashboardCodePromo />
             </div>
           );
+      case 'services':
+        return (
+          <div className={styles.dashboardContent}>
+            <DashboardServices />
+          </div>
+        );
       default:
         return (
           <div className={styles.dashboardContent}>

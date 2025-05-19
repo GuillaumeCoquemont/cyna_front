@@ -1,58 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from '../../styles/components/sections/ProductsPreviewSection.module.css';
+import { fetchProducts } from '../../api/products';
 
 const ProductsPreviewSection = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState(null);
 
-  const featuredProducts = [
-    {
-      id: 1,
-      title: 'Antivirus Pro',
-      description: 'Protection avancée contre les malwares',
-      price: 199.99,
-      discount: 15,
-      category: 'Protection'
-    },
-    {
-      id: 2,
-      title: 'Firewall Enterprise',
-      description: 'Sécurité réseau complète',
-      price: 299.99,
-      category: 'Réseau'
-    },
-    {
-      id: 3,
-      title: 'VPN Secure',
-      description: 'Navigation sécurisée et privée',
-      price: 149.99,
-      discount: 20,
-      category: 'Protection'
-    },
-    {
-      id: 4,
-      title: 'Email Shield',
-      description: 'Protection contre le phishing et les spams',
-      price: 99.99,
-      category: 'Communication'
-    },
-    {
-      id: 5,
-      title: 'Data Backup',
-      description: 'Sauvegarde automatique de vos fichiers critiques',
-      price: 129.99,
-      discount: 10,
-      category: 'Stockage'
-    },
-    {
-      id: 6,
-      title: 'Endpoint Defender',
-      description: 'Sécurisation des appareils connectés',
-      price: 179.99,
-      category: 'Appareils'
-    }
-  ];
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+
+  useEffect(() => {
+    fetchProducts()
+      .then(data => setFeaturedProducts(data))
+      .catch(err => console.error('Erreur fetchProducts:', err));
+  }, []);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -64,7 +25,7 @@ const ProductsPreviewSection = () => {
 
   const filteredProducts = featuredProducts
     .filter((product) =>
-      product.title.toLowerCase().includes(searchTerm.toLowerCase())
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => {
       if (sortOrder === "asc") return a.price - b.price;
@@ -104,13 +65,13 @@ const ProductsPreviewSection = () => {
             </div>
             <div className={styles.productInfo}>
               <span className={styles.category}>{product.category}</span>
-              <h3 className={styles.productTitle}>{product.title}</h3>
+              <h3 className={styles.productTitle}>{product.name}</h3>
               <p className={styles.description}>{product.description}</p>
               <div className={styles.priceContainer}>
-                <span className={styles.price}>${product.price.toFixed(2)}</span>
-                {product.discount && (
+                <span className={styles.price}>${product.price != null ? product.price.toFixed(2) : '0.00'}</span>
+                {product.price != null && product.discount && (
                   <span className={styles.originalPrice}>
-                    ${(product.price / (1 - product.discount / 100)).toFixed(2)}
+                    ${((product.price / (1 - product.discount / 100)) || 0).toFixed(2)}
                   </span>
                 )}
               </div>

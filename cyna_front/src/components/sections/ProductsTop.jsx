@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from '../../styles/components/sections/ProductsTop.module.css';
+import { fetchProducts } from '../../api/products';
 
 
 const ProductsTop = () => {
-  const topProducts = [
-    { id: 1, title: 'Produit A', description: 'Description du produit A', price: 49.99, isNew: true, isTrending: false },
-    { id: 2, title: 'Produit B', description: 'Description du produit B', price: 59.99, isNew: false, isTrending: true },
-    { id: 3, title: 'Produit C', description: 'Description du produit C', price: 39.99, isNew: true, isTrending: true },
-    // Ajoutez d'autres produits au besoin
-  ];
+  const [topProducts, setTopProducts] = useState([]);
+
+  useEffect(() => {
+    fetchProducts()
+      .then(data => setTopProducts(data))
+      .catch(err => console.error('Erreur fetchProducts:', err));
+  }, []);
 
   return (
     <section className={styles.topSection}>
@@ -32,12 +34,14 @@ const ProductsTop = () => {
               {product.isTrending && (
                 <span className={`${styles.label} ${styles.labelTrending}`}>Produit du moment</span>
               )}
-              {/* À remplacer par <img src={...} alt={product.title} /> */}
+              <img src={product.image} alt={product.name} className={styles.productImageTag} />
             </div>
             <div className={styles.productInfo}>
-              <h3 className={styles.productTitle}>{product.title}</h3>
+              <h3 className={styles.productTitle}>{product.name}</h3>
               <p className={styles.productDesc}>{product.description}</p>
-              <p className={styles.price}>${product.price.toFixed(2)}</p>
+              <p className={styles.price}>
+  ${product.price != null ? product.price.toFixed(2) : '0.00'}
+</p>
             </div>
             </div>
           </Link>

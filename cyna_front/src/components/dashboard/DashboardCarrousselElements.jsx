@@ -1,161 +1,158 @@
 // This file contains the data for the carrousel elements in the dashboard.
 import styles from '../../styles/components/dashboard/DashboardCarrousselElement.module.css';
 
-const carrouselElements = [
-    {
-        id: 1,
-        order: 1,
-        image: '/path/to/product1.jpg',
-        name: 'Solution Antivirus Pro',
-        description: 'Protection avancée contre les malwares',
-        characteristic: 'Détection en temps réel',
-        price: '£905.00',
-        availability: 'En stock'
-      },
-      {
-        id: 2,
-        order: 2,
-        image: '/path/to/product2.jpg',
-        name: 'Firewall Enterprise',
-        description: 'Sécurité réseau complète',
-        characteristic: 'Protection périmétrique avancée',
-        price: '£120.00',
-        availability: 'En stock'
-      },
-      {
-        id: 3,
-        order: 3,
-        image: '/path/to/product3.jpg',
-        name: 'Audit de Sécurité',
-        description: 'Analyse complète de votre infrastructure',
-        characteristic: 'Rapport détaillé et recommandations',
-        price: '£150.00',
-        availability: 'Sur demande'
-      },
-      {
-        id: 4,
-        order: 4,
-        image: '/path/to/product4.jpg',
-        name: 'VPN Secure Connect',
-        description: 'Navigation anonyme et sécurisée',
-        characteristic: 'Chiffrement 256-bit',
-        price: '£80.00',
-        availability: 'En stock'
-      },
-      {
-        id: 5,
-        order: 5,
-        image: '/path/to/product5.jpg',
-        name: 'Gestionnaire de mots de passe',
-        description: 'Sécurisez et centralisez vos identifiants',
-        characteristic: 'Authentification multi-facteurs',
-        price: '£50.00',
-        availability: 'En stock'
-      },
-      {
-        id: 6,
-        order: 6,
-        image: '/path/to/product6.jpg',
-        name: 'Formation cybersécurité',
-        description: 'Sensibilisation des équipes aux risques',
-        characteristic: 'Modules interactifs en ligne',
-        price: '£200.00',
-        availability: 'Sur demande'
-      }
-    ];
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import EditCarouselItemModal from '../modals/EditCarouselItemModal';
+import AddCarouselItemModal from '../modals/AddCarouselItemModal';
+import { fetchProducts } from '../../api/products';
+import { fetchCarousel } from '../../api/carousel';
 
 export const CarrouselEditor = () => {
-  const [elements, setElements] = useState(carrouselElements);
+  const [elements, setElements] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  // Charger la config du carousel + produits
+  useEffect(() => {
+    Promise.all([fetchCarousel(), fetchProducts()])
+      .then(([carouselConfig, products]) => {
+        const merged = carouselConfig
+          .map(c => {
+            // c.product_id comes from carousel.json
+            const prod = products.find(p => p.id === c.product_id);
+            return prod ? { ...prod, order: c.order } : null;
+          })
+          .filter(Boolean)
+          .sort((a, b) => a.order - b.order);
+        setElements(merged);
+      })
+      .catch(err => console.error('Erreur chargement carrousel:', err));
+  }, []);
+
+  // Charger tous les produits pour le select d’ajout
+  useEffect(() => {
+    fetchProducts()
+      .then(data => setAllProducts(data))
+      .catch(err => console.error('Erreur fetchProducts allProducts:', err));
+  }, []);
 
   const handleChange = (id, field, value) => {
-    setElements(prevElements =>
-      prevElements.map(el => el.id === id ? { ...el, [field]: value } : el)
+    setElements(prev =>
+      prev.map(el => (el.id === id ? { ...el, [field]: value } : el))
     );
   };
 
-  const handleSave = (id) => {
-    const updatedElement = elements.find(el => el.id === id);
-    console.log("Enregistré :", updatedElement);
-    // Ici tu pourrais envoyer l'élément à un serveur ou déclencher une autre action
+  const handleSave = async (updatedItem) => {
+    // updatedItem contains product_id and new order
+    const { product_id, order } = updatedItem;
+    try {
+      const response = await fetch(`/api/carousel/${product_id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order }),
+      });
+      if (!response.ok) throw new Error(`Erreur ${response.status}`);
+      const saved = await response.json();
+      setElements(prev =>
+        prev.map(el =>
+          el.id === saved.product_id ? { ...el, order: saved.order } : el
+        )
+      );
+      window.alert('Configuration du carrousel mise à jour');
+    } catch (err) {
+      console.error('Erreur lors de la mise à jour du carrousel:', err);
+      window.alert('Impossible de sauvegarder la configuration du carrousel');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await fetch(`/api/carousel/${id}`, { method: 'DELETE' });
+      setElements(prev => prev.filter(el => el.id !== id));
+    } catch (err) {
+      console.error('Erreur suppression du carousel item:', err);
+    }
+  };
+
+  const handleOpenModal = () => setShowAddModal(true);
+  const handleCloseModal = () => setShowAddModal(false);
+
+  const handleAdd = async (newItem) => {
+    try {
+      const response = await fetch('/api/carousel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_id: newItem.id, order: newItem.order }),
+      });
+      const saved = await response.json();
+      // Merge saved with product data
+      const prod = allProducts.find(p => p.id === saved.product_id);
+      if (prod) setElements(prev => [...prev, { ...prod, order: saved.order }]);
+      setShowAddModal(false);
+    } catch (err) {
+      console.error('Erreur ajout du carousel item:', err);
+    }
+  };
+
+  const handleOpenEdit = item => {
+    setSelectedItem(item);
+    setShowEditModal(true);
+  };
+  const handleCloseEdit = () => {
+    setSelectedItem(null);
+    setShowEditModal(false);
   };
 
   return (
     <div className={styles.editorContainer}>
+      
+
       <h2>Éditeur de Carrousel</h2>
-      {elements.map(product => (
-        <div key={product.id} className={styles.editorCard}>
-          {product.image && (
-            <div className={styles.imagePreview}>
-              <img src={product.image} alt={product.name} />
-            </div>
-          )}
-          <input
-            type="text"
-            value={product.name}
-            onChange={(e) => handleChange(product.id, 'name', e.target.value)}
-            placeholder="Nom"
-            className={styles.inputField}
-          />
-          <input
-            type="text"
-            value={product.description}
-            onChange={(e) => handleChange(product.id, 'description', e.target.value)}
-            placeholder="Description"
-            className={styles.inputField}
-          />
-          <input
-            type="text"
-            value={product.characteristic}
-            onChange={(e) => handleChange(product.id, 'characteristic', e.target.value)}
-            placeholder="Caractéristique"
-            className={styles.inputField}
-          />
-          <input
-            type="text"
-            value={product.price}
-            onChange={(e) => handleChange(product.id, 'price', e.target.value)}
-            placeholder="Prix"
-            className={styles.inputField}
-          />
-          <input
-            type="text"
-            value={product.availability}
-            onChange={(e) => handleChange(product.id, 'availability', e.target.value)}
-            placeholder="Disponibilité"
-            className={styles.inputField}
-          />
-          <input
-            type="number"
-            value={product.order}
-            onChange={(e) => handleChange(product.id, 'order', e.target.value)}
-            placeholder="Ordre d'affichage"
-            className={styles.inputField}
-          />
-          <input
-            type="file"
-            accept="image/png, image/jpeg, image/webp"
-            onChange={(e) => {
-              const file = e.target.files[0];
-              if (file) {
-                const maxSizeMB = 2; // Limite de 2MB
-                const maxSizeBytes = maxSizeMB * 1024 * 1024;
-                if (file.size > maxSizeBytes) {
-                  alert(`L'image est trop grande. Taille maximale autorisée : ${maxSizeMB}MB.`);
-                  return;
-                }
-                const imageUrl = URL.createObjectURL(file);
-                handleChange(product.id, 'image', imageUrl);
-              }
-            }}
-            className={styles.inputField}
-          />
-          <button onClick={() => handleSave(product.id)} className={styles.saveButton}>Enregistrer</button>
-        </div>
-      ))}
+      <button onClick={handleOpenModal} className={styles.addButton}>
+        Ajouter un produit
+      </button>
+      <table className={styles.summaryTable}>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Ordre</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {elements.map(item => (
+            <tr key={item.id}>
+              <td>{item.id}</td>
+              <td>{item.name}</td>
+              <td>{item.order}</td>
+              <td>
+                <button onClick={() => handleOpenEdit(item)}>Modifier</button>
+                <button onClick={() => handleDelete(item.id)}>Supprimer</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <EditCarouselItemModal
+        isOpen={showEditModal}
+        onClose={handleCloseEdit}
+        item={selectedItem}
+        onSave={async updated => {
+          await handleSave(updated);
+          handleCloseEdit();
+        }}
+      />
+      <AddCarouselItemModal
+        isOpen={showAddModal}
+        onClose={handleCloseModal}
+        products={allProducts}
+        onSave={handleAdd}
+      />
     </div>
   );
 };
 
-export default carrouselElements;
+export default CarrouselEditor;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styles from '../../styles/components/modals/ProductModal.module.css'
 
-const ProductModal = ({ isOpen, onClose, onSubmit }) => {
+const ProductModal = ({ isOpen, onClose, onSave }) => {
   const [formData, setFormData] = useState({ name: '', stock: 0, price: 0 });
 
   if (!isOpen) return null;
@@ -16,7 +16,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit }) => {
 
   const handleSubmit = e => {
     e.preventDefault();
-    onSubmit(formData);
+    const newItem = { ...formData };
+    onSave(newItem);
     setFormData({ name: '', stock: 0, price: 0 });
   };
 

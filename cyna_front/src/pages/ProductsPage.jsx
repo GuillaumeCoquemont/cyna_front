@@ -1,37 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from '../styles/pages/ProductsPage.module.css';
 import { useCart } from '../context/CartContext';
+import { fetchProducts } from '../api/products';
+
 
 
 const ProductsPage = () => {
   const { addToCart } = useCart();
   const [searchQuery, setSearchQuery] = useState('');
+  const [allProducts, setAllProducts] = useState([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedType, setSelectedType] = useState('');  // 'Produit' or 'Service'
   const [visibleProducts, setVisibleProducts] = useState(6);
   const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchProducts()
+      .then(data => setAllProducts(data))
+      .catch(err => {
+        console.error('Erreur fetchProducts:', err);
+        setError(err.message);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p>Chargement des produits…</p>;
+  if (error) return <p>Erreur : {error}</p>;
 
   const priceRanges = [
     { id: '20-50', label: '$20.00 - $50.00' },
     { id: '50-100', label: '$50.00 - $100.00' },
     { id: '100-200', label: '$100.00 - $200.00' },
     { id: '200-500', label: '$200.00 - $500.00' }
-  ];
-
-  // Liste explicite de produits de cybersécurité avec catégorie ajoutée
-  const allProducts = [
-    { id: 1, title: 'Antivirus Pro',           price: 199.99, image: '/path/to/image1.jpg', category: 'Antivirus', type: 'Produit', shortDescription: "Brève description du produit." },
-    { id: 2, title: 'Firewall Enterprise',      price: 299.99, image: '/path/to/image2.jpg', category: 'Firewall', type: 'Service', shortDescription: "Brève description du produit." },
-    { id: 3, title: 'VPN Secure',               price: 149.99, discount: 20, image: '/path/to/image3.jpg', category: 'VPN', type: 'Produit', shortDescription: "Brève description du produit." },
-    { id: 4, title: 'Vulnerability Scanner',    price: 249.99, discount: 20, image: '/path/to/vulnerability.jpg', category: 'Scanner', type: 'Service', shortDescription: "Brève description du produit." },
-    { id: 5, title: 'SIEM Analytics',           price: 399.99, discount: 10, image: '/path/to/siem.jpg', category: 'SIEM', type: 'Service', shortDescription: "Brève description du produit." },
-    { id: 6, title: 'Endpoint Protection',      price: 179.99, image: '/path/to/endpoint.jpg', category: 'Endpoint', type: 'Produit', shortDescription: "Brève description du produit." },
-    { id: 7, title: 'Secure Email Gateway',     price: 129.99, discount: 15, image: '/path/to/email.jpg', category: 'Email', type: 'Service', shortDescription: "Brève description du produit." },
-    { id: 8, title: 'DDoS Mitigation Service',  price: 499.99, discount: 25, image: '/path/to/ddos.jpg', category: 'DDoS', type: 'Service', shortDescription: "Brève description du produit." },
-    { id: 9, title: 'Threat Intelligence Feed', price: 299.99, discount: 15, image: '/path/to/threat.jpg', category: 'Threat Intelligence', type: 'Service', shortDescription: "Brève description du produit." },
-    { id: 10, title: 'Multi-Factor Auth',       price: 99.99,  image: '/path/to/mfa.jpg', category: 'Authentication', type: 'Produit', shortDescription: "Brève description du produit." },
   ];
 
   // derive unique categories
@@ -42,7 +47,7 @@ const ProductsPage = () => {
   // Filtrage selon la requête de recherche, type, et catégories sélectionnées
   const filteredProducts = allProducts
     .filter(product =>
-      product.title.toLowerCase().includes(searchQuery.toLowerCase())
+      product.name.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .filter(product =>
       !selectedType || product.type === selectedType
@@ -163,10 +168,11 @@ const ProductsPage = () => {
                     {product.discount && (
                       <span className={styles.saleTag}>-{product.discount}%</span>
                     )}
+                    <img src={product.image} alt={product.name} className={styles.productImageTag} />
                   </div>
                   <div className={styles.productInfo}>
-                    <h3 className={styles.productTitle}>{product.title}</h3>
-                    <p className={styles.productDescription}>{product.shortDescription}</p>
+                    <h3 className={styles.productTitle}>{product.name}</h3>
+                    <p className={styles.productDescription}>{product.description}</p>
                     <p className={styles.productPrice}>${product.price.toFixed(2)}</p>
                     <button
                       className={styles.addToCartButton}
@@ -175,7 +181,7 @@ const ProductsPage = () => {
                         e.stopPropagation();
                         addToCart({ 
                           id: product.id,
-                          name: product.title, 
+                          name: product.name, 
                           price: product.price, 
                           image: product.image,
                           // include other fields if needed

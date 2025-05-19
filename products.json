@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "name": "Solution Antivirus Profe",
+    "description": "Protection avancée contre les malwares",
+    "price": 1905,
+    "stock": 20,
+    "promotion": "",
+    "category_id": 1
+  },
+  {
+    "id": 2,
+    "name": "Firewall Enterprise",
+    "description": "Sécurité réseau complète",
+    "price": 120,
+    "stock": 10,
+    "promotion": "",
+    "category_id": 2
+  },
+  {
+    "id": 3,
+    "name": "Data Encryption Suite",
+    "description": "Chiffrement des données sensibles",
+    "price": 150,
+    "stock": 0,
+    "promotion": "",
+    "category_id": 3
+  },
+  {
+    "id": 4,
+    "name": "Web Application Firewall",
+    "description": "Protection des applications web",
+    "price": 200,
+    "stock": 0,
+    "promotion": "",
+    "category_id": 4
+  },
+  {
+    "id": 5,
+    "name": "Intrusion Detection System",
+    "description": "Détection des intrusions en temps réel",
+    "price": 300,
+    "stock": 0,
+    "promotion": "",
+    "category_id": 5
+  },
+  {
+    "id": 6,
+    "name": "Cloud Security Suite",
+    "description": "Sécurité pour les environnements cloud",
+    "price": 400,
+    "stock": 20,
+    "promotion": "",
+    "category_id": 6
+  }
+]

@@ -1,6 +1,6 @@
 import React from "react";
 import { CartProvider } from "./context/CartContext";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import "./styles/global.css";
 import ProductsPage from "./pages/ProductsPage";
@@ -25,7 +25,10 @@ const App = () => {
             <Route path ="/dashboardClient" element={<DashboardClient/>} />
             <Route path="/discover" element={<Discover />} />
             <Route path="/product/:id" element={<ProductDetails />} />
-            <Route path="/auth" element={<AuthPage />} />
+            {/* Redirect base /auth to login */}
+            <Route path="/auth" element={<Navigate to="/auth/login" replace />} />
+            <Route path="/auth/login" element={<AuthPage />} />
+            <Route path="/auth/register" element={<AuthPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/contact" element={<Contact />} />
           </Routes>

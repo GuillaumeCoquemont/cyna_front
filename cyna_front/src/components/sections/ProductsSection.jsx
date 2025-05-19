@@ -1,26 +1,55 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../../context/CartContext';
-import { Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import styles from '../../styles/components/sections/ProductsSection.module.css';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import carrouselElements from '../dashboard/DashboardCarrousselElements';
 
-// Carousel de produits
+import { fetchProducts } from '../../api/products';
+import { fetchCarousel } from '../../api/carousel';
+
 const ProductsSection = () => {
-  const products = carrouselElements;
+  const [slides, setSlides] = useState([]);
   const { addToCart } = useCart();
+  const location = useLocation(); // pour relancer le fetch quand on navigue
+
+  useEffect(() => {
+    const loadSlides = () => {
+      Promise.all([fetchCarousel(), fetchProducts()])
+        .then(([carouselConfig, products]) => {
+          const merged = carouselConfig
+            .map(c => {
+              // find the matching product data by product_id
+              const prod = products.find(p => p.id === c.product_id);
+              // merge product fields and apply order from carousel config
+              return prod ? { ...prod, order: c.order } : null;
+            })
+            .filter(Boolean)
+            .sort((a, b) => a.order - b.order);
+          setSlides(merged);
+        })
+        .catch(err => console.error('Erreur chargement carousel :', err));
+    };
+
+    // Chargement initial
+    loadSlides();
+    // Rechargement si on revient sur l'onglet
+    window.addEventListener('focus', loadSlides);
+    return () => window.removeEventListener('focus', loadSlides);
+  }, [location.pathname]);
 
   return (
     <section className={styles.productsSection}>
       <div className={styles.banner}>
         <h2 className={styles.bannerTitle}>
-          Découvrez <span className={styles.highlight}>nos solutions 360 de cybersécurité </span>pour les PME
+          Découvrez <span className={styles.highlight}>nos solutions 360 de cybersécurité</span> pour les PME
         </h2>
-        <h4 className={styles.subtitle}>Cyna s’adapte à vos besoins et vous propose un accompagnement dans la protection globale de votre SI.</h4>
+        <h4 className={styles.subtitle}>
+          Cyna s’adapte à vos besoins et vous propose un accompagnement dans la protection globale de votre SI.
+        </h4>
       </div>
 
       <div className={styles.carouselContainer}>
@@ -33,24 +62,18 @@ const ProductsSection = () => {
             prevEl: '.swiper-button-prev-custom',
           }}
           pagination={{ clickable: true }}
-          autoplay={{
-            delay: 4000,
-            disableOnInteraction: false,
-          }}
-          loop={true}
+          autoplay={{ delay: 4000, disableOnInteraction: false }}
+          loop
           breakpoints={{
-            640: { slidesPerView: 2 },
+            640:  { slidesPerView: 2 },
             1024: { slidesPerView: 3 },
             1280: { slidesPerView: 4 },
           }}
           className={styles.swiper}
         >
-          {products.map((product) => (
+          {slides.map(product => (
             <SwiperSlide key={product.id}>
-              <Link
-                to={`/product/${product.id}`}
-                className={styles.productLink}
-              >
+              <Link to={`/product/${product.id}`} className={styles.productLink}>
                 <div className={styles.productCard}>
                   <div className={styles.productImage}>
                     <img src={product.image} alt={product.name} />
@@ -59,11 +82,11 @@ const ProductsSection = () => {
                     <h3 className={styles.productName}>{product.name}</h3>
                     <p className={styles.productDescription}>{product.description}</p>
                     <p className={styles.productCharacteristic}>{product.characteristic}</p>
-                    <p className={styles.productPrice}>{product.price}</p>
+                    <p className={styles.productPrice}>{product.price} €</p>
                     <p className={styles.productAvailability}>{product.availability}</p>
                     <button
                       className={styles.addToCartButton}
-                      onClick={(e) => {
+                      onClick={e => {
                         e.preventDefault();
                         e.stopPropagation();
                         addToCart(product, 1);
@@ -77,8 +100,8 @@ const ProductsSection = () => {
             </SwiperSlide>
           ))}
         </Swiper>
-        <div className="swiper-button-prev-custom"></div>
-        <div className="swiper-button-next-custom"></div>
+        <div className="swiper-button-prev-custom" />
+        <div className="swiper-button-next-custom" />
       </div>
     </section>
   );
