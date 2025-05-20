@@ -25,13 +25,13 @@
 }
 
 .tab:hover {
-  background: #f5f5f5;
+  background: var(--primary-color); /* using primary for active hover */
 }
 
 .tab.active {
-  color: #4E73DF;
+  color: var(--primary-color);
   font-weight: bold;
-  border-bottom: 2px solid #4E73DF;
+  border-bottom: 2px solid var(--primary-color);
 }
 
 .messageList {
@@ -140,7 +140,7 @@
 .sendButton {
   margin-top: 1rem;
   padding: 0.5rem 1rem;
-  background-color: #4E73DF;
+  background-color: var(--primary-color);
   color: #ffffff;
   border: none;
   border-radius: 4px;
@@ -149,7 +149,7 @@
 }
 
 .sendButton:hover {
-  background-color: #2e59d9;
+  background-color: var(--blue-hover);
 }
 
 .modalOverlay {

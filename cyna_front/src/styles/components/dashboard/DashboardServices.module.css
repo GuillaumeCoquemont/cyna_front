@@ -1,5 +1,3 @@
-
-
 .editorContainer {
   display: flex;
   flex-direction: column;
@@ -47,29 +45,29 @@
 }
 
 .saveButton {
-  background-color: #007bff;
+  background-color: var(--blue-color);
   color: white;
 }
 
 .saveButton:hover {
-  background-color: #0069d9;
+  background-color: var(--blue-hover);
 }
 
 .deleteButton {
-  background-color: #dc3545;
+  background-color: var(--rouge-color);
   color: white;
 }
 
 .deleteButton:hover {
-  background-color: #c82333;
+  background-color: var(--rouge-hover);
 }
 
 .addButton {
   align-self: flex-start;
-  background-color: #28a745;
+  background-color: var(--tertiary-color);
   color: white;
 }
 
 .addButton:hover {
-  background-color: #218838;
+  background-color: var(--tertiary-hover);
 }

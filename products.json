@@ -22,7 +22,7 @@
     "name": "Data Encryption Suite",
     "description": "Chiffrement des données sensibles",
     "price": 150,
-    "stock": 0,
+    "stock": 4,
     "promotion": "",
     "category_id": 3
   },
@@ -31,7 +31,7 @@
     "name": "Web Application Firewall",
     "description": "Protection des applications web",
     "price": 200,
-    "stock": 0,
+    "stock": 5,
     "promotion": "",
     "category_id": 4
   },

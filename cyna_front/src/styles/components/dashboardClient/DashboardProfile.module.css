@@ -33,14 +33,20 @@
 
 .profileForm input {
   padding: 0.5rem;
-  border: 1px solid #D1D3E2;
+  border: 1px solid var(--grey-color);
   border-radius: 4px;
   font-size: 1rem;
   margin-top: 0.25rem;
 }
 
+.profileForm input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(48, 32, 130, 0.2);
+}
+
 .passwordGroup {
-  border: 1px solid #D1D3E2;
+  border: 1px solid var(--grey-color);
   padding: 1rem;
   border-radius: 4px;
   display: flex;
@@ -63,9 +69,18 @@
   border-radius: 4px;
   cursor: pointer;
   font-weight: 600;
+  transition: background-color var(--transition);
 }
 
 .saveBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.saveBtn:hover {
+  background-color: var(--blue-hover);
+}
+
+.saveBtn:active {
+  background-color: var(--blue-active);
 }

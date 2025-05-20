@@ -14,7 +14,7 @@
 }
 
 .modal {
-  background-color: #fff;
+  background-color: var(--white-color);
   border-radius: 6px;
   padding: 24px;
   width: 90%;
@@ -39,7 +39,7 @@
   margin-top: 8px;
   padding: 8px 12px;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--grey-color);
   border-radius: 4px;
   box-sizing: border-box;
 }
@@ -60,19 +60,19 @@
 }
 
 .actions button[type="button"] {
-  background-color: #6c757d;
+  background-color: var(--tertiary-color);
   color: #fff;
 }
 
 .actions button[type="submit"] {
-  background-color: #007bff;
+  background-color: var(--blue-color);
   color: #fff;
 }
 
 .actions button[type="button"]:hover {
-  background-color: #5a6268;
+  background-color: var(--tertiary-hover);
 }
 
 .actions button[type="submit"]:hover {
-  background-color: #0069d9;
+  background-color: var(--blue-hover);
 }

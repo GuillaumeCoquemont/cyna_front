@@ -25,7 +25,7 @@
 }
 
 .addButton:hover {
-  background-color: var(--primary-hover-color);
+  background-color: var(--blue-hover);
 }
 
 /* Table styling */
@@ -114,7 +114,7 @@
 }
 
 .actions button[type="submit"]:hover {
-  background-color: var(--primary-hover-color);
+  background-color: var(--blue-hover);
 }
 
 .actions button[type="button"] {
@@ -123,5 +123,5 @@
 }
 
 .actions button[type="button"]:hover {
-  background-color: var(--secondary-hover-color);
+  background-color: var(--grey-color);
 }

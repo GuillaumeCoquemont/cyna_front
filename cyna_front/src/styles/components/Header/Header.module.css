@@ -45,6 +45,10 @@
   text-decoration: none;
 }
 
+.navLinks a:hover {
+  color: var(--tertiary-hover);
+}
+
 /* Dropdown */
 .dropdownButton {
   display: flex;
@@ -101,7 +105,7 @@
 }
 
 .dropdownMenu li a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--tertiary-hover);
 }
 
 /* Icons */
@@ -374,8 +378,8 @@
 }
 
 .authButton:hover {
-  background-color: #f5f5f5;
-  color: #2196f3;
+  background-color: var(--grey-color);
+  color: var(--blue-hover);
 }
 
 .authButton i {
@@ -405,4 +409,10 @@
   padding: 0 6px;
   font-size: 0.75rem;
   line-height: 1.5;
+}
+
+.hamburgerButton:hover .hamburgerIcon,
+.hamburgerButton:hover .hamburgerIcon::before,
+.hamburgerButton:hover .hamburgerIcon::after {
+  background-color: var(--blue-hover);
 }

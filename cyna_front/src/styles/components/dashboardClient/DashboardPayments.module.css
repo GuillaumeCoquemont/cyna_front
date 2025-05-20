@@ -1,5 +1,3 @@
-
-
 .paymentsContainer {
   background-color: #ffffff;
   padding: 1.5rem;
@@ -20,13 +18,13 @@
 }
 
 .methodCard {
-  border: 1px solid #E3E6F0;
+  border: 1px solid var(--grey-color);
   border-radius: 4px;
   overflow: hidden;
 }
 
 .cardHeader {
-  background-color: #EAECF4;
+  background-color: var(--grey-color);
   padding: 0.75rem 1rem;
   display: flex;
   justify-content: space-between;
@@ -64,15 +62,24 @@
   background-color: var(--secondary-color);
   color: #ffffff;
 }
+.defaultBtn:hover {
+  background-color: var(--grey-color);
+}
 
 .deleteBtn {
-  background-color: #E74A3B;
+  background-color: var(--rouge-color);
   color: #ffffff;
+}
+.deleteBtn:hover {
+  background-color: var(--rouge-hover);
 }
 
 .addBtn {
-  background-color: var(--primary-color);
+  background-color: var(--blue-color);
   color: #ffffff;
   display: block;
   margin-top: 1rem;
+}
+.addBtn:hover {
+  background-color: var(--blue-hover);
 }

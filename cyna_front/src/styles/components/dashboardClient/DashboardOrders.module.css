@@ -18,7 +18,7 @@
 }
 
 .ordersTable thead {
-  background-color: #EAECF4;
+  background-color: var(--grey-color);
 }
 
 .ordersTable th,
@@ -30,7 +30,7 @@
 }
 
 .ordersTable tbody tr {
-  border-bottom: 1px solid #E3E6F0;
+  border-bottom: 1px solid var(--grey-color);
 }
 
 .statusBadge {
@@ -47,12 +47,12 @@
 }
 
 .pending {
-  background-color: #F6C23E;
+  background-color: var(--tertiary-color);
   color: #212529;
 }
 
 .rejected {
-  background-color: #E74A3B;
+  background-color: var(--rouge-color);
   color: #ffffff;
 }
 
@@ -60,4 +60,9 @@
   text-align: center;
   padding: 1rem;
   color: var(--text-color-light);
+}
+
+.ordersTable tbody tr:hover {
+  background-color: var(--grey-color);
+  transition: background-color 0.3s ease;
 }

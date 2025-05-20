@@ -8,7 +8,7 @@
   z-index: 1000;
 }
 .modal {
-  background: #fff;
+  background: var(--white-color);
   border-radius: 6px;
   padding: 24px;
   width: 90%;
@@ -29,7 +29,7 @@
 .form textarea {
   padding: 8px 12px;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--grey-color);
   border-radius: 4px;
   resize: vertical;
 }
@@ -46,16 +46,16 @@
   cursor: pointer;
 }
 .actions button[type="button"] {
-  background: #6c757d;
+  background: var(--grey-color);
   color: #fff;
 }
 .actions button[type="submit"] {
-  background: #007bff;
+  background: var(--blue-color);
   color: #fff;
 }
 .actions button[type="button"]:hover {
-  background: #5a6268;
+  background: var(--grey-hover);
 }
 .actions button[type="submit"]:hover {
-  background: #0069d9;
+  background: var(--blue-hover);
 }

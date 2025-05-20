@@ -19,7 +19,7 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styles from '../styles/pages/DashboardAdmin.module.css';
 import { Link } from 'react-router-dom';
 import DashboardMessage from '../components/dashboard/DashboardMessage';
@@ -27,9 +27,19 @@ import DashboardProducts from '../components/dashboard/DashboardProducts';
 import { CarrouselEditor } from '../components/dashboard/DashboardCarrousselElements';
 import DashboardCodePromo from '../components/dashboard/DashboardCodePromo';
 import DashboardServices from '../components/dashboard/DashboardServices';
+import { fetchProducts } from '../api/products';
 
 export default function DashboardAdmin() {
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  const [productsData, setProductsData] = useState([]);
+
+  useEffect(() => {
+    // load real products on mount
+    fetchProducts()
+      .then(data => setProductsData(data))
+      .catch(err => console.error('Erreur fetchProducts:', err));
+  }, []);
 
   const statsData = [
     { title: 'Utilisateurs totaux', value: '40 689' },
@@ -75,11 +85,10 @@ export default function DashboardAdmin() {
     }
   };
 
-  const products = [
-    { name: 'Produit 1', address: 'Adresse', dateTime: '12.09.2019 - 12h00', quantity: 1, amount: '34 €', status: 'Livré' },
-    { name: 'Produit 2', address: 'Adresse', dateTime: '12.09.2019 - 13h00', quantity: 2, amount: '60 €', status: 'En attente' },
-    { name: 'Produit 3', address: 'Adresse', dateTime: '12.09.2019 - 12h00', quantity: 1, amount: '34 €', status: 'Rejeté' },
-  ];
+  const lowStockProducts = useMemo(
+    () => productsData.filter(p => p.stock > 0 && p.stock < 5),
+    [productsData]
+  );
 
   const renderContent = () => {
     switch (activeTab) {
@@ -103,33 +112,32 @@ export default function DashboardAdmin() {
                 <thead>
                   <tr>
                     <th>Nom produit</th>
-                    <th>Adresse</th>
-                    <th>Date - Time</th>
-                    <th>Nombre produit</th>
-                    <th>Montant</th>
-                    <th>Status</th>
+                    <th>Stock</th>
+                    <th>Prix</th>
+                    <th>Disponibilité</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((p) => (
-                    <tr key={p.name}>
-                      <td>{p.name}</td>
-                      <td>{p.address}</td>
-                      <td>{p.dateTime}</td>
-                      <td>{p.quantity}</td>
-                      <td>{p.amount}</td>
+                  {productsData.map((p) => (
+                    <tr key={p.id || p.name}>
                       <td>
-                        <span
-                          className={`${styles.statusBadge} ${
-                            p.status === 'Livré'
-                              ? styles.delivered
-                              : p.status === 'En attente'
-                                ? styles.pending
-                                : styles.rejected
-                          }`}
-                        >
-                          {p.status}
-                        </span>
+                        {p.name}
+                        {p.stock > 0 && p.stock < 5 && (
+                          <span
+                            className={styles.lowStockIcon}
+                            title="Stock faible"
+                            style={{ display: 'inline-block' }}
+                          >
+                            {'\u26A0'}
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        {p.stock === 0 ? 'Rupture de stock' : p.stock}
+                      </td>
+                      <td>{p.price}</td>
+                      <td>
+                        {p.stock > 0 ? 'En stock' : 'Rupture de stock'}
                       </td>
                     </tr>
                   ))}

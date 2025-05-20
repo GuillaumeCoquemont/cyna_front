@@ -86,9 +86,23 @@ export default function ProductsEditor() {
           {tableProducts.map(p => (
             <tr key={p.id}>
               <td>{p.id}</td>
-              <td>{p.name}</td>
+              <td>
+                {p.name}
+                {p.stock > 0 && p.stock < 5 && (
+                  <span
+                    className={styles.lowStockIcon}
+                    title="Stock faible"
+                  >
+                    {'\u26A0'}
+                  </span>
+                )}
+              </td>
               <td>{p.price}</td>
-              <td>{p.stock}</td>
+              <td>
+                {p.stock === 0 
+                  ? 'Rupture de stock' 
+                  : p.stock}
+              </td>
               <td>
                 <button onClick={() => handleOpenEdit(p)}>Modifier</button>
                 <button onClick={() => handleDelete(p.id)}>Supprimer</button>

@@ -24,7 +24,7 @@
 
 .editorCard button {
   padding: 0.8rem 1.2rem;
-  background-color: #007bff;
+  background-color: var(--blue-color);
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -32,7 +32,7 @@
 }
 
 .editorCard button:hover {
-  background-color: #0056b3;
+  background-color: var(--blue-hover);
 }
 
 .imagePreview img {
@@ -45,7 +45,7 @@
 
 .addButton {
   padding: 0.8rem 1.2rem;
-  background-color: #28a745;
+  background-color: var(--tertiary-color);
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -55,7 +55,7 @@
 }
 
 .addButton:hover {
-  background-color: #218838;
+  background-color: var(--tertiary-hover);
 }
 
 .summaryTable {
@@ -99,7 +99,7 @@
 }
 
 .summaryTable button:first-of-type:hover {
-  background-color: #0056b3;
+  background-color: var(--blue-hover);
 }
 
 .summaryTable button:last-of-type {
@@ -108,5 +108,5 @@
 }
 
 .summaryTable button:last-of-type:hover {
-  background-color: #b02a37;
+  background-color: var(--rouge-hover);
 }

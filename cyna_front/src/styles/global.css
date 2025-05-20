@@ -4,10 +4,21 @@
   --primary-color: #302082;
   --secondary-color: #FFFFFF;
   --tertiary-color: #FF9054;
+  --blue-color:#007bff;
+  --rouge-color: #dc3545;
   --white-color: #FFFFFF;
+  --grey-color: #F8F9FC;
   --border-radius: 4px;
   --transition: all 0.3s ease;
   --menu-height: 0px;
+
+  /* Hover and Active states */
+  --blue-hover: #339aff;
+  --blue-active: #0056b3;
+  --rouge-hover: #e55360;
+  --rouge-active: #b02a37;
+  --tertiary-hover: #ffab6d;
+  --tertiary-active: #e67e22;
 }
 
 * {

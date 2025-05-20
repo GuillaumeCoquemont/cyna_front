@@ -9,7 +9,7 @@
   padding: 2rem;
   background-color: var(--primary-color);
   color: var(--secondary-color);
-  min-height: calc(100vh - var(--header-height) - 100px); /* adjust for header/footer */
+  min-height: calc(100vh - var(--header-height) - 100px);
   border-radius: 8px;
 }
 .layout {
