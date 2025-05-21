@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import styles from '../../styles/components/modals/ProductModal.module.css'
 
 const ProductModal = ({ isOpen, onClose, onSave }) => {
-  const [formData, setFormData] = useState({ name: '', stock: 0, price: 0 });
+  const [formData, setFormData] = useState({ name: '', stock: 0, price: 0, image: '' });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   if (!isOpen) return null;
 
@@ -14,11 +16,32 @@ const ProductModal = ({ isOpen, onClose, onSave }) => {
     }));
   };
 
-  const handleSubmit = e => {
+  const handleImageChange = e => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const fileToBase64 = file =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+  const handleSubmit = async e => {
     e.preventDefault();
-    const newItem = { ...formData };
-    onSave(newItem);
-    setFormData({ name: '', stock: 0, price: 0 });
+    let payload = { ...formData };
+    if (imageFile) {
+      payload.image = await fileToBase64(imageFile);
+    }
+    onSave(payload);
+    setFormData({ name: '', stock: 0, price: 0, image: '' });
+    setImageFile(null);
+    setImagePreview(null);
   };
 
   return (
@@ -60,6 +83,22 @@ const ProductModal = ({ isOpen, onClose, onSave }) => {
             />
           </div>
 
+          <div className={styles['form-group']}>
+            <label>Image</label>
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+            {imagePreview && (
+              <img
+                src={imagePreview}
+                alt="Preview"
+                style={{ width: '100%', marginTop: '0.5rem', borderRadius: '4px' }}
+              />
+            )}
+          </div>
           
           <div className={styles['modal-actions']}>
             <button type="button" onClick={onClose}>Annuler</button>

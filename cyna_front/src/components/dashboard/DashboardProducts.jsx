@@ -77,6 +77,7 @@ export default function ProductsEditor() {
           <tr>
             <th>ID</th>
             <th>Nom</th>
+            <th>Image</th>
             <th>Prix</th>
             <th>Stock</th>
             <th>Actions</th>
@@ -95,6 +96,17 @@ export default function ProductsEditor() {
                   >
                     {'\u26A0'}
                   </span>
+                )}
+              </td>
+              <td>
+                {p.image ? (
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
+                  />
+                ) : (
+                  <span>—</span>
                 )}
               </td>
               <td>{p.price}</td>

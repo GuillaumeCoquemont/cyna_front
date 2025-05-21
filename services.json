@@ -1,23 +1,42 @@
+
 [
   {
-    "key": "prevention",
-    "title": "Prévention",
-    "subtitle": "Audit de sécurité",
-    "description": "Réduisez votre niveau d’exposition aux risques grâce à nos audits.",
+    "id": 1,
+    "Name": "Prévention",
+    "Description": "Réduisez votre niveau d’exposition aux risques grâce à nos audits.",
+    "Status": true,
+    "Price": 0,
+    "Subscription": false,
+    "SubscriptionType": null,
+    "UserCount": 0,
+    "Promotion": "",
+    "service_type_id": 1,
     "image": "/images/prevention.jpg"
   },
   {
-    "key": "protection",
-    "title": "Protection",
-    "subtitle": "SOC 24/7",
-    "description": "Défendez-vous face aux menaces grâce à une surveillance en temps réel 24/7.",
+    "id": 2,
+    "Name": "Protection",
+    "Description": "Défendez-vous face aux menaces grâce à une surveillance en temps réel 24/7.",
+    "Status": true,
+    "Price": 0,
+    "Subscription": false,
+    "SubscriptionType": null,
+    "UserCount": 0,
+    "Promotion": "",
+    "service_type_id": 2,
     "image": "/images/protection.jpg"
   },
   {
-    "key": "reponse",
-    "title": "Réponse",
-    "subtitle": "Cyna CERT",
-    "description": "Soyez sécurisé avec notre CERT qui répond présent en cas d’attaque : investigation, éradication et remédiation.",
+    "id": 3,
+    "Name": "Réponse",
+    "Description": "Soyez sécurisé avec notre CERT : investigation, éradication et remédiation.",
+    "Status": true,
+    "Price": 0,
+    "Subscription": false,
+    "SubscriptionType": null,
+    "UserCount": 0,
+    "Promotion": "",
+    "service_type_id": 3,
     "image": "/images/reponse.jpg"
   }
 ]

@@ -24,15 +24,21 @@
     "order": 6
   },
   {
-    "product_id": 7,
-    "order": 7
+    "product_id": 9,
+    "order": 9
   },
   {
     "product_id": 8,
+    "order": 7
+  },
+  {
+    "item_id": 8,
+    "type": "product",
     "order": 8
   },
   {
-    "product_id": 9,
-    "order": 9
+    "item_id": 3,
+    "type": "service",
+    "order": 10
   }
 ]

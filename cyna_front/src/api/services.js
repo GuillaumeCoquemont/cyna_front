@@ -39,3 +39,10 @@ export async function addService(data) {
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }
+
+// GET all service types
+export async function fetchServiceTypes() {
+  const res = await fetch('/api/service-types');
+  if (!res.ok) throw new Error(`Erreur ${res.status}`);
+  return res.json();
+}

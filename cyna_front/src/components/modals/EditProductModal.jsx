@@ -2,15 +2,19 @@ import React, { useState, useEffect } from 'react';
 import styles from '../../styles/components/modals/EditProductModal.module.css';
 
 const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
-  const [formData, setFormData] = useState({ name: '', stock: 0, price: 0 });
+  const [formData, setFormData] = useState({ name: '', stock: 0, price: 0, image: '' });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     if (product) {
       setFormData({
         name: product.name,
         stock: product.stock,
-        price: product.price
+        price: product.price,
+        image: product.image || ''
       });
+      setImagePreview(product.image || null);
     }
   }, [product]);
 
@@ -24,9 +28,28 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
     }));
   };
 
-  const handleSubmit = e => {
+  const handleImageChange = e => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+  const fileToBase64 = file =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+  const handleSubmit = async e => {
     e.preventDefault();
-    onSave({ ...formData, id: product.id });
+    let payload = { ...formData, id: product.id };
+    if (imageFile) {
+      payload.image = await fileToBase64(imageFile);
+    }
+    onSave(payload);
   };
 
   return (
@@ -66,6 +89,22 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
               min="0"
               required
             />
+          </div>
+          <div className={styles['form-group']}>
+            <label>Image</label>
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+            {imagePreview && (
+              <img
+                src={imagePreview}
+                alt="Preview"
+                style={{ width: '100%', marginTop: '0.5rem', borderRadius: '4px' }}
+              />
+            )}
           </div>
           <div className={styles['modal-actions']}>
             <button type="button" onClick={onClose}>Annuler</button>

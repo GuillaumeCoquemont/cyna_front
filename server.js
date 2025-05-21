@@ -4,7 +4,8 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Expose raw JSON for dashboard fetching
 // app.use('/api', express.static(path.join(__dirname)));
@@ -42,6 +43,7 @@ app.put('/api/products/:id', (req, res) => {
   res.json(products[idx]);
 });
 
+
 // GET /api/carousel → renvoie la configuration du carrousel
 app.get('/api/carousel', (req, res) => {
   const filePath = path.join(__dirname, 'carousel.json');
@@ -51,19 +53,80 @@ app.get('/api/carousel', (req, res) => {
   res.json(carousel);
 });
 
-
-// PUT /api/carousel/:product_id → met à jour l’ordre dans carousel.json
-app.put('/api/carousel/:product_id', (req, res) => {
+// POST /api/carousel → ajoute un nouvel élément au carousel
+app.post('/api/carousel', (req, res) => {
   const filePath = path.join(__dirname, 'carousel.json');
   const carousel = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-  const idx = carousel.findIndex(item => item.product_id === +req.params.product_id);
-  if (idx === -1) {
+  const newItem = req.body;
+  console.log('🛠️ Backend a reçu:', newItem); 
+
+  // Require either product_id or service_id
+  if (!newItem.product_id && !newItem.service_id) {
+    return res.status(400).json({ error: 'product_id ou service_id est requis' });
+  }
+
+  // Determine item_id and type
+  const item_id = newItem.product_id || newItem.service_id;
+  const type = newItem.product_id ? 'product' : 'service';
+
+  // Ensure order is a number
+  if (newItem.order != null) {
+    newItem.order = parseInt(newItem.order, 10);
+  }
+
+  // Validate unique order
+  if (carousel.some(item => item.order === newItem.order)) {
+    return res.status(400).json({ error: 'order doit être unique' });
+  }
+
+  const carouselItem = { item_id, type, order: newItem.order };
+
+  carousel.push(carouselItem);
+  fs.writeFileSync(filePath, JSON.stringify(carousel, null, 2), 'utf-8');
+  res.status(201).json(carouselItem);
+});
+
+
+// PUT /api/carousel/:item_id → met à jour l’ordre dans carousel.json
+app.put('/api/carousel/:item_id', (req, res) => {
+  const filePath = path.join(__dirname, 'carousel.json');
+  const carousel = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  const item_id = +req.params.item_id;
+  const type = req.query.type;
+
+  // Find matching items
+  const matchedItems = carousel.filter(item => item.item_id === item_id && item.type === type);
+  if (matchedItems.length === 0) {
     return res.status(404).json({ error: 'Carousel item not found' });
   }
+  if (matchedItems.length > 1) {
+    return res.status(400).json({ error: 'Multiple carousel items found, specify type to disambiguate' });
+  }
+  const idx = carousel.findIndex(item => item.item_id === item_id && item.type === type);
+
   // Mise à jour de l'ordre
-  carousel[idx].order = req.body.order;
+  const newOrder = parseInt(req.body.order, 10);
+  if (carousel.some((it, i) => i !== idx && it.order === newOrder)) {
+    return res.status(400).json({ error: 'order doit être unique' });
+  }
+  carousel[idx].order = newOrder;
   fs.writeFileSync(filePath, JSON.stringify(carousel, null, 2), 'utf-8');
   res.json(carousel[idx]);
+});
+
+// DELETE /api/carousel/:item_id → supprime un élément du carousel
+app.delete('/api/carousel/:item_id', (req, res) => {
+  const filePath = path.join(__dirname, 'carousel.json');
+  const carousel = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  const item_id = +req.params.item_id;
+  const type = req.query.type;
+
+  const filtered = carousel.filter(item => !(item.item_id === item_id && item.type === type));
+  if (filtered.length === carousel.length) {
+    return res.status(404).json({ error: 'Carousel item not found' });
+  }
+  fs.writeFileSync(filePath, JSON.stringify(filtered, null, 2), 'utf-8');
+  res.status(204).end();
 });
 
 // GET /api/services → renvoie tout services.json

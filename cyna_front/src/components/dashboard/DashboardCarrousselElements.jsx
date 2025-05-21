@@ -4,29 +4,38 @@ import styles from '../../styles/components/dashboard/DashboardCarrousselElement
 import React, { useState, useEffect } from 'react';
 import EditCarouselItemModal from '../modals/EditCarouselItemModal';
 import AddCarouselItemModal from '../modals/AddCarouselItemModal';
+import AddServiceModal from '../modals/AddServiceModal';
 import { fetchProducts } from '../../api/products';
 import { fetchCarousel } from '../../api/carousel';
+import { fetchServices } from '../../api/services';
 
 export const CarrouselEditor = () => {
   const [elements, setElements] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
+  const [allServices, setAllServices] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showAddServiceModal, setShowAddServiceModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  // Charger la config du carousel + produits
+  // Charger la config du carousel + produits + services
   useEffect(() => {
-    Promise.all([fetchCarousel(), fetchProducts()])
-      .then(([carouselConfig, products]) => {
+    Promise.all([fetchCarousel(), fetchProducts(), fetchServices()])
+      .then(([carouselConfig, products, services]) => {
         const merged = carouselConfig
           .map(c => {
-            // c.product_id comes from carousel.json
+            // try match product
             const prod = products.find(p => p.id === c.product_id);
-            return prod ? { ...prod, order: c.order } : null;
+            if (prod) return { ...prod, order: c.order, type: 'product' };
+            // else try match service
+            const serv = services.find(s => s.id === c.product_id);
+            if (serv) return { ...serv, order: c.order, type: 'service' };
+            return null;
           })
           .filter(Boolean)
           .sort((a, b) => a.order - b.order);
         setElements(merged);
+        setAllServices(services);
       })
       .catch(err => console.error('Erreur chargement carrousel:', err));
   }, []);
@@ -79,22 +88,64 @@ export const CarrouselEditor = () => {
   const handleOpenModal = () => setShowAddModal(true);
   const handleCloseModal = () => setShowAddModal(false);
 
-  const handleAdd = async (newItem) => {
-    try {
-      const response = await fetch('/api/carousel', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product_id: newItem.id, order: newItem.order }),
-      });
-      const saved = await response.json();
-      // Merge saved with product data
-      const prod = allProducts.find(p => p.id === saved.product_id);
-      if (prod) setElements(prev => [...prev, { ...prod, order: saved.order }]);
-      setShowAddModal(false);
-    } catch (err) {
-      console.error('Erreur ajout du carousel item:', err);
+  const handleOpenServiceModal = () => setShowAddServiceModal(true);
+  const handleCloseServiceModal = () => setShowAddServiceModal(false);
+
+ // Ajout de gestion d'erreurs explicite dans handleAdd et handleAddService
+
+const handleAdd = async (newItem) => {
+  try {
+    const payload = {
+      product_id: parseInt(newItem.product_id, 10),
+      order: parseInt(newItem.order, 10)
+    };
+    const response = await fetch('/api/carousel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Erreur lors de l’ajout');
     }
-  };
+    const saved = await response.json();
+    const prod = allProducts.find(p => p.id === saved.item_id);
+    if (prod) {
+      setElements(prev => [...prev, { ...prod, order: saved.order }]);
+    }
+    setShowAddModal(false);
+  } catch (err) {
+    console.error('Erreur ajout du carousel item:', err);
+    alert(err.message); 
+  }
+};
+
+const handleAddService = async (newItem) => {
+  try {
+    const payload = {
+      service_id: parseInt(newItem.service_id, 10),
+      order: parseInt(newItem.order, 10)
+    };
+    const response = await fetch('/api/carousel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Erreur lors de l’ajout');
+    }
+    const saved = await response.json();
+    const serv = allServices.find(s => s.id === saved.item_id);
+    if (serv) {
+      setElements(prev => [...prev, { ...serv, order: saved.order, type: 'service' }]);
+    }
+    setShowAddServiceModal(false);
+  } catch (err) {
+    console.error('Erreur ajout du carousel service item:', err);
+    alert(err.message);
+  }
+};
 
   const handleOpenEdit = item => {
     setSelectedItem(item);
@@ -113,11 +164,15 @@ export const CarrouselEditor = () => {
       <button onClick={handleOpenModal} className={styles.addButton}>
         Ajouter un produit
       </button>
+      <button onClick={handleOpenServiceModal} className={styles.addButton}>
+        Ajouter un service
+      </button>
       <table className={styles.summaryTable}>
         <thead>
           <tr>
             <th>ID</th>
             <th>Nom</th>
+            <th>Image</th>
             <th>Ordre</th>
             <th>Actions</th>
           </tr>
@@ -127,6 +182,17 @@ export const CarrouselEditor = () => {
             <tr key={item.id}>
               <td>{item.id}</td>
               <td>{item.name}</td>
+              <td>
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
+                  />
+                ) : (
+                  <span>—</span>
+                )}
+              </td>
               <td>{item.order}</td>
               <td>
                 <button onClick={() => handleOpenEdit(item)}>Modifier</button>
@@ -150,6 +216,12 @@ export const CarrouselEditor = () => {
         onClose={handleCloseModal}
         products={allProducts}
         onSave={handleAdd}
+      />
+      <AddServiceModal
+        isOpen={showAddServiceModal}
+        onClose={handleCloseServiceModal}
+        services={allServices}
+        onSave={handleAddService}
       />
     </div>
   );
