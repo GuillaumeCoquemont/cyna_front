@@ -27,6 +27,7 @@ import DashboardProducts from '../components/dashboard/DashboardProducts';
 import { CarrouselEditor } from '../components/dashboard/DashboardCarrousselElements';
 import DashboardCodePromo from '../components/dashboard/DashboardCodePromo';
 import DashboardServices from '../components/dashboard/DashboardServices';
+import DashboardTeam from '../components/dashboard/DashboardTeam';
 import { fetchProducts } from '../api/products';
 
 export default function DashboardAdmin() {
@@ -170,6 +171,12 @@ export default function DashboardAdmin() {
         return (
           <div className={styles.dashboardContent}>
             <DashboardServices />
+          </div>
+        );
+      case 'team':
+        return (
+          <div className={styles.dashboardContent}>
+            <DashboardTeam />
           </div>
         );
       default:

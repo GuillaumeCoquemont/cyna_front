@@ -149,6 +149,9 @@
   border-radius: var(--border-radius);
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .productImage {
@@ -159,7 +162,7 @@
 
 .productDescription {
   font-size: 0.9rem;
-  color: var(--primary-color);
+  color: var(--primary-color) !important;
   margin: 0.5rem 0;
   line-height: 1.4;
 }
@@ -181,6 +184,10 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 0.5rem;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .productTitle {
@@ -196,15 +203,19 @@
 }
 
 .addToCartButton {
-  background: none;
-  border: none;
-  color: var(--text-color);
+  background: var(--tertiary-color);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  border:none;
+  color: var(--white-color);
   cursor: pointer;
   transition: color 0.3s ease;
 }
 
 .addToCartButton:hover {
   color: var(--tertiary-color);
+  background: var(--white-color);
+  border: var(--tertiary-color) 1px solid;
 }
 
 .pagination {
@@ -230,7 +241,7 @@
 }
 
 .loadMoreButton:hover:not(:disabled) {
-  background-color: var(--tertiary-color-dark);
+  background-color: var(--tertiary-color);
 }
 
 .loadMoreButton:disabled {
@@ -278,9 +289,12 @@
   }
 } 
 
-/* Remove link underlines on Products page */
 .sidebar a,
-.categoryList a,
+.categoryCheckboxList a,
 .productsGrid a {
   text-decoration: none;
+}
+
+.productInfo p {
+  color: var(--primary-color);
 }

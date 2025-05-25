@@ -1,0 +1,98 @@
+
+.editorContainer {
+  padding: 20px;
+  background-color: var(--white-color);
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  padding: 15px;
+  background-color: var(--white-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card input,
+.card textarea {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: 0.9rem;
+}
+
+.card textarea {
+  resize: vertical;
+}
+
+.card button {
+  padding: 8px 12px;
+  background-color: var(--tertiary-color);
+  color: var(--white-color);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color var(--transition);
+}
+
+.card button:hover {
+  background-color: var(--tertiary-hover);
+}
+
+.addButton {
+  padding: 10px 20px;
+  background-color: var(--tertiary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: background-color var(--transition-duration) var(--transition-timing);
+}
+
+.summaryTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.summaryTable th,
+.summaryTable td {
+  border-bottom: 1px solid #ddd;
+  padding: 12px 15px;
+}
+
+.summaryTable th {
+  text-align: left;
+  background-color: var(--grey-color);
+}
+
+.summaryTable tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+.summaryTable td button {
+  padding: 6px 12px;
+  margin-right: 8px;
+  background-color: var(--blue-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color var(--transition-duration) var(--transition-timing);
+}
+
+.summaryTable td button:hover {
+  background-color: var(--blue-hover);
+}
+
+.summaryTable td .deleteButton {
+  background-color: var(--rouge-color);
+}
+
+.summaryTable td .deleteButton:hover {
+  background-color: var(--rouge-hover);
+}

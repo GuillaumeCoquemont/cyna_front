@@ -60,26 +60,21 @@ app.post('/api/carousel', (req, res) => {
   const newItem = req.body;
   console.log('🛠️ Backend a reçu:', newItem); 
 
-  // Require either product_id or service_id
-  if (!newItem.product_id && !newItem.service_id) {
-    return res.status(400).json({ error: 'product_id ou service_id est requis' });
+  // Destructure expected fields and validate
+  const { item_id, type } = newItem;
+  if (!item_id || !type) {
+    return res.status(400).json({ error: 'item_id et type sont requis' });
   }
 
-  // Determine item_id and type
-  const item_id = newItem.product_id || newItem.service_id;
-  const type = newItem.product_id ? 'product' : 'service';
-
-  // Ensure order is a number
-  if (newItem.order != null) {
-    newItem.order = parseInt(newItem.order, 10);
-  }
+  // Parse order as integer
+  const order = parseInt(newItem.order, 10);
 
   // Validate unique order
-  if (carousel.some(item => item.order === newItem.order)) {
+  if (carousel.some(item => item.order === order)) {
     return res.status(400).json({ error: 'order doit être unique' });
   }
 
-  const carouselItem = { item_id, type, order: newItem.order };
+  const carouselItem = { item_id, type, order };
 
   carousel.push(carouselItem);
   fs.writeFileSync(filePath, JSON.stringify(carousel, null, 2), 'utf-8');
@@ -182,6 +177,61 @@ app.delete('/api/products/:id', (req, res) => {
   products = products.filter(p => p.id !== +req.params.id);
   fs.writeFileSync(filePath, JSON.stringify(products, null, 2), 'utf-8');
   res.status(204).end();
+});
+
+// GET /api/team → renvoie tout team.json
+app.get('/api/team', (req, res) => {
+  res.sendFile(path.join(__dirname, 'team.json'));
+});
+
+// PUT /api/team/:id → met à jour un membre dans team.json
+
+app.put('/api/team/:id', (req, res) => {
+  const filePath = path.join(__dirname, 'team.json');
+  const team = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  const idx = team.findIndex(m => m.id === +req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Membre non trouvé' });
+
+  team[idx] = { ...team[idx], ...req.body };
+  fs.writeFileSync(filePath, JSON.stringify(team, null, 2), 'utf-8');
+  res.json(team[idx]);
+});
+
+// DELETE /api/team/:id → supprime un membre dans team.json
+app.delete('/api/team/:id', (req, res) => {
+  const filePath = path.join(__dirname, 'team.json');
+  let team = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  const id = +req.params.id;
+  const newTeam = team.filter(m => m.id !== id);
+  if (newTeam.length === team.length) {
+    return res.status(404).json({ error: 'Membre non trouvé' });
+  }
+  fs.writeFileSync(filePath, JSON.stringify(newTeam, null, 2), 'utf-8');
+  res.status(204).end();
+});
+
+// POST /api/team → ajoute un nouveau membre dans team.json
+app.post('/api/team', (req, res) => {
+  const filePath = path.join(__dirname, 'team.json');
+  const team = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  // Calculer le prochain id
+  const nextId = team.reduce((max, m) => Math.max(max, m.id), 0) + 1;
+  const newMember = { id: nextId, ...req.body };
+  team.push(newMember);
+  fs.writeFileSync(filePath, JSON.stringify(team, null, 2), 'utf-8');
+  res.status(201).json(newMember);
+});
+
+// POST /api/team → ajoute un nouveau membre dans team.json
+app.post('/api/team', (req, res) => {
+  const filePath = path.join(__dirname, 'team.json');
+  const team = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  // Calculer le prochain id
+  const nextId = team.reduce((max, m) => Math.max(max, m.id), 0) + 1;
+  const newMember = { id: nextId, ...req.body };
+  team.push(newMember);
+  fs.writeFileSync(filePath, JSON.stringify(team, null, 2), 'utf-8');
+  res.status(201).json(newMember);
 });
 
 // POST /api/auth/login → vérifie les identifiants dans users.json

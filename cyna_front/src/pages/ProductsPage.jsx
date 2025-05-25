@@ -1,71 +1,95 @@
+// src/pages/ProductsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from '../styles/pages/ProductsPage.module.css';
 import { useCart } from '../context/CartContext';
 import { fetchProducts } from '../api/products';
-
-
+import { fetchServices } from '../api/services';
 
 const ProductsPage = () => {
   const { addToCart } = useCart();
   const [searchQuery, setSearchQuery] = useState('');
-  const [allProducts, setAllProducts] = useState([]);
+  const [allItems, setAllItems] = useState([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedType, setSelectedType] = useState('');  // 'Produit' or 'Service'
-  const [visibleProducts, setVisibleProducts] = useState(6);
-  const [isLoading, setIsLoading] = useState(false);
+  const [visibleItems, setVisibleItems] = useState(6);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Charge produits + services
   useEffect(() => {
     setLoading(true);
-    fetchProducts()
-      .then(data => setAllProducts(data))
+    Promise.all([fetchProducts(), fetchServices()])
+      .then(([products, services]) => {
+        // Map services to same shape as products
+        const svcNormalized = services.map(s => ({
+          id: s.id,
+          name: s.Name,
+          description: s.Description,
+          price: s.Price,
+          image: s.image,
+          category: s.Subscription ? 'Abonnement' : 'Service à la carte',
+          type: 'service',
+        }));
+        const prodNormalized = products.map(p => ({
+          id: p.id,
+          name: p.name,
+          description: p.description,
+          price: p.price,
+          image: p.image,
+          category: p.category || 'Produit',
+          type: 'product',
+        }));
+        setAllItems([...prodNormalized, ...svcNormalized]);
+      })
       .catch(err => {
-        console.error('Erreur fetchProducts:', err);
+        console.error(err);
         setError(err.message);
       })
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p>Chargement des produits…</p>;
-  if (error) return <p>Erreur : {error}</p>;
+  if (loading) return <p>Chargement en cours…</p>;
+  if (error)   return <p className={styles.error}>Erreur : {error}</p>;
 
   const priceRanges = [
-    { id: '20-50', label: '$20.00 - $50.00' },
-    { id: '50-100', label: '$50.00 - $100.00' },
-    { id: '100-200', label: '$100.00 - $200.00' },
-    { id: '200-500', label: '$200.00 - $500.00' }
+    { id: '0-50',   label: '€0 - €50' },
+    { id: '50-100', label: '€50 - €100' },
+    { id: '100-200',label: '€100 - €200' },
+    { id: '200-500',label: '€200 - €500' },
   ];
 
-  // derive unique categories
+  // catégories dynamiques
   const categories = Array.from(
-    new Set(allProducts.map(p => p.category))
-  ).map(cat => ({ id: cat, name: cat }));
+    new Set(allItems.map(i => i.category))
+  );
 
-  // Filtrage selon la requête de recherche, type, et catégories sélectionnées
-  const filteredProducts = allProducts
-    .filter(product =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filtered = allItems
+    // recherche sur name + description
+    .filter(i =>
+      i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      i.description.toLowerCase().includes(searchQuery.toLowerCase())
     )
-    .filter(product =>
-      !selectedType || product.type === selectedType
-    )
-    .filter(product =>
-      selectedCategories.length === 0 || selectedCategories.includes(product.category)
-    );
+    // filtre catégories
+    .filter(i => !selectedCategories.length || selectedCategories.includes(i.category))
+    // filtre prix
+    .filter(i => {
+      if (!selectedPriceRange) return true;
+      const [min, max] = selectedPriceRange.split('-').map(Number);
+      return i.price >= min && i.price <= max;
+    });
 
-  const handleLoadMore = () => {
-    setIsLoading(true);
+  const displayed = filtered.slice(0, visibleItems);
+  const hasMore = visibleItems < filtered.length;
+
+  const loadMore = () => {
+    setIsLoadingMore(true);
     setTimeout(() => {
-      setVisibleProducts(prev => Math.min(prev + 6, filteredProducts.length));
-      setIsLoading(false);
-    }, 500);
+      setVisibleItems(v => Math.min(v + 6, filtered.length));
+      setIsLoadingMore(false);
+    }, 300);
   };
-
-  const displayedProducts = filteredProducts.slice(0, visibleProducts);
-  const hasMoreProducts = visibleProducts < filteredProducts.length;
 
   return (
     <div className={styles.productsPage}>
@@ -73,123 +97,82 @@ const ProductsPage = () => {
         <aside className={styles.sidebar}>
 
           <div className={styles.filterSection}>
-            <h2 className={styles.filterTitle}>Type</h2>
-            <div className={styles.categoryCheckboxList}>
-              {['Produit', 'Service'].map(type => (
-                <label key={type} className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={selectedType === type}
-                    onChange={() =>
-                      setSelectedType(prev => (prev === type ? '' : type))
-                    }
-                  />
-                  <span className={styles.checkboxText}>{type}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.filterSection}>
-            <h2 className={styles.filterTitle}>Price Range</h2>
-            <div className={styles.priceRangeList}>
-              {priceRanges.map((range) => (
-                <label key={range.id} className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={selectedPriceRange === range.id}
-                    onChange={() =>
-                      setSelectedPriceRange(prev => prev === range.id ? '' : range.id)
-                    }
-                  />
-                  <span className={styles.checkboxText}>{range.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.filterSection}>
             <h2 className={styles.filterTitle}>Catégorie</h2>
-            <div className={styles.categoryCheckboxList}>
-              {categories.map(category => (
-                <label key={category.id} className={styles.checkboxLabel}>
+            <div className={styles.checkboxList}>
+              {categories.map(cat => (
+                <label key={cat} className={styles.checkboxLabel}>
                   <input
                     type="checkbox"
-                    checked={selectedCategories.includes(category.name)}
-                    onChange={() => {
+                    checked={selectedCategories.includes(cat)}
+                    onChange={() =>
                       setSelectedCategories(prev =>
-                        prev.includes(category.name)
-                          ? prev.filter(cat => cat !== category.name)
-                          : [...prev, category.name]
-                      );
-                    }}
+                        prev.includes(cat)
+                          ? prev.filter(c => c !== cat)
+                          : [...prev, cat]
+                      )
+                    }
                   />
-                  <span className={styles.checkboxText}>{category.name}</span>
+                  <span>{cat}</span>
                 </label>
               ))}
             </div>
           </div>
 
-
-          <button
-            className={styles.searchButton}
-            onClick={() => setVisibleProducts(filteredProducts.length > 6 ? 6 : filteredProducts.length)}
-          >
-            Rechercher
-          </button>
-
+          <div className={styles.filterSection}>
+            <h2 className={styles.filterTitle}>Prix</h2>
+            <div className={styles.checkboxList}>
+              {priceRanges.map(r => (
+                <label key={r.id} className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={selectedPriceRange === r.id}
+                    onChange={() =>
+                      setSelectedPriceRange(pr => pr === r.id ? '' : r.id)
+                    }
+                  />
+                  <span>{r.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
         </aside>
 
         <section className={styles.productSection}>
-          <h1 className={styles.pageTitle}>Nos produits</h1>
-          
           <div className={styles.searchBar}>
             <input
               type="text"
-              placeholder="Rechercher par nom ou desc"
+              placeholder="Rechercher..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={styles.mainSearchInput}
+              onChange={e => setSearchQuery(e.target.value)}
+              className={styles.searchInput}
             />
-            <button className={styles.searchButton}>
-              <i className="fas fa-search"></i>
-            </button>
           </div>
 
           <div className={styles.productsGrid}>
-            {displayedProducts.map((product) => (
-              <Link
-                key={product.id}
-                to={`/product/${product.id}`}
-                className={styles.productLink}
-              >
+            {displayed.map(item => (
+              <Link key={`${item.type}-${item.id}`} to={`/${item.type}/${item.id}`}>
                 <div className={styles.productCard}>
                   <div className={styles.productImage}>
-                    {product.discount && (
-                      <span className={styles.saleTag}>-{product.discount}%</span>
-                    )}
-                    <img src={product.image} alt={product.name} className={styles.productImageTag} />
+                    <img src={item.image} alt={item.name} />
                   </div>
                   <div className={styles.productInfo}>
-                    <h3 className={styles.productTitle}>{product.name}</h3>
-                    <p className={styles.productDescription}>{product.description}</p>
-                    <p className={styles.productPrice}>${product.price.toFixed(2)}</p>
+                    <h3>{item.name}</h3>
+                    <p>{item.description}</p>
+                    <p className={styles.price}>€{item.price.toFixed(2)}</p>
                     <button
                       className={styles.addToCartButton}
                       onClick={e => {
                         e.preventDefault();
                         e.stopPropagation();
-                        addToCart({ 
-                          id: product.id,
-                          name: product.name, 
-                          price: product.price, 
-                          image: product.image,
-                          // include other fields if needed
+                        addToCart({
+                          id: item.id,
+                          name: item.name,
+                          price: item.price,
+                          image: item.image
                         }, 1);
                       }}
-                      aria-label="Ajouter au panier"
                     >
-                      <i className="fas fa-shopping-cart"></i>
+                      Ajouter au panier
                     </button>
                   </div>
                 </div>
@@ -197,20 +180,15 @@ const ProductsPage = () => {
             ))}
           </div>
 
-          <div className={styles.pagination}>
-            <p className={styles.showingText}>
-              Showing 1–{visibleProducts} of {filteredProducts.length} item(s)
-            </p>
-            {hasMoreProducts && (
-              <button 
-                className={`${styles.loadMoreButton} ${isLoading ? styles.loading : ''}`}
-                onClick={handleLoadMore}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Chargement...' : 'Load More'}
-              </button>
-            )}
-          </div>
+          {hasMore && (
+            <button
+              className={styles.loadMoreButton}
+              onClick={loadMore}
+              disabled={isLoadingMore}
+            >
+              {isLoadingMore ? 'Chargement…' : 'Voir plus'}
+            </button>
+          )}
         </section>
       </main>
     </div>

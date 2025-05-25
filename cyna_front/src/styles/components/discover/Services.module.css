@@ -1,163 +1,107 @@
 .servicesSection {
-  color: var(--white-color);
-  text-align: left;
   background-color: var(--primary-color);
   color: var(--white-color);
-  padding: 0 1rem 2rem 1rem;
+  padding: 2rem 1rem;
+}
+
+.headerGroup {
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
 .title {
-  color: var(--white-color);
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0;
+  font-size: 2.5rem;
+  margin-bottom: .5rem;
 }
 
 .subtitle {
   font-size: 1rem;
-  color: rgba(255,255,255,0.75);
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
+  color: rgba(255,255,255,0.8);
 }
 
 .cards {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
 }
 
 @media(min-width: 768px) {
   .cards {
-    flex-direction: row;
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 .card {
   background: var(--white-color);
-  border-radius: 8px;
+  color: #333;
+  border-radius: var(--border-radius);
   overflow: hidden;
-  flex: 1;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0,0,0,.1);
 }
 
 .cardHeader {
   display: flex;
   align-items: center;
-  background-color: var(--primary-color);
+  background: var(--primary-color);
   color: var(--white-color);
   padding: 1rem;
 }
 
 .cardIcon {
-  margin-right: 0.5rem;
+  margin-right: .75rem;
   font-size: 1.5rem;
 }
 
 .cardHeader h3 {
   margin: 0;
   font-size: 1.25rem;
-  font-weight: 600;
 }
 
 .cardContent {
-  display: flex;
-  flex-direction: column;
-}
-
-@media(min-width: 768px) {
-  .cardContent {
-    flex-direction: row;
-    min-height: 200px;
-  }
-}
-
-.text {
-  background-color: var(--primary-color);
-  color: var(--white-color);
-  padding: 1.5rem;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.subtitleItem {
-  margin: 0 0 0.5rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-
-.text p {
-  margin: 0;
-  line-height: 1.4;
-}
-
-.image {
-  flex: 1;
-  overflow: hidden;
-}
-
-.image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.serviceRow {
-  border: 1px solid var(--white-color);
-  margin-bottom: 1.5rem;
-}
-
-.serviceHeader {
-  background-color: var(--white-color);
-  color: var(--primary-color);
-  font-size: 1.5rem;
-  font-weight: 600;
-  padding: 0.5rem 1rem;
-}
-
-.serviceContent {
-  display: flex;
-  flex-wrap: nowrap;
-  min-height: 200px;
-}
-
-.textBlock {
-  flex: 1;
-  background-color: var(--primary-color);
   padding: 1rem;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
 }
 
-.textBlock p {
-  margin: 0;
-  line-height: 1.4;
+.cardContent .subtitleItem {
+  font-size: 1.125rem;
+  margin-bottom: .5rem;
 }
 
-.imageBlock {
+.cardContent p {
   flex: 1;
+  margin: 0 0 1rem 0;
+  line-height: 1.4;
+  color:var(--primary-color);
+}
+
+.cardImage {
+  width: 100%;
+  height: 150px;
   overflow: hidden;
 }
 
-.imageBlock img {
+.cardImage img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-@media (max-width: 768px) {
-  .serviceContent {
-    flex-direction: column;
-  }
+.cardFooter {
+  background: var(--white-color);
+  padding: 0.75rem 1rem;
+  text-align: right;
 }
 
-.headerGroup {
-  text-align: center;
-  background-color: var(--tertiary-color);
-  margin: 0 -1rem 1rem -1rem;
-  padding: 1rem 0;
+.cardFooter a {
+  color: var(--tertiary-color);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.cardFooter a:hover {
+  text-decoration: underline;
 }
