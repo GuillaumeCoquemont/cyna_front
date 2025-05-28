@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "CreationDate": "2025-05-27T14:23:00Z",
+    "TotalPrice": 320.00,
+    "Status": "pending",
+    "user_id": 42,
+    "cart_id": 7,
+    "items": [
+      {
+        "id": 1,
+        "order_id": 1,
+        "product_id": 3,
+        "Quantity": 2,
+        "Price": 150.00
+      },
+      {
+        "id": 2,
+        "order_id": 1,
+        "service_id": 1,
+        "Quantity": 1,
+        "Price": 20.00
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "CreationDate": "2025-05-28T09:10:00Z",
+    "TotalPrice": 450.50,
+    "Status": "completed",
+    "user_id": 15,
+    "cart_id": 8,
+    "items": [
+      {
+        "id": 3,
+        "order_id": 2,
+        "product_id": 1,
+        "Quantity": 1,
+        "Price": 200.00
+      },
+      {
+        "id": 4,
+        "order_id": 2,
+        "service_id": 2,
+        "Quantity": 5,
+        "Price": 50.10
+      }
+    ]
+  }
+]

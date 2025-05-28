@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "label": "Domicile",
+    "line1": "123 rue du soleil",
+    "city": "Rennes",
+    "zip": "35500",
+    "country": "France",
+    "isDefault": false
+  },
+  {
+    "id": 1,
+    "label": "Domicile",
+    "line1": "123 rue du soleil",
+    "city": "Rennes",
+    "zip": "35500",
+    "country": "France",
+    "isDefault": false
+  },
+  {
+    "id": 2,
+    "label": "travail",
+    "line1": "321 rue de la pluie",
+    "city": "Rennes",
+    "zip": "35500",
+    "country": "France",
+    "isDefault": true
+  },
+  {
+    "id": 2,
+    "label": "travail",
+    "line1": "321 rue de la pluie",
+    "city": "Rennes",
+    "zip": "35500",
+    "country": "France",
+    "isDefault": false
+  }
+]

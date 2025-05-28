@@ -1,14 +1,15 @@
 // server.js
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 
 const app = express();
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Expose raw JSON for dashboard fetching
-// app.use('/api', express.static(path.join(__dirname)));
+// Enable CORS for requests from the front-end development server
+app.use(cors({ origin: 'http://localhost:3000' }));
 
 // Log incoming API requests for debugging proxy
 app.use('/api', (req, res, next) => {
@@ -16,7 +17,9 @@ app.use('/api', (req, res, next) => {
   next();
 });
 
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
+
+// ----- Products Routes -----
 
 // GET /api/products → renvoie tout products.json
 app.get('/api/products', (req, res) => {
@@ -43,6 +46,25 @@ app.put('/api/products/:id', (req, res) => {
   res.json(products[idx]);
 });
 
+// POST /api/products → ajoute un nouveau produit
+app.post('/api/products', (req, res) => {
+  const filePath = path.join(__dirname, 'products.json');
+  const products = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  products.push(req.body);
+  fs.writeFileSync(filePath, JSON.stringify(products, null, 2), 'utf-8');
+  res.status(201).json(req.body);
+});
+
+// DELETE /api/products/:id → supprime un produit
+app.delete('/api/products/:id', (req, res) => {
+  const filePath = path.join(__dirname, 'products.json');
+  let products = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  products = products.filter(p => p.id !== +req.params.id);
+  fs.writeFileSync(filePath, JSON.stringify(products, null, 2), 'utf-8');
+  res.status(204).end();
+});
+
+// ----- Carousel Routes -----
 
 // GET /api/carousel → renvoie la configuration du carrousel
 app.get('/api/carousel', (req, res) => {
@@ -80,7 +102,6 @@ app.post('/api/carousel', (req, res) => {
   fs.writeFileSync(filePath, JSON.stringify(carousel, null, 2), 'utf-8');
   res.status(201).json(carouselItem);
 });
-
 
 // PUT /api/carousel/:item_id → met à jour l’ordre dans carousel.json
 app.put('/api/carousel/:item_id', (req, res) => {
@@ -124,6 +145,8 @@ app.delete('/api/carousel/:item_id', (req, res) => {
   res.status(204).end();
 });
 
+// ----- Services Routes -----
+
 // GET /api/services → renvoie tout services.json
 app.get('/api/services', (req, res) => {
   const filePath = path.join(__dirname, 'services.json');
@@ -161,23 +184,7 @@ app.delete('/api/services/:key', (req, res) => {
   res.status(204).end();
 });
 
-// POST /api/products → ajoute un nouveau produit
-app.post('/api/products', (req, res) => {
-  const filePath = path.join(__dirname, 'products.json');
-  const products = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-  products.push(req.body);
-  fs.writeFileSync(filePath, JSON.stringify(products, null, 2), 'utf-8');
-  res.status(201).json(req.body);
-});
-
-// DELETE /api/products/:id → supprime un produit
-app.delete('/api/products/:id', (req, res) => {
-  const filePath = path.join(__dirname, 'products.json');
-  let products = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-  products = products.filter(p => p.id !== +req.params.id);
-  fs.writeFileSync(filePath, JSON.stringify(products, null, 2), 'utf-8');
-  res.status(204).end();
-});
+// ----- Team Routes -----
 
 // GET /api/team → renvoie tout team.json
 app.get('/api/team', (req, res) => {
@@ -222,17 +229,114 @@ app.post('/api/team', (req, res) => {
   res.status(201).json(newMember);
 });
 
-// POST /api/team → ajoute un nouveau membre dans team.json
-app.post('/api/team', (req, res) => {
-  const filePath = path.join(__dirname, 'team.json');
-  const team = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-  // Calculer le prochain id
-  const nextId = team.reduce((max, m) => Math.max(max, m.id), 0) + 1;
-  const newMember = { id: nextId, ...req.body };
-  team.push(newMember);
-  fs.writeFileSync(filePath, JSON.stringify(team, null, 2), 'utf-8');
-  res.status(201).json(newMember);
+// ----- Client Routes -----
+
+app.get('/api/client/products', (req, res) => {
+  res.sendFile(path.join(__dirname, 'products.json'));
 });
+
+app.get('/api/client/services', (req, res) => {
+  res.sendFile(path.join(__dirname, 'services.json'));
+});
+
+// GET /api/orders → renvoie tout orders.json
+app.get('/api/orders', (req, res) => {
+  res.sendFile(path.join(__dirname, 'orders.json'));
+});
+
+// ----- Payment Methods Routes -----
+
+// GET /api/payment-methods → liste tous les moyens
+app.get('/api/payment-methods', (req, res) => {
+  const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'paymentMethods.json'), 'utf-8'));
+  res.json(data);
+});
+
+// POST /api/payment-methods → ajoute un moyen
+app.post('/api/payment-methods', (req, res) => {
+  const file = path.join(__dirname, 'paymentMethods.json');
+  const arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  // Si le nouveau moyen est défini par défaut, retirer le statut par défaut des autres
+  if (req.body.isDefault) {
+    arr.forEach(m => { m.isDefault = false; });
+  }
+  const nextId = arr.reduce((max, m) => Math.max(max, m.id), 0) + 1;
+  const newMethod = { id: nextId, ...req.body };
+  arr.push(newMethod);
+  fs.writeFileSync(file, JSON.stringify(arr, null, 2));
+  res.status(201).json(newMethod);
+});
+
+// PUT /api/payment-methods/:id → modifie un moyen
+app.put('/api/payment-methods/:id', (req, res) => {
+  console.log('Debug PUT /api/payment-methods/:id → id:', req.params.id, 'body:', req.body);
+  const file = path.join(__dirname, 'paymentMethods.json');
+  const arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  // Si on met à jour pour définir ce moyen par défaut, retirer le statut par défaut des autres
+  if (req.body.isDefault) {
+    arr.forEach(m => { m.isDefault = false; });
+  }
+  const idx = arr.findIndex(m => m.id === +req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Non trouvé' });
+  arr[idx] = { ...arr[idx], ...req.body };
+  fs.writeFileSync(file, JSON.stringify(arr, null, 2));
+  res.json(arr[idx]);
+});
+
+// DELETE /api/payment-methods/:id → supprime un moyen
+app.delete('/api/payment-methods/:id', (req, res) => {
+  const file = path.join(__dirname, 'paymentMethods.json');
+  let arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  arr = arr.filter(m => m.id !== +req.params.id);
+  fs.writeFileSync(file, JSON.stringify(arr, null, 2));
+  res.status(204).end();
+});
+
+// ----- Addresses Routes -----
+
+// GET /api/addresses → liste toutes les adresses
+app.get('/api/addresses', (req, res) => {
+  const file = path.join(__dirname, 'addresses.json');
+  const arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  res.json(arr);
+});
+
+// POST /api/addresses → ajoute une adresse
+app.post('/api/addresses', (req, res) => {
+  const file = path.join(__dirname, 'addresses.json');
+  const arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  // Si la nouvelle adresse est définie par défaut, retirer le statut des autres
+  if (req.body.isDefault) arr.forEach(a => a.isDefault = false);
+  const nextId = arr.reduce((max, a) => Math.max(max, a.id), 0) + 1;
+  const newAddress = { id: nextId, ...req.body };
+  arr.push(newAddress);
+  fs.writeFileSync(file, JSON.stringify(arr, null, 2));
+  res.status(201).json(newAddress);
+});
+
+// PUT /api/addresses/:id → modifie une adresse
+app.put('/api/addresses/:id', (req, res) => {
+  const file = path.join(__dirname, 'addresses.json');
+  const arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  // Si on définit par défaut, retirer le statut des autres
+  if (req.body.isDefault) arr.forEach(a => a.isDefault = false);
+  const idx = arr.findIndex(a => a.id === +req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Adresse non trouvée' });
+  arr[idx] = { ...arr[idx], ...req.body };
+  fs.writeFileSync(file, JSON.stringify(arr, null, 2));
+  res.json(arr[idx]);
+});
+
+// DELETE /api/addresses/:id → supprime une adresse
+app.delete('/api/addresses/:id', (req, res) => {
+  const file = path.join(__dirname, 'addresses.json');
+  let arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  arr = arr.filter(a => a.id !== +req.params.id);
+  fs.writeFileSync(file, JSON.stringify(arr, null, 2));
+  res.status(204).end();
+});
+
+// ----- Auth Routes -----
 
 // POST /api/auth/login → vérifie les identifiants dans users.json
 app.post('/api/auth/login', (req, res) => {

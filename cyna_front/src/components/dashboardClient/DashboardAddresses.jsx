@@ -1,47 +1,85 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../../styles/components/dashboardClient/DashboardAddresses.module.css';
-
-const mockAddresses = [
-  {
-    id: 'addr1',
-    label: 'Domicile',
-    line1: "123 Rue de l'École",
-    line2: '',
-    city: 'Paris',
-    zip: '75000',
-    country: 'France',
-    isDefault: true,
-  },
-  {
-    id: 'addr2',
-    label: 'Travail',
-    line1: '45 Avenue des Champs-Élysées',
-    line2: 'Bureau 12',
-    city: 'Paris',
-    zip: '75008',
-    country: 'France',
-    isDefault: false,
-  },
-];
+import {
+  fetchAddresses,
+  addAddress,
+  updateAddress,
+  deleteAddress,
+} from '../../api/addresses';
+import AddAddressModal from '../modals/AddAddressModal';
+import EditAddressModal from '../modals/EditAddressModal';
 
 export default function DashboardAddresses() {
   const [addresses, setAddresses] = useState([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState(null);
 
   useEffect(() => {
-    // Simuler la récupération depuis le backend
-    setAddresses(mockAddresses);
+    fetchAddresses()
+      .then(setAddresses)
+      .catch(console.error);
   }, []);
 
-  const handleDelete = (id) => {
-    // TODO: appel API pour supprimer
-    setAddresses(prev => prev.filter(a => a.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await deleteAddress(id);
+      setAddresses(prev => prev.filter(a => a.id !== id));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleMakeDefault = (id) => {
-    // TODO: appel API pour définir par défaut
-    setAddresses(prev =>
-      prev.map(a => ({ ...a, isDefault: a.id === id }))
-    );
+  const handleMakeDefault = async (id) => {
+    try {
+      await updateAddress(id, { isDefault: true });
+      setAddresses(prev =>
+        prev.map(a => ({ ...a, isDefault: a.id === id }))
+      );
+    } catch (error) {
+      console.error('Erreur mise à jour par défaut :', error);
+    }
+  };
+
+  const handleAdd = () => setShowAddModal(true);
+
+  const handleSaveNew = async (newAddress) => {
+    try {
+      const saved = await addAddress(newAddress);
+      setAddresses(prev => {
+        if (saved.isDefault) {
+          const cleared = prev.map(a => ({ ...a, isDefault: false }));
+          return [...cleared, saved];
+        }
+        return [...prev, saved];
+      });
+      setShowAddModal(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleOpenEdit = (address) => {
+    setSelectedAddress(address);
+    setShowEditModal(true);
+  };
+  const handleCloseEdit = () => {
+    setSelectedAddress(null);
+    setShowEditModal(false);
+  };
+  const handleSaveEdit = async (updated) => {
+    try {
+      const saved = await updateAddress(updated.id, updated);
+      setAddresses(prev => {
+        if (saved.isDefault) {
+          return prev.map(a => a.id === saved.id ? saved : { ...a, isDefault: false });
+        }
+        return prev.map(a => a.id === saved.id ? saved : a);
+      });
+      setShowEditModal(false);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -72,7 +110,7 @@ export default function DashboardAddresses() {
                     Définir par défaut
                   </button>
                 )}
-                <button className={styles.editBtn}>Éditer</button>
+                <button className={styles.editBtn} onClick={() => handleOpenEdit(addr)}>Éditer</button>
                 <button
                   className={styles.deleteBtn}
                   onClick={() => handleDelete(addr.id)}
@@ -84,8 +122,18 @@ export default function DashboardAddresses() {
           </div>
         ))}
       </div>
-      <button className={styles.addBtn}>Ajouter une adresse</button>
+      <button className={styles.addBtn} onClick={handleAdd}>Ajouter une adresse</button>
+      <AddAddressModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSave={handleSaveNew}
+      />
+      <EditAddressModal
+        isOpen={showEditModal}
+        onClose={handleCloseEdit}
+        address={selectedAddress}
+        onSave={handleSaveEdit}
+      />
     </div>
   );
 }
-

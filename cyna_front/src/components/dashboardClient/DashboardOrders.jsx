@@ -1,58 +1,92 @@
-// src/components/dashboard/DashboardOrders.jsx
+// src/components/dashboardClient/DashboardOrders.jsx
 import React, { useState, useEffect } from 'react';
 import styles from '../../styles/components/dashboardClient/DashboardOrders.module.css';
-
-const mockOrders = [
-  { id: 'CMD-001', date: '2025-04-20', total: '120,00 €', status: 'Livrée' },
-  { id: 'CMD-002', date: '2025-04-22', total: '75,50 €',  status: 'En cours' },
-  { id: 'CMD-003', date: '2025-04-25', total: '210,00 €', status: 'Annulée' },
-  { id: 'CMD-004', date: '2025-05-01', total: '49,99 €',  status: 'Livrée' },
-];
+import { fetchOrders } from '../../api/orders';
+import { fetchProducts } from '../../api/products';
+import { fetchServices } from '../../api/services';
 
 export default function DashboardOrders() {
-  const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [services, setServices] = useState([]);
 
   useEffect(() => {
-    // ici tu ferais un fetch('/api/client/orders')…
-    setOrders(mockOrders);
+    Promise.all([fetchOrders(), fetchProducts(), fetchServices()]).then(([orders, allProducts, allServices]) => {
+      const productItems = orders.flatMap(o =>
+        o.items
+          .filter(i => i.product_id)
+          .map(i => {
+            const product = allProducts.find(p => p.id === i.product_id);
+            return {
+              ...i,
+              orderId: o.id,
+              name: product ? product.name : '',
+              quantity: i.Quantity,
+              price: i.Price
+            };
+          })
+      );
+      const serviceItems = orders.flatMap(o =>
+        o.items
+          .filter(i => i.service_id)
+          .map(i => {
+            const service = allServices.find(s => s.id === i.service_id);
+            return {
+              ...i,
+              orderId: o.id,
+              name: service ? service.Name : '',
+              quantity: i.Quantity,
+              price: i.Price
+            };
+          })
+      );
+      setProducts(productItems);
+      setServices(serviceItems);
+    });
   }, []);
 
   return (
     <div className={styles.ordersContainer}>
-      <h3 className={styles.sectionTitle}>Mes commandes récentes</h3>
+      <h3 className={styles.sectionTitle}>Mes produits</h3>
       <table className={styles.ordersTable}>
         <thead>
           <tr>
-            <th>Numéro</th>
-            <th>Date</th>
-            <th>Montant</th>
-            <th>Statut</th>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Quantité</th>
+            <th>Prix</th>
           </tr>
         </thead>
         <tbody>
-          {orders.map(o => (
-            <tr key={o.id}>
-              <td>{o.id}</td>
-              <td>{o.date}</td>
-              <td>{o.total}</td>
-              <td>
-                <span className={`${styles.statusBadge} ${
-                  o.status === 'Livrée'   ? styles.delivered :
-                  o.status === 'En cours'  ? styles.pending   :
-                  styles.rejected
-                }`}>
-                  {o.status}
-                </span>
-              </td>
+          {products.map(p => (
+            <tr key={`${p.orderId}-${p.product_id}`}>
+              <td>{p.orderId}</td>
+              <td>{p.name}</td>
+              <td>{p.quantity}</td>
+              <td>{p.price}</td>
             </tr>
           ))}
-          {orders.length === 0 && (
-            <tr>
-              <td colSpan="4" className={styles.emptyMessage}>
-                Aucune commande à afficher
-              </td>
+        </tbody>
+      </table>
+
+      <h3 className={styles.sectionTitle}>Mes services</h3>
+      <table className={styles.ordersTable}>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Quantité</th>
+            <th>Prix</th>
+          </tr>
+        </thead>
+        <tbody>
+          {services.map(s => (
+            <tr key={`${s.orderId}-${s.service_id}`}>
+              <td>{s.orderId}</td>
+              <td>{s.name}</td>
+              <td>{s.quantity}</td>
+              <td>{s.price}</td>
             </tr>
-          )}
+          ))}
         </tbody>
       </table>
     </div>

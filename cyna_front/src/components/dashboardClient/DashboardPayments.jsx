@@ -1,29 +1,88 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../../styles/components/dashboardClient/DashboardPayments.module.css';
-
-const mockPaymentMethods = [
-  { id: 'pm_1', type: 'Visa', last4: '4242', expiry: '12/24', isDefault: true },
-  { id: 'pm_2', type: 'MasterCard', last4: '5555', expiry: '11/23', isDefault: false },
-];
+import {
+  fetchPaymentMethods,
+  addPaymentMethod,
+  updatePaymentMethod,
+  deletePaymentMethod,
+} from '../../api/paymentMethods';
+import AddPaymentMethodModal from '../modals/AddPaymentMethodModal';
+import EditPaymentMethodModal from '../modals/EditPaymentMethodModal';
 
 export default function DashboardPayments() {
   const [methods, setMethods] = useState([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedMethod, setSelectedMethod] = useState(null);
 
   useEffect(() => {
-    // Simuler la récupération des moyens de paiement depuis le backend
-    setMethods(mockPaymentMethods);
+    fetchPaymentMethods()
+      .then(setMethods)
+      .catch(console.error);
   }, []);
 
-  const handleDelete = (id) => {
-    // TODO: appel API pour supprimer
-    setMethods(prev => prev.filter(m => m.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await deletePaymentMethod(id);
+      setMethods(prev => prev.filter(m => m.id !== id));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleMakeDefault = (id) => {
-    // TODO: appel API pour définir par défaut
-    setMethods(prev =>
-      prev.map(m => ({ ...m, isDefault: m.id === id }))
-    );
+  const handleMakeDefault = async (id) => {
+    try {
+      // Call API to mark this method as default
+      await updatePaymentMethod(id, { isDefault: true });
+      // Update local state
+      setMethods(prev =>
+        prev.map(m => ({ ...m, isDefault: m.id === id }))
+      );
+    } catch (error) {
+      console.error('Erreur mise à jour par défaut :', error);
+      window.alert('Impossible de définir ce moyen de paiement comme défaut');
+    }
+  };
+
+  const handleAdd = () => setShowAddModal(true);
+
+  const handleSaveNew = async (newMethod) => {
+    try {
+      const saved = await addPaymentMethod(newMethod);
+      setMethods(prev => {
+        if (saved.isDefault) {
+          const cleared = prev.map(m => ({ ...m, isDefault: false }));
+          return [...cleared, saved];
+        }
+        return [...prev, saved];
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleOpenEdit = (method) => {
+    setSelectedMethod(method);
+    setShowEditModal(true);
+  };
+  const handleCloseEdit = () => {
+    setSelectedMethod(null);
+    setShowEditModal(false);
+  };
+  const handleSaveEdit = async (updated) => {
+    try {
+      const saved = await updatePaymentMethod(updated.id, updated);
+      setMethods(prev => {
+        if (saved.isDefault) {
+          return prev.map(m => m.id === saved.id ? saved : { ...m, isDefault: false });
+        }
+        return prev.map(m => m.id === saved.id ? saved : m);
+      });
+      setShowEditModal(false);
+    } catch (error) {
+      console.error(error);
+      window.alert('Impossible de modifier le moyen de paiement');
+    }
   };
 
   return (
@@ -47,6 +106,12 @@ export default function DashboardPayments() {
                 </button>
               )}
               <button
+                className={styles.editBtn}
+                onClick={() => handleOpenEdit(m)}
+              >
+                Modifier
+              </button>
+              <button
                 className={styles.deleteBtn}
                 onClick={() => handleDelete(m.id)}
               >
@@ -56,7 +121,18 @@ export default function DashboardPayments() {
           </div>
         ))}
       </div>
-      <button className={styles.addBtn}>Ajouter un moyen de paiement</button>
+      <button className={styles.addBtn} onClick={handleAdd}>Ajouter un moyen de paiement</button>
+      <AddPaymentMethodModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSave={handleSaveNew}
+      />
+      <EditPaymentMethodModal
+        isOpen={showEditModal}
+        onClose={handleCloseEdit}
+        method={selectedMethod}
+        onSave={handleSaveEdit}
+      />
     </div>
   );
 }
