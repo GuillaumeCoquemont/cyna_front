@@ -4,7 +4,7 @@ import styles from '../../styles/components/dashboard/DashboardCarrousselElement
 import React, { useState, useEffect } from 'react';
 import EditCarouselItemModal from '../modals/EditCarouselItemModal';
 import AddCarouselItemModal from '../modals/AddCarouselItemModal';
-import AddServiceModal from '../modals/AddServiceModal';
+import AddCarouselServiceModal from '../modals/AddCarouselServiceModal';
 import { fetchProducts } from '../../api/products';
 import { fetchCarousel } from '../../api/carousel';
 import { fetchServices } from '../../api/services';
@@ -217,10 +217,9 @@ const handleAddService = async (newItem) => {
         products={allProducts}
         onSave={handleAdd}
       />
-      <AddServiceModal
+      <AddCarouselServiceModal
         isOpen={showAddServiceModal}
         onClose={handleCloseServiceModal}
-        services={allServices}
         onSave={handleAddService}
       />
     </div>

@@ -25,7 +25,7 @@
 }
 
 .tab:hover {
-  background: var(--primary-color); /* using primary for active hover */
+  background: var(--primary-color);
 }
 
 .tab.active {

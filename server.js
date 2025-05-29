@@ -239,9 +239,38 @@ app.get('/api/client/services', (req, res) => {
   res.sendFile(path.join(__dirname, 'services.json'));
 });
 
-// GET /api/orders → renvoie tout orders.json
+// GET /api/orders → assemble orders from separate JSON files
 app.get('/api/orders', (req, res) => {
-  res.sendFile(path.join(__dirname, 'orders.json'));
+  try {
+    const orderItems = JSON.parse(fs.readFileSync(path.join(__dirname, 'orderItems.json'), 'utf-8'));
+    const assoProducts = JSON.parse(fs.readFileSync(path.join(__dirname, 'assoOrderItemsProducts.json'), 'utf-8'));
+    const assoServices = JSON.parse(fs.readFileSync(path.join(__dirname, 'assoOrderItemsServices.json'), 'utf-8'));
+    
+    // Group items by order_id
+    const ordersMap = {};
+    orderItems.forEach(item => {
+      const { id, order_id, Quantity, Price } = item;
+      const productAssoc = assoProducts.find(ap => ap.order_item_id === id);
+      const serviceAssoc = assoServices.find(asrv => asrv.order_item_id === id);
+      const entry = { id, order_id, Quantity, Price };
+      if (productAssoc) {
+        entry.product_id = productAssoc.product_id;
+      } else if (serviceAssoc) {
+        entry.service_id = serviceAssoc.service_id;
+      }
+      if (!ordersMap[order_id]) {
+        ordersMap[order_id] = { id: order_id, items: [] };
+      }
+      ordersMap[order_id].items.push(entry);
+    });
+
+    // Convert map to array
+    const orders = Object.values(ordersMap);
+    res.json(orders);
+  } catch (err) {
+    console.error('Error assembling orders:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
 });
 
 // ----- Payment Methods Routes -----
@@ -328,11 +357,92 @@ app.put('/api/addresses/:id', (req, res) => {
 });
 
 // DELETE /api/addresses/:id → supprime une adresse
+
 app.delete('/api/addresses/:id', (req, res) => {
   const file = path.join(__dirname, 'addresses.json');
   let arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
   arr = arr.filter(a => a.id !== +req.params.id);
   fs.writeFileSync(file, JSON.stringify(arr, null, 2));
+  res.status(204).end();
+});
+
+// ----- Product Categories Routes -----
+
+// GET /api/product-categories → liste toutes les catégories
+app.get('/api/product-categories', (req, res) => {
+  const file = path.join(__dirname, 'productCategories.json');
+  const arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  res.json(arr);
+});
+
+// POST /api/product-categories → crée une nouvelle catégorie
+app.post('/api/product-categories', (req, res) => {
+  const file = path.join(__dirname, 'productCategories.json');
+  const arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  const nextId = arr.reduce((max, c) => Math.max(max, c.id), 0) + 1;
+  const newCategory = { id: nextId, ...req.body };
+  arr.push(newCategory);
+  fs.writeFileSync(file, JSON.stringify(arr, null, 2), 'utf-8');
+  res.status(201).json(newCategory);
+});
+
+// PUT /api/product-categories/:id → met à jour une catégorie
+app.put('/api/product-categories/:id', (req, res) => {
+  const file = path.join(__dirname, 'productCategories.json');
+  const arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  const idx = arr.findIndex(c => c.id === +req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Catégorie non trouvée' });
+  arr[idx] = { ...arr[idx], ...req.body };
+  fs.writeFileSync(file, JSON.stringify(arr, null, 2), 'utf-8');
+  res.json(arr[idx]);
+});
+
+// DELETE /api/product-categories/:id → supprime une catégorie
+app.delete('/api/product-categories/:id', (req, res) => {
+  const file = path.join(__dirname, 'productCategories.json');
+  let arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  arr = arr.filter(c => c.id !== +req.params.id);
+  fs.writeFileSync(file, JSON.stringify(arr, null, 2), 'utf-8');
+  res.status(204).end();
+});
+
+// ----- Service Types Routes -----
+
+// GET /api/service-types → list all service types
+app.get('/api/service-types', (req, res) => {
+  const file = path.join(__dirname, 'serviceTypes.json');
+  const arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  res.json(arr);
+});
+
+// POST /api/service-types → create a new service type
+app.post('/api/service-types', (req, res) => {
+  const file = path.join(__dirname, 'serviceTypes.json');
+  const arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  const nextId = arr.reduce((max, st) => Math.max(max, st.id), 0) + 1;
+  const newType = { id: nextId, ...req.body };
+  arr.push(newType);
+  fs.writeFileSync(file, JSON.stringify(arr, null, 2), 'utf-8');
+  res.status(201).json(newType);
+});
+
+// PUT /api/service-types/:id → update a service type
+app.put('/api/service-types/:id', (req, res) => {
+  const file = path.join(__dirname, 'serviceTypes.json');
+  const arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  const idx = arr.findIndex(st => st.id === +req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Service type not found' });
+  arr[idx] = { ...arr[idx], ...req.body };
+  fs.writeFileSync(file, JSON.stringify(arr, null, 2), 'utf-8');
+  res.json(arr[idx]);
+});
+
+// DELETE /api/service-types/:id → delete a service type
+app.delete('/api/service-types/:id', (req, res) => {
+  const file = path.join(__dirname, 'serviceTypes.json');
+  let arr = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  arr = arr.filter(st => st.id !== +req.params.id);
+  fs.writeFileSync(file, JSON.stringify(arr, null, 2), 'utf-8');
   res.status(204).end();
 });
 

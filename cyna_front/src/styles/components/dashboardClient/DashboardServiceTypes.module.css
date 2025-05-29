@@ -1,0 +1,94 @@
+/* src/styles/components/dashboardClient/DashboardServiceTypes.module.css */
+
+.typesContainer {
+  padding: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.typesList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.typeCard {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardHeader {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.cardBody {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex-grow: 1;
+}
+
+.cardBody p {
+  margin: 0;
+  flex-grow: 1;
+}
+
+.editBtn,
+.deleteBtn,
+.addBtn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.editBtn {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.editBtn:hover {
+  background-color: var(--primary-color-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.deleteBtn {
+  background-color: var(--grey-color);
+  color: #ffffff;
+}
+
+.deleteBtn:hover {
+  background-color: var(--grey-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.addBtn {
+  margin-top: 1rem;
+  background-color: var(--primary-color);
+  color: #ffffff;
+  align-self: flex-start;
+}
+
+.addBtn:hover {
+  background-color: var(--primary-color-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}

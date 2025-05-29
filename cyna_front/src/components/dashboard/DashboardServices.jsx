@@ -7,7 +7,6 @@ import AddServiceModal from '../modals/AddServiceModal';
 const DashboardServices = () => {
   const [services, setServices] = useState([]);
   const [allKeys, setAllKeys] = useState([]);
-  const [newService, setNewService] = useState({ key: '', title: '', subtitle: '', description: '', image: '' });
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
@@ -59,14 +58,13 @@ const DashboardServices = () => {
     }
   };
 
-  const handleAdd = async () => {
-    if (!newService.key) return;
+  const handleSaveNew = async (serviceData) => {
     try {
-      const saved = await addService(newService);
+      const saved = await addService(serviceData);
       setServices(prev => [...prev, saved]);
-      setNewService({ key: '', title: '', subtitle: '', description: '', image: '' });
+      setShowAddModal(false);
     } catch (err) {
-      console.error('Erreur ajout service:', err);
+      console.error('Erreur ajout service :', err);
     }
   };
 
@@ -80,21 +78,21 @@ const DashboardServices = () => {
       <table className={styles.summaryTable}>
         <thead>
           <tr>
-            <th>Key</th>
-            <th>Titre</th>
-            <th>Sous-titre</th>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Description</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {services.map(s => (
-            <tr key={s.key}>
-              <td>{s.key}</td>
-              <td>{s.title}</td>
-              <td>{s.subtitle}</td>
+            <tr key={s.id}>
+              <td>{s.id}</td>
+              <td>{s.Name}</td>
+              <td>{s.Description}</td>
               <td>
                 <button onClick={() => handleOpenEdit(s)}>Modifier</button>
-                <button onClick={() => handleDelete(s.key)}>Supprimer</button>
+                <button onClick={() => handleDelete(s.id)}>Supprimer</button>
               </td>
             </tr>
           ))}
@@ -109,7 +107,7 @@ const DashboardServices = () => {
       <AddServiceModal
         isOpen={showAddModal}
         onClose={handleCloseAdd}
-        onSave={handleAdd}
+        onSave={handleSaveNew}
         existingKeys={allKeys}
       />
     </div>

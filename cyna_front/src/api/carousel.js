@@ -1,6 +1,9 @@
 // src/api/carousel.js
+import { API_BASE_URL } from './config';
+const BASE_URL = `${API_BASE_URL}/api/carousel`;
+
 export async function fetchCarousel() {
-  const res = await fetch('/api/carousel');
+  const res = await fetch(BASE_URL);
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }

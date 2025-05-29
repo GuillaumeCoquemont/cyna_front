@@ -28,6 +28,8 @@ import { CarrouselEditor } from '../components/dashboard/DashboardCarrousselElem
 import DashboardCodePromo from '../components/dashboard/DashboardCodePromo';
 import DashboardServices from '../components/dashboard/DashboardServices';
 import DashboardTeam from '../components/dashboard/DashboardTeam';
+import DashboardCategories from '../components/dashboard/DashboardCategories';
+import AddServiceModal from '../components/modals/AddServiceModal';
 import { fetchProducts } from '../api/products';
 
 export default function DashboardAdmin() {
@@ -53,6 +55,7 @@ export default function DashboardAdmin() {
     { key: 'dashboard', label: 'Dashboard' },
     { key: 'messages', label: 'Messages' },
     { key: 'produits', label: 'Produits' },
+    { key: 'categories', label: 'Catégories' },
     { key: 'favoris', label: 'Favoris' },
     { key: 'ui', label: 'Carroussel' },
     { key: 'team', label: 'Team' },
@@ -155,18 +158,24 @@ export default function DashboardAdmin() {
             <DashboardProducts />
           </div>
         );
-        case 'ui':
-          return (
-            <div className={styles.dashboardContent}>
-              <CarrouselEditor />
-            </div>
-          );
-          case 'code':
-          return (
-            <div className={styles.dashboardContent}>
-              <DashboardCodePromo />
-            </div>
-          );
+      case 'ui':
+        return (
+          <div className={styles.dashboardContent}>
+            <CarrouselEditor />
+          </div>
+        );
+      case 'code':
+        return (
+          <div className={styles.dashboardContent}>
+            <DashboardCodePromo />
+          </div>
+        );
+      case 'categories':
+        return (
+          <div className={styles.dashboardContent}>
+            <DashboardCategories />
+          </div>
+        );
       case 'services':
         return (
           <div className={styles.dashboardContent}>

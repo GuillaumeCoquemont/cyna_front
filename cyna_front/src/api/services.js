@@ -1,17 +1,19 @@
 // src/api/services.js
 
-const BASE_URL = '/api/services';
+import { API_BASE_URL } from './config';
+const SERVICES_URL = `${API_BASE_URL}/api/services`;
+const SERVICE_TYPES_URL = `${API_BASE_URL}/api/service-types`;
 
 // GET all services
 export async function fetchServices() {
-  const res = await fetch(BASE_URL);
+  const res = await fetch(SERVICES_URL);
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }
 
 // PUT update a service by key
 export async function updateService(key, data) {
-  const res = await fetch(`${BASE_URL}/${encodeURIComponent(key)}`, {
+  const res = await fetch(`${SERVICES_URL}/${encodeURIComponent(key)}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -22,7 +24,7 @@ export async function updateService(key, data) {
 
 // DELETE a service by key
 export async function deleteService(key) {
-  const res = await fetch(`${BASE_URL}/${encodeURIComponent(key)}`, {
+  const res = await fetch(`${SERVICES_URL}/${encodeURIComponent(key)}`, {
     method: 'DELETE',
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
@@ -31,7 +33,7 @@ export async function deleteService(key) {
 
 // POST add a new service
 export async function addService(data) {
-  const res = await fetch(BASE_URL, {
+  const res = await fetch(SERVICES_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -42,7 +44,7 @@ export async function addService(data) {
 
 // GET all service types
 export async function fetchServiceTypes() {
-  const res = await fetch('/api/service-types');
+  const res = await fetch(SERVICE_TYPES_URL);
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }
