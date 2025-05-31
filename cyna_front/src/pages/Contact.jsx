@@ -11,13 +11,20 @@ export default function ContactPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/messages', {
+      // Build payload matching admin schema
+      const nowDate = new Date().toISOString().slice(0, 10);
+      const payload = {
+        sujet: formData.subject,
+        expediteur: `${formData.name} <${formData.email}>`,
+        message: formData.message,
+        date: nowDate
+      };
+      const response = await fetch('/api/messages/mails', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
       if (!response.ok) throw new Error('Erreur lors de l’envoi du message');
-      // Vous pouvez ajouter une alerte ou notification ici
       setFormData({ subject: '', name: '', email: '', message: '' });
     } catch (error) {
       console.error(error);

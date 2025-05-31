@@ -3,6 +3,15 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const rolesFile = path.join(__dirname, 'roles.json');
+const usersFile = path.join(__dirname, 'users.json');
+const assoOrderItemsProductsFile    = path.join(__dirname, 'assoOrderItemsProducts.json');
+const assoOrderItemsServicesFile    = path.join(__dirname, 'assoOrderItemsServices.json');
+const assoAddressesUserProfilesFile = path.join(__dirname, 'assoAddressesUserProfiles.json');
+const assoCategoryProductsRolesFile = path.join(__dirname, 'assoCategoryProductsRoles.json');
+const assoServiceTypesRolesFile     = path.join(__dirname, 'assoServiceTypesRoles.json');
+const assoRolesPromoCodesFile       = path.join(__dirname, 'assoRolesPromoCodes.json');
+const assoServicesRolesFile         = path.join(__dirname, 'assoServicesRoles.json');
 
 const app = express();
 
@@ -273,6 +282,119 @@ app.get('/api/orders', (req, res) => {
   }
 });
 
+// GET /api/admin/stats → agrège les ventes mensuelles produits et services
+app.get('/api/admin/stats', (req, res) => {
+  try {
+    const orderItems = JSON.parse(
+      fs.readFileSync(path.join(__dirname, 'orderItems.json'), 'utf-8')
+    );
+    const assoProducts = JSON.parse(
+      fs.readFileSync(path.join(__dirname, 'assoOrderItemsProducts.json'), 'utf-8')
+    );
+    const assoServices = JSON.parse(
+      fs.readFileSync(path.join(__dirname, 'assoOrderItemsServices.json'), 'utf-8')
+    );
+
+    const revenueByMonth = {};
+
+    orderItems.forEach(item => {
+      // Using current month as fallback if no date in item
+      const monthKey = new Date().toISOString().slice(0, 7); // e.g., "2024-05"
+      const amount = item.Price * item.Quantity;
+      const isProduct = assoProducts.some(ap => ap.order_item_id === item.id);
+      const isService = assoServices.some(asrv => asrv.order_item_id === item.id);
+
+      if (!revenueByMonth[monthKey]) {
+        revenueByMonth[monthKey] = { productRevenue: 0, serviceRevenue: 0 };
+      }
+      if (isProduct) {
+        revenueByMonth[monthKey].productRevenue += amount;
+      } else if (isService) {
+        revenueByMonth[monthKey].serviceRevenue += amount;
+      }
+    });
+
+    const stats = Object.keys(revenueByMonth)
+      .sort()
+      .map(month => ({
+        month,
+        productRevenue: revenueByMonth[month].productRevenue,
+        serviceRevenue: revenueByMonth[month].serviceRevenue,
+        totalRevenue:
+          revenueByMonth[month].productRevenue + revenueByMonth[month].serviceRevenue
+      }));
+
+    res.json(stats);
+  } catch (err) {
+    console.error('Error computing admin stats:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// ----- Messages Routes -----
+const messagesFile = path.join(__dirname, 'messages.json')
+
+// Récupère les messages par type (mails, tickets, autres)
+app.get('/api/messages/:type', (req, res) => {
+  try {
+    const all = JSON.parse(fs.readFileSync(messagesFile, 'utf-8'));
+    const arr = all[req.params.type] || [];
+    res.json(arr);
+  } catch (err) {
+    console.error('Error reading messages:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// Crée un nouveau message dans le type donné
+app.post('/api/messages/:type', (req, res) => {
+  try {
+    const all = JSON.parse(fs.readFileSync(messagesFile, 'utf-8'));
+    const arr = all[req.params.type] || [];
+    const nextId = arr.reduce((max, m) => Math.max(max, m.id), 0) + 1;
+    const newMsg = { id: nextId, ...req.body };
+    arr.push(newMsg);
+    all[req.params.type] = arr;
+    fs.writeFileSync(messagesFile, JSON.stringify(all, null, 2), 'utf-8');
+    res.status(201).json(newMsg);
+  } catch (err) {
+    console.error('Error adding message:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// Met à jour un message existant
+app.put('/api/messages/:type/:id', (req, res) => {
+  try {
+    const all = JSON.parse(fs.readFileSync(messagesFile, 'utf-8'));
+    const arr = all[req.params.type] || [];
+    const idx = arr.findIndex(m => m.id === +req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'Message non trouvé' });
+    arr[idx] = { ...arr[idx], ...req.body };
+    all[req.params.type] = arr;
+    fs.writeFileSync(messagesFile, JSON.stringify(all, null, 2), 'utf-8');
+    res.json(arr[idx]);
+  } catch (err) {
+    console.error('Error updating message:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// Supprime un message
+app.delete('/api/messages/:type/:id', (req, res) => {
+  try {
+    const all = JSON.parse(fs.readFileSync(messagesFile, 'utf-8'));
+    let arr = all[req.params.type] || [];
+    arr = arr.filter(m => m.id !== +req.params.id);
+    all[req.params.type] = arr;
+    fs.writeFileSync(messagesFile, JSON.stringify(all, null, 2), 'utf-8');
+    res.status(204).end();
+  } catch (err) {
+    console.error('Error deleting message:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
 // ----- Payment Methods Routes -----
 
 // GET /api/payment-methods → liste tous les moyens
@@ -444,6 +566,374 @@ app.delete('/api/service-types/:id', (req, res) => {
   arr = arr.filter(st => st.id !== +req.params.id);
   fs.writeFileSync(file, JSON.stringify(arr, null, 2), 'utf-8');
   res.status(204).end();
+});
+
+// ----- Roles Routes -----
+// GET /api/roles → liste tous les rôles
+app.get('/api/roles', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(rolesFile, 'utf-8'));
+    res.json(arr);
+  } catch (err) {
+    console.error('Error reading roles:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// ----- Users Routes -----
+// GET /api/users → liste tous les utilisateurs
+app.get('/api/users', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(usersFile, 'utf-8'));
+    res.json(arr);
+  } catch (err) {
+    console.error('Error reading users:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// POST /api/users → crée un nouvel utilisateur
+app.post('/api/users', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(usersFile, 'utf-8'));
+    const nextId = arr.reduce((max, u) => Math.max(max, u.id), 0) + 1;
+    const newUser = { id: nextId, ...req.body };
+    arr.push(newUser);
+    fs.writeFileSync(usersFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(201).json(newUser);
+  } catch (err) {
+    console.error('Error creating user:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// PUT /api/users/:id → met à jour un utilisateur existant
+app.put('/api/users/:id', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(usersFile, 'utf-8'));
+    const idx = arr.findIndex(u => u.id === +req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    arr[idx] = { ...arr[idx], ...req.body };
+    fs.writeFileSync(usersFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.json(arr[idx]);
+  } catch (err) {
+    console.error('Error updating user:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// DELETE /api/users/:id → supprime un utilisateur
+app.delete('/api/users/:id', (req, res) => {
+  try {
+    let arr = JSON.parse(fs.readFileSync(usersFile, 'utf-8'));
+    arr = arr.filter(u => u.id !== +req.params.id);
+    fs.writeFileSync(usersFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(204).end();
+  } catch (err) {
+    console.error('Error deleting user:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// ----- ASSO_ORDERITEMS_PRODUCTS Routes -----
+app.get('/api/asso-orderitems-products', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(assoOrderItemsProductsFile, 'utf-8'));
+    res.json(arr);
+  } catch (err) {
+    console.error('Error reading assoOrderItemsProducts:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+app.post('/api/asso-orderitems-products', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(assoOrderItemsProductsFile, 'utf-8'));
+    const exists = arr.some(
+      a => a.order_item_id === req.body.order_item_id && a.product_id === req.body.product_id
+    );
+    if (exists) {
+      return res.status(400).json({ error: 'Cette association existe déjà' });
+    }
+    arr.push({ order_item_id: req.body.order_item_id, product_id: req.body.product_id });
+    fs.writeFileSync(assoOrderItemsProductsFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(201).json({ order_item_id: req.body.order_item_id, product_id: req.body.product_id });
+  } catch (err) {
+    console.error('Error creating assoOrderItemsProducts:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+app.delete('/api/asso-orderitems-products/:orderItemId/:productId', (req, res) => {
+  try {
+    let arr = JSON.parse(fs.readFileSync(assoOrderItemsProductsFile, 'utf-8'));
+    const orderItemId = +req.params.orderItemId;
+    const productId   = +req.params.productId;
+    arr = arr.filter(a => !(a.order_item_id === orderItemId && a.product_id === productId));
+    fs.writeFileSync(assoOrderItemsProductsFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(204).end();
+  } catch (err) {
+    console.error('Error deleting assoOrderItemsProducts:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// ----- ASSO_ORDERITEMS_SERVICES Routes -----
+app.get('/api/asso-orderitems-services', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(assoOrderItemsServicesFile, 'utf-8'));
+    res.json(arr);
+  } catch (err) {
+    console.error('Error reading assoOrderItemsServices:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+app.post('/api/asso-orderitems-services', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(assoOrderItemsServicesFile, 'utf-8'));
+    const exists = arr.some(
+      a => a.order_item_id === req.body.order_item_id && a.service_id === req.body.service_id
+    );
+    if (exists) {
+      return res.status(400).json({ error: 'Cette association existe déjà' });
+    }
+    arr.push({ order_item_id: req.body.order_item_id, service_id: req.body.service_id });
+    fs.writeFileSync(assoOrderItemsServicesFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(201).json({ order_item_id: req.body.order_item_id, service_id: req.body.service_id });
+  } catch (err) {
+    console.error('Error creating assoOrderItemsServices:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+app.delete('/api/asso-orderitems-services/:orderItemId/:serviceId', (req, res) => {
+  try {
+    let arr = JSON.parse(fs.readFileSync(assoOrderItemsServicesFile, 'utf-8'));
+    const orderItemId = +req.params.orderItemId;
+    const serviceId   = +req.params.serviceId;
+    arr = arr.filter(a => !(a.order_item_id === orderItemId && a.service_id === serviceId));
+    fs.writeFileSync(assoOrderItemsServicesFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(204).end();
+  } catch (err) {
+    console.error('Error deleting assoOrderItemsServices:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// ----- ASSO_ADDRESSES_USER_PROFILES Routes -----
+app.get('/api/asso-addresses-user-profiles', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(assoAddressesUserProfilesFile, 'utf-8'));
+    res.json(arr);
+  } catch (err) {
+    console.error('Error reading assoAddressesUserProfiles:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+app.post('/api/asso-addresses-user-profiles', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(assoAddressesUserProfilesFile, 'utf-8'));
+    const exists = arr.some(
+      a => a.address_id === req.body.address_id && a.user_profile_id === req.body.user_profile_id
+    );
+    if (exists) {
+      return res.status(400).json({ error: 'Cette association existe déjà' });
+    }
+    arr.push({ address_id: req.body.address_id, user_profile_id: req.body.user_profile_id });
+    fs.writeFileSync(assoAddressesUserProfilesFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(201).json({ address_id: req.body.address_id, user_profile_id: req.body.user_profile_id });
+  } catch (err) {
+    console.error('Error creating assoAddressesUserProfiles:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+app.delete('/api/asso-addresses-user-profiles/:addressId/:userProfileId', (req, res) => {
+  try {
+    let arr = JSON.parse(fs.readFileSync(assoAddressesUserProfilesFile, 'utf-8'));
+    const addressId    = +req.params.addressId;
+    const userProfileId = +req.params.userProfileId;
+    arr = arr.filter(a => !(a.address_id === addressId && a.user_profile_id === userProfileId));
+    fs.writeFileSync(assoAddressesUserProfilesFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(204).end();
+  } catch (err) {
+    console.error('Error deleting assoAddressesUserProfiles:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// ----- ASSO_CATEGORYPRODUCTS_ROLES Routes -----
+app.get('/api/asso-categoryproducts-roles', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(assoCategoryProductsRolesFile, 'utf-8'));
+    res.json(arr);
+  } catch (err) {
+    console.error('Error reading assoCategoryProductsRoles:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+app.post('/api/asso-categoryproducts-roles', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(assoCategoryProductsRolesFile, 'utf-8'));
+    const exists = arr.some(
+      a => a.category_id === req.body.category_id && a.role_id === req.body.role_id
+    );
+    if (exists) {
+      return res.status(400).json({ error: 'Cette association existe déjà' });
+    }
+    arr.push({ category_id: req.body.category_id, role_id: req.body.role_id });
+    fs.writeFileSync(assoCategoryProductsRolesFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(201).json({ category_id: req.body.category_id, role_id: req.body.role_id });
+  } catch (err) {
+    console.error('Error creating assoCategoryProductsRoles:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+app.delete('/api/asso-categoryproducts-roles/:categoryId/:roleId', (req, res) => {
+  try {
+    let arr = JSON.parse(fs.readFileSync(assoCategoryProductsRolesFile, 'utf-8'));
+    const categoryId = +req.params.categoryId;
+    const roleId     = +req.params.roleId;
+    arr = arr.filter(a => !(a.category_id === categoryId && a.role_id === roleId));
+    fs.writeFileSync(assoCategoryProductsRolesFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(204).end();
+  } catch (err) {
+    console.error('Error deleting assoCategoryProductsRoles:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// ----- ASSO_SERVICETYPES_ROLES Routes -----
+app.get('/api/asso-servicetypes-roles', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(assoServiceTypesRolesFile, 'utf-8'));
+    res.json(arr);
+  } catch (err) {
+    console.error('Error reading assoServiceTypesRoles:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+app.post('/api/asso-servicetypes-roles', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(assoServiceTypesRolesFile, 'utf-8'));
+    const exists = arr.some(
+      a => a.service_type_id === req.body.service_type_id && a.role_id === req.body.role_id
+    );
+    if (exists) {
+      return res.status(400).json({ error: 'Cette association existe déjà' });
+    }
+    arr.push({ service_type_id: req.body.service_type_id, role_id: req.body.role_id });
+    fs.writeFileSync(assoServiceTypesRolesFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(201).json({ service_type_id: req.body.service_type_id, role_id: req.body.role_id });
+  } catch (err) {
+    console.error('Error creating assoServiceTypesRoles:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+app.delete('/api/asso-servicetypes-roles/:serviceTypeId/:roleId', (req, res) => {
+  try {
+    let arr = JSON.parse(fs.readFileSync(assoServiceTypesRolesFile, 'utf-8'));
+    const serviceTypeId = +req.params.serviceTypeId;
+    const roleId        = +req.params.roleId;
+    arr = arr.filter(a => !(a.service_type_id === serviceTypeId && a.role_id === roleId));
+    fs.writeFileSync(assoServiceTypesRolesFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(204).end();
+  } catch (err) {
+    console.error('Error deleting assoServiceTypesRoles:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// ----- ASSO_ROLES_PROMOCODES Routes -----
+app.get('/api/asso-roles-promocodes', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(assoRolesPromoCodesFile, 'utf-8'));
+    res.json(arr);
+  } catch (err) {
+    console.error('Error reading assoRolesPromoCodes:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+app.post('/api/asso-roles-promocodes', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(assoRolesPromoCodesFile, 'utf-8'));
+    const exists = arr.some(
+      a => a.role_id === req.body.role_id && a.promo_code_id === req.body.promo_code_id
+    );
+    if (exists) {
+      return res.status(400).json({ error: 'Cette association existe déjà' });
+    }
+    arr.push({ role_id: req.body.role_id, promo_code_id: req.body.promo_code_id });
+    fs.writeFileSync(assoRolesPromoCodesFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(201).json({ role_id: req.body.role_id, promo_code_id: req.body.promo_code_id });
+  } catch (err) {
+    console.error('Error creating assoRolesPromoCodes:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+app.delete('/api/asso-roles-promocodes/:roleId/:promoCodeId', (req, res) => {
+  try {
+    let arr = JSON.parse(fs.readFileSync(assoRolesPromoCodesFile, 'utf-8'));
+    const roleId      = +req.params.roleId;
+    const promoCodeId = +req.params.promoCodeId;
+    arr = arr.filter(a => !(a.role_id === roleId && a.promo_code_id === promoCodeId));
+    fs.writeFileSync(assoRolesPromoCodesFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(204).end();
+  } catch (err) {
+    console.error('Error deleting assoRolesPromoCodes:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// ----- ASSO_SERVICES_ROLES Routes -----
+app.get('/api/asso-services-roles', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(assoServicesRolesFile, 'utf-8'));
+    res.json(arr);
+  } catch (err) {
+    console.error('Error reading assoServicesRoles:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+app.post('/api/asso-services-roles', (req, res) => {
+  try {
+    const arr = JSON.parse(fs.readFileSync(assoServicesRolesFile, 'utf-8'));
+    const exists = arr.some(
+      a => a.service_id === req.body.service_id && a.role_id === req.body.role_id
+    );
+    if (exists) {
+      return res.status(400).json({ error: 'Cette association existe déjà' });
+    }
+    arr.push({ service_id: req.body.service_id, role_id: req.body.role_id });
+    fs.writeFileSync(assoServicesRolesFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(201).json({ service_id: req.body.service_id, role_id: req.body.role_id });
+  } catch (err) {
+    console.error('Error creating assoServicesRoles:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+app.delete('/api/asso-services-roles/:serviceId/:roleId', (req, res) => {
+  try {
+    let arr = JSON.parse(fs.readFileSync(assoServicesRolesFile, 'utf-8'));
+    const serviceId = +req.params.serviceId;
+    const roleId    = +req.params.roleId;
+    arr = arr.filter(a => !(a.service_id === serviceId && a.role_id === roleId));
+    fs.writeFileSync(assoServicesRolesFile, JSON.stringify(arr, null, 2), 'utf-8');
+    res.status(204).end();
+  } catch (err) {
+    console.error('Error deleting assoServicesRoles:', err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
 });
 
 // ----- Auth Routes -----

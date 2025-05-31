@@ -29,25 +29,68 @@ import DashboardCodePromo from '../components/dashboard/DashboardCodePromo';
 import DashboardServices from '../components/dashboard/DashboardServices';
 import DashboardTeam from '../components/dashboard/DashboardTeam';
 import DashboardCategories from '../components/dashboard/DashboardCategories';
-import AddServiceModal from '../components/modals/AddServiceModal';
+import ClientList from '../components/dashboard/DashboardClientList';
+import CategoryRoleLinks from '../components/dashboard/DashboardCategoryRoleLinks';
+
+import OrderItemProductLinks from '../components/dashboard/DashboardOrderItemProductLinks';
+import OrderItemServiceLinks from '../components/dashboard/DashboardOrderItemServiceLinks';
+import ServiceTypeRoleLinks from '../components/dashboard/DashboardServiceTypeRoleLinks';
+import RolePromoCodeLinks from '../components/dashboard/DashboardRolePromoCodeLinks';
+import ServiceRoleLinks from '../components/dashboard/DashboardServiceRoleLinks';
+import DashboardAddressUserProfileLinks from '../components/dashboard/DashboardAddressUserProfileLinks';
+
 import { fetchProducts } from '../api/products';
+import { fetchSalesStats } from '../api/salesStats';
 
 export default function DashboardAdmin() {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   const [productsData, setProductsData] = useState([]);
+  const [monthlyStats, setMonthlyStats] = useState([]);
 
   useEffect(() => {
     // load real products on mount
     fetchProducts()
       .then(data => setProductsData(data))
       .catch(err => console.error('Erreur fetchProducts:', err));
+
+    // load sales stats on mount
+    fetchSalesStats()
+      .then(data => setMonthlyStats(data))
+      .catch(err => console.error('Erreur fetchSalesStats:', err));
   }, []);
+
+  const totalRevenue = monthlyStats.length > 0
+    ? monthlyStats.reduce((sum, m) => sum + m.totalRevenue, 0)
+    : null;
+  const totalProductRevenue = monthlyStats.length > 0
+    ? monthlyStats.reduce((sum, m) => sum + m.productRevenue, 0)
+    : null;
+  const totalServiceRevenue = monthlyStats.length > 0
+    ? monthlyStats.reduce((sum, m) => sum + m.serviceRevenue, 0)
+    : null;
 
   const statsData = [
     { title: 'Utilisateurs totaux', value: '40 689' },
     { title: 'Total commandes', value: '10 293' },
-    { title: 'Total vente', value: '89,00 €' },
+    {
+      title: 'Ventes produits',
+      value: totalProductRevenue !== null
+        ? totalProductRevenue.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+        : 'Chargement...'
+    },
+    {
+      title: 'Ventes services',
+      value: totalServiceRevenue !== null
+        ? totalServiceRevenue.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+        : 'Chargement...'
+    },
+    {
+      title: 'Total ventes',
+      value: totalRevenue !== null
+        ? totalRevenue.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+        : 'Chargement...'
+    },
     { title: 'Total Pending', value: '2 040' },
   ];
 
@@ -57,23 +100,39 @@ export default function DashboardAdmin() {
     { key: 'produits', label: 'Produits' },
     { key: 'categories', label: 'Catégories' },
     { key: 'favoris', label: 'Favoris' },
+    { key: 'clients',   label: 'Clients' },
     { key: 'ui', label: 'Carroussel' },
     { key: 'team', label: 'Team' },
+    { key: 'liaisons-categories-roles', label: 'Catégories ↔ Rôles' },
+    { key: 'liaisons-oip', label: 'Cmd↔Produits' },
+    { key: 'liaisons-ois', label: 'Cmd↔Services' },
+    { key: 'liaisons-str-roles', label: 'TypeSvc↔Rôles' },
+    { key: 'liaisons-rol-promo', label: 'Rôles↔Promo' },
+    { key: 'liaisons-svc-roles', label: 'Services↔Rôles' },
+    { key: 'liaisons-addr-upp', label: 'Adresses↔Profils' },
     { key: 'params', label: 'Paramètres' },
     { key: 'code', label: 'Code Promo' },
     { key: 'services', label: 'Services' },
   ];
 
   const chartData = {
-    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
+    labels: monthlyStats.map(s => s.month),
     datasets: [
       {
-        label: 'Ventes',
-        data: [1200, 1900, 3000, 2800, 3500, 4000],
+        label: 'Produits (€)',
+        data: monthlyStats.map(s => s.productRevenue),
         fill: false,
         tension: 0.4,
         borderColor: '#4E73DF',
         backgroundColor: '#4E73DF'
+      },
+      {
+        label: 'Services (€)',
+        data: monthlyStats.map(s => s.serviceRevenue),
+        fill: false,
+        tension: 0.4,
+        borderColor: '#1CC88A',
+        backgroundColor: '#1CC88A'
       }
     ]
   };
@@ -82,7 +141,7 @@ export default function DashboardAdmin() {
     responsive: true,
     plugins: {
       legend: { position: 'top' },
-      title: { display: true, text: 'Évolution des ventes' }
+      title: { display: true, text: 'Évolution des ventes mensuelles' }
     },
     scales: {
       y: { beginAtZero: true }
@@ -176,6 +235,48 @@ export default function DashboardAdmin() {
             <DashboardCategories />
           </div>
         );
+      case 'liaisons-categories-roles':
+        return (
+          <div className={styles.dashboardContent}>
+            <CategoryRoleLinks />
+          </div>
+        );
+      case 'liaisons-oip':
+        return (
+          <div className={styles.dashboardContent}>
+            <OrderItemProductLinks />
+          </div>
+        );
+      case 'liaisons-ois':
+        return (
+          <div className={styles.dashboardContent}>
+            <OrderItemServiceLinks />
+          </div>
+        );
+      case 'liaisons-str-roles':
+        return (
+          <div className={styles.dashboardContent}>
+            <ServiceTypeRoleLinks />
+          </div>
+        );
+      case 'liaisons-rol-promo':
+        return (
+          <div className={styles.dashboardContent}>
+            <RolePromoCodeLinks />
+          </div>
+        );
+      case 'liaisons-svc-roles':
+        return (
+          <div className={styles.dashboardContent}>
+            <ServiceRoleLinks />
+          </div>
+        );
+      case 'liaisons-addr-upp':
+        return (
+          <div className={styles.dashboardContent}>
+            <DashboardAddressUserProfileLinks />
+          </div>
+        );
       case 'services':
         return (
           <div className={styles.dashboardContent}>
@@ -186,6 +287,12 @@ export default function DashboardAdmin() {
         return (
           <div className={styles.dashboardContent}>
             <DashboardTeam />
+          </div>
+        );
+      case 'clients':
+        return (
+          <div className={styles.dashboardContent}>
+            <ClientList />
           </div>
         );
       default:

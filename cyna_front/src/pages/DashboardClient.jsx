@@ -7,6 +7,7 @@ import DashboardOrders    from '../components/dashboardClient/DashboardOrders';
 import DashboardPayments  from '../components/dashboardClient/DashboardPayments';
 import DashboardAddresses from '../components/dashboardClient/DashboardAddresses';
 import DashboardProfile   from '../components/dashboardClient/DashboardProfile';
+import DashboardMessages  from '../components/dashboardClient/DashboardMessagesClient';
 
 export default function DashboardClient() {
   const [activeTab, setActiveTab] = useState('orders');
@@ -14,6 +15,7 @@ export default function DashboardClient() {
   const sidebarItems = [
     { key: 'orders',     label: 'Mes commandes' },
     { key: 'payments',   label: 'Moyens de paiement' },
+    { key: 'messages',   label: 'Messages' },
     { key: 'addresses',  label: 'Adresses' },
     { key: 'profile',    label: 'Profil' }
   ];
@@ -28,6 +30,8 @@ export default function DashboardClient() {
         return <DashboardAddresses />;
       case 'profile':
         return <DashboardProfile />;
+      case 'messages':
+        return <DashboardMessages />;
       default:
         return <div>Aucun contenu à afficher</div>;
     }

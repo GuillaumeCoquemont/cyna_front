@@ -1,61 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../../styles/components/dashboard/DashboardMessage.module.css';
+
+import {
+  fetchMessages,
+  addMessage,
+  updateMessage,
+  deleteMessage
+} from '../../api/messages';
 
 const DashboardMessage = () => {
   const [activeTab, setActiveTab] = useState('mails');
+  const [messages, setMessages] = useState({ mails: [], tickets: [], autres: [] });
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [replyContent, setReplyContent] = useState('');
 
-  // Données fictives pour les messages
-  const messages = {
-    mails: [
-      {
-        id: 1,
-        sujet: "Demande d'information",
-        expediteur: "client@example.com",
-        message: "Bonjour, je souhaiterais avoir plus d'informations sur vos produits.",
-        date: "2024-04-23"
-      },
-      {
-        id: 2,
-        sujet: "Commande #12345",
-        expediteur: "achat@entreprise.com",
-        message: "Confirmation de votre commande du 22/04/2024",
-        date: "2024-04-22"
-      }
-    ],
-    tickets: [
-      {
-        id: 1,
-        sujet: "Problème de connexion",
-        expediteur: "support@example.com",
-        message: "Nous avons identifié un problème avec votre compte.",
-        date: "2024-04-23",
-        statut: "En cours"
-      },
-      {
-        id: 2,
-        sujet: "Demande d'assistance",
-        expediteur: "utilisateur@example.com",
-        message: "Besoin d'aide pour configurer mon compte",
-        date: "2024-04-22",
-        statut: "Nouveau"
-      }
-    ],
-    autres: [
-      {
-        id: 1,
-        sujet: "Newsletter",
-        expediteur: "newsletter@example.com",
-        message: "Découvrez nos nouvelles offres du mois !",
-        date: "2024-04-23"
-      }
-    ]
-  };
+  // Charger les messages pour chaque onglet au montage
+  useEffect(() => {
+    ['mails', 'tickets', 'autres'].forEach(type => {
+      fetchMessages(type)
+        .then(data => setMessages(prev => ({ ...prev, [type]: data })))
+        .catch(console.error);
+    });
+  }, []);
 
   const renderMessageList = (messageType) => {
-    const currentMessages = messages[messageType] || [];
-    
+    const currentMessages = messages[messageType];
+
     if (currentMessages.length === 0) {
       return <p>Aucun message pour le moment</p>;
     }

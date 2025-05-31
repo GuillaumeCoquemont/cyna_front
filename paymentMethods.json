@@ -16,13 +16,13 @@
     "expiry": "11/23",
     "is_default": false,
     "type": "moyen 1",
-    "isDefault": false
+    "isDefault": true
   },
   {
     "id": 3,
     "type": "test",
     "last4": "4343",
     "expiry": "12/32",
-    "isDefault": true
+    "isDefault": false
   }
 ]
