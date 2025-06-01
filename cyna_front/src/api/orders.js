@@ -1,8 +1,6 @@
 // src/api/orders.js
 
 import { API_BASE_URL } from './config';
-const CLIENT_PRODUCTS_URL = `${API_BASE_URL}/api/client/products`;
-const CLIENT_SERVICES_URL = `${API_BASE_URL}/api/client/services`;
 const BASE_URL = `${API_BASE_URL}/api/orders`;
 
 // Fetch the list of client-facing products
@@ -20,7 +18,10 @@ export async function fetchClientServices() {
 }
 
 export async function fetchOrders() {
-  const res = await fetch(BASE_URL);
+  const token = localStorage.getItem('token');
+  const res = await fetch(BASE_URL, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }

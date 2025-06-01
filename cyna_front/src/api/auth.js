@@ -1,29 +1,24 @@
-import { API_BASE_URL } from './config';
-const BASE_URL = `${API_BASE_URL}/api/auth`;
-// src/api/auth.js
-export async function login({ username, password }) {
-  const res = await fetch(`${BASE_URL}/login`, {
+const BASE_URL = `${process.env.REACT_APP_API_URL}/api/auth`;
+
+export async function login({ email, password }) {
+  const response = await fetch(`${BASE_URL}/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password })
+    body: JSON.stringify({ email, password }),
   });
-  if (!res.ok) throw new Error('Échec de la connexion');
-  return res.json(); // { token }
+  const data = await response.json();
+  console.log('Réponse login backend:', response.status, data);
+  if (!response.ok) {
+    throw new Error(data.message || 'Échec de la connexion');
+  }
+  return data;
 }
 
-export async function fetchMe(token) {
-  const res = await fetch(`${BASE_URL}/me`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error('Token invalide');
-  return res.json(); // { username, role }
-}
-
-export async function register({ username, password }) {
+export async function register({ email, password }) {
   const res = await fetch(`${BASE_URL}/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password })
+    body: JSON.stringify({ email, password })
   });
   if (!res.ok) throw new Error("Échec de l'inscription");
   return res.json();

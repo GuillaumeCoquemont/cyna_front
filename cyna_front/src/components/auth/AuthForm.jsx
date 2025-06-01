@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from '../../styles/components/auth/AuthForm.module.css';
 import { AuthContext } from '../../context/AuthContext';
 import { login as apiLogin, register as apiRegister } from '../../api/auth';
+import { jwtDecode } from "jwt-decode";
 
 const AuthForm = () => {
   const { signIn } = useContext(AuthContext);
@@ -31,31 +32,23 @@ const AuthForm = () => {
         return;
       }
       try {
-        // Register the user
         await apiRegister({
-          username: formData.email,
+          email: formData.email,
           password: formData.password
         });
-        // Then log in
-        const me = await signIn({ username: formData.email, password: formData.password });
-        // Redirect based on role
-        if (me.role === 'admin') navigate('/dashboard');
+        const me = await signIn({ email: formData.email, password: formData.password });
+        const decoded = jwtDecode(me.token); 
+        if (decoded.role === 'admin') navigate('/dashboard');
         else navigate('/dashboardClient');
       } catch (err) {
         console.error('Erreur lors de l\'inscription :', err);
         alert('Échec de l\'inscription');
       }
     } else {
-      try {
-        // Log in the user
-        const me = await signIn({ username: formData.email, password: formData.password });
-        // Redirect based on role
-        if (me.role === 'admin') navigate('/dashboard');
-        else navigate('/dashboardClient');
-      } catch (err) {
-        console.error('Erreur lors de la connexion :', err);
-        alert('Identifiants invalides');
-      }
+      const me = await signIn({ email: formData.email, password: formData.password });
+      const decoded = jwtDecode(me.token); 
+      if (decoded.role === 'admin') navigate('/dashboard');
+      else navigate('/dashboardClient');
     }
   };
 

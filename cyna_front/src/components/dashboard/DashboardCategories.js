@@ -135,10 +135,10 @@ export default function DashboardCategories() {
         {categories.map(c => (
           <div key={c.id} className={styles.categoryCard}>
             <div className={styles.cardHeader}>
-              <span>{c.Name}</span>
+              <span>{c.name}</span>
             </div>
             <div className={styles.cardBody}>
-              <p>{c.Description}</p>
+              <p>{c.description}</p> {/* <-- ici, pas Description */}
               <button className={styles.editBtn} onClick={() => handleOpenEdit(c)}>Modifier</button>
               <button className={styles.deleteBtn} onClick={() => handleDelete(c.id)}>Supprimer</button>
             </div>

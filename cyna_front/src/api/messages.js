@@ -7,16 +7,23 @@ const BASE_URL = `${API_BASE_URL}/api/messages`;
  * @param {'mails'|'tickets'|'autres'} type
  */
 export async function fetchMessages(type) {
-  const res = await fetch(`${BASE_URL}/${type}`);
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${BASE_URL}/${type}`, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }
 
 /** Ajoute un message */
 export async function addMessage(type, data) {
+  const token = localStorage.getItem('token');
   const res = await fetch(`${BASE_URL}/${type}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    },
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
@@ -25,9 +32,13 @@ export async function addMessage(type, data) {
 
 /** Met à jour un message */
 export async function updateMessage(type, id, data) {
+  const token = localStorage.getItem('token');
   const res = await fetch(`${BASE_URL}/${type}/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    },
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
@@ -36,8 +47,10 @@ export async function updateMessage(type, id, data) {
 
 /** Supprime un message */
 export async function deleteMessage(type, id) {
+  const token = localStorage.getItem('token');
   const res = await fetch(`${BASE_URL}/${type}/${id}`, {
     method: 'DELETE',
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
 }

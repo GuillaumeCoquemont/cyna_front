@@ -4,13 +4,19 @@ const USERS_URL = `${API_BASE_URL}/api/users`;
 const ROLES_URL = `${API_BASE_URL}/api/roles`;
 
 export async function fetchUsers() {
-  const res = await fetch(USERS_URL);
+  const token = localStorage.getItem('token');
+  const res = await fetch(USERS_URL, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }
 
 export async function fetchRoles() {
-  const res = await fetch(ROLES_URL);
+  const token = localStorage.getItem('token');
+  const res = await fetch(ROLES_URL, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }

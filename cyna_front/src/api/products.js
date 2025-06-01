@@ -3,7 +3,10 @@ const BASE_URL = `${API_BASE_URL}/api/products`;
 // src/api/products.js
 
 export async function fetchProducts() {
-  const res = await fetch(BASE_URL);
+  const token = localStorage.getItem('token');
+  const res = await fetch(BASE_URL, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }
@@ -31,10 +34,17 @@ export async function deleteProduct(id) {
 }
 
 export async function addProduct(data) {
+  console.log('addProduct data:', data);
+  const token = localStorage.getItem('token');
+  const { id, ...dataSansId } = data;
+  console.log('addProduct envoyé:', dataSansId);
   const res = await fetch(BASE_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    },
+    body: JSON.stringify(dataSansId),
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();

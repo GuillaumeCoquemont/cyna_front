@@ -6,7 +6,10 @@ const URL = `${API_BASE_URL}/api/asso-categoryproducts-roles`;
  * Récupère toutes les associations category_id ↔ role_id
  */
 export async function fetchCategoryProductRoleLinks() {
-  const res = await fetch(URL);
+  const token = localStorage.getItem('token');
+  const res = await fetch(URL, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }
@@ -15,9 +18,13 @@ export async function fetchCategoryProductRoleLinks() {
  * Crée une association { category_id, role_id }
  */
 export async function addCategoryProductRoleLink(categoryId, roleId) {
+  const token = localStorage.getItem('token');
   const res = await fetch(URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    },
     body: JSON.stringify({ category_id: categoryId, role_id: roleId })
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
@@ -28,8 +35,10 @@ export async function addCategoryProductRoleLink(categoryId, roleId) {
  * Supprime l’association identifiée par (categoryId, roleId)
  */
 export async function deleteCategoryProductRoleLink(categoryId, roleId) {
+  const token = localStorage.getItem('token');
   const res = await fetch(`${URL}/${categoryId}/${roleId}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return;

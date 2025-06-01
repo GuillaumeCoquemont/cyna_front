@@ -6,7 +6,10 @@ const SERVICE_TYPES_URL = `${API_BASE_URL}/api/service-types`;
 
 // GET all services
 export async function fetchServices() {
-  const res = await fetch(SERVICES_URL);
+  const token = localStorage.getItem('token');
+  const res = await fetch(SERVICES_URL, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from '../../styles/components/modals/CategoryModal.module.css';
 
 export default function EditCategoryModal({ isOpen, onClose, category, onSave }) {
-  const [form, setForm] = useState({ id: '', Name: '', Description: '' });
+  const [form, setForm] = useState({ id: '', name: '', description: '' });
   const [error, setError] = useState('');
 
   // Pré-remplissage et reset à chaque ouverture
@@ -10,8 +10,8 @@ export default function EditCategoryModal({ isOpen, onClose, category, onSave })
     if (isOpen && category) {
       setForm({
         id: category.id,
-        Name: category.Name,
-        Description: category.Description
+        name: category.name,
+        description: category.description
       });
       setError('');
     }
@@ -26,7 +26,7 @@ export default function EditCategoryModal({ isOpen, onClose, category, onSave })
 
   const handleSubmit = async e => {
     e.preventDefault();
-    if (!form.Name.trim()) {
+    if (!form.name.trim()) {
       setError('Le nom est requis.');
       return;
     }
@@ -48,8 +48,8 @@ export default function EditCategoryModal({ isOpen, onClose, category, onSave })
             <label>Nom *</label>
             <input
               type="text"
-              name="Name"
-              value={form.Name}
+              name="name"
+              value={form.name}
               onChange={handleChange}
               required
             />
@@ -57,8 +57,8 @@ export default function EditCategoryModal({ isOpen, onClose, category, onSave })
           <div className={styles.field}>
             <label>Description</label>
             <textarea
-              name="Description"
-              value={form.Description}
+              name="description"
+              value={form.description}
               onChange={handleChange}
             />
           </div>

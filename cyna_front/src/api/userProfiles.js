@@ -6,7 +6,10 @@ const URL = `${API_BASE_URL}/api/user-profiles`;
  * Récupère la liste des profils utilisateurs
  */
 export async function fetchUserProfiles() {
-  const res = await fetch(URL);
+  const token = localStorage.getItem('token');
+  const res = await fetch(URL, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }

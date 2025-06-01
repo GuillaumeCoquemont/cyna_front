@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { login as apiLogin, fetchMe } from '../api/auth';
+import React, { createContext, useState } from 'react';
+import { login as apiLogin } from '../api/auth';
 
 export const AuthContext = createContext();
 
@@ -7,21 +7,12 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
 
-  useEffect(() => {
-    if (token) {
-      fetchMe(token)
-        .then(data => setUser(data))
-        .catch(() => signOut());
-    }
-  }, [token]);
-
   const signIn = async (credentials) => {
-    const { token: newToken } = await apiLogin(credentials);
-    localStorage.setItem('token', newToken);
-    setToken(newToken);
-    const me = await fetchMe(newToken);
-    setUser(me);
-    return me;
+    const data = await apiLogin(credentials);
+    localStorage.setItem('token', data.token);
+    setToken(data.token);
+    setUser(data); // Utilise directement la réponse du login
+    return data;
   };
 
   const signOut = () => {
