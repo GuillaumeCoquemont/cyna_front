@@ -1,48 +1,44 @@
 // src/components/modals/AddServiceModal.jsx
 
 import React, { useState, useEffect } from 'react';
-import { addService } from '../../api/services';
 import { fetchServiceTypes } from '../../api/serviceTypes';
 import styles from '../../styles/components/modals/ServiceModal.module.css';
 
-export default function AddServiceModal({ isOpen, onClose, onSave }) {
+const AddServiceModal = ({ isOpen, onClose, onSave }) => {
   const [form, setForm] = useState({
-    Name: '',
-    Description: '',
-    Status: false,
-    Price: '',
-    Subscription: false,
-    SubscriptionType: '',
-    UserCount: '',
-    Promotion: '',
+    name: '',
+    description: '',
+    status: false,
+    price: '',
+    subscription: false,
+    subscriptionType: '',
+    userCount: '',
+    promotion: '',
     service_type_id: ''
   });
   const [serviceTypes, setServiceTypes] = useState([]);
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
       setForm({
-        Name: '',
-        Description: '',
-        Status: false,
-        Price: '',
-        Subscription: false,
-        SubscriptionType: '',
-        UserCount: '',
-        Promotion: '',
+        name: '',
+        description: '',
+        status: false,
+        price: '',
+        subscription: false,
+        subscriptionType: '',
+        userCount: '',
+        promotion: '',
         service_type_id: ''
       });
-      setError('');
     }
   }, [isOpen]);
 
-  // Load service types for the dropdown
   useEffect(() => {
     fetchServiceTypes()
-      .then(data => setServiceTypes(data))
-      .catch(console.error);
+      .then(setServiceTypes)
+      .catch(() => setServiceTypes([]));
   }, []);
 
   if (!isOpen) return null;
@@ -57,31 +53,27 @@ export default function AddServiceModal({ isOpen, onClose, onSave }) {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    // Validate required fields
-    if (!form.Name.trim() || !form.service_type_id) {
-      setError('Le nom et le type de service sont requis.');
-      return;
-    }
-    setError('');
-    try {
-      const payload = {
-        Name: form.Name,
-        Description: form.Description,
-        Status: form.Status,
-        Price: parseFloat(form.Price) || 0,
-        Subscription: form.Subscription,
-        SubscriptionType: form.SubscriptionType,
-        UserCount: parseInt(form.UserCount, 10) || 0,
-        Promotion: form.Promotion,
-        service_type_id: parseInt(form.service_type_id, 10)
-      };
-      const saved = await addService(payload);
-      onSave(saved);
-      onClose();
-    } catch (err) {
-      console.error('API error adding service:', err);
-      setError('Erreur lors de la sauvegarde du service.');
-    }
+    setLoading(true);
+    // On force status à être un booléen (par sécurité)
+    const payload = {
+      ...form,
+      status: !!form.status,
+      subscription: !!form.subscription
+    };
+    await onSave(payload);
+    setLoading(false);
+    setForm({
+      name: '',
+      description: '',
+      status: false,
+      price: '',
+      subscription: false,
+      subscriptionType: '',
+      userCount: '',
+      promotion: '',
+      service_type_id: ''
+    });
+    onClose();
   };
 
   return (
@@ -93,8 +85,8 @@ export default function AddServiceModal({ isOpen, onClose, onSave }) {
             <label>Nom *</label>
             <input
               type="text"
-              name="Name"
-              value={form.Name}
+              name="name"
+              value={form.name}
               onChange={handleChange}
               required
             />
@@ -102,28 +94,34 @@ export default function AddServiceModal({ isOpen, onClose, onSave }) {
           <div className={styles.field}>
             <label>Description</label>
             <textarea
-              name="Description"
-              value={form.Description}
+              name="description"
+              value={form.description}
               onChange={handleChange}
             />
           </div>
-          <div className={styles.fieldCheckbox}>
-            <label>
-              <input
-                type="checkbox"
-                name="Status"
-                checked={form.Status}
-                onChange={handleChange}
-              />
-              Actif
-            </label>
+          <div className={styles.field}>
+            <label>Statut *</label>
+            <select
+              name="status"
+              value={form.status ? "true" : "false"}
+              onChange={e =>
+                setForm(prev => ({
+                  ...prev,
+                  status: e.target.value === "true"
+                }))
+              }
+              required
+            >
+              <option value="true">En service</option>
+              <option value="false">Hors service</option>
+            </select>
           </div>
           <div className={styles.field}>
             <label>Prix *</label>
             <input
               type="number"
-              name="Price"
-              value={form.Price}
+              name="price"
+              value={form.price}
               onChange={handleChange}
               required
             />
@@ -132,20 +130,20 @@ export default function AddServiceModal({ isOpen, onClose, onSave }) {
             <label>
               <input
                 type="checkbox"
-                name="Subscription"
-                checked={form.Subscription}
+                name="subscription"
+                checked={form.subscription}
                 onChange={handleChange}
               />
               Abonnement
             </label>
           </div>
-          {form.Subscription && (
+          {form.subscription && (
             <div className={styles.field}>
               <label>Type d'abonnement</label>
               <input
                 type="text"
-                name="SubscriptionType"
-                value={form.SubscriptionType}
+                name="subscriptionType"
+                value={form.subscriptionType}
                 onChange={handleChange}
               />
             </div>
@@ -154,8 +152,8 @@ export default function AddServiceModal({ isOpen, onClose, onSave }) {
             <label>Nombre d'utilisateurs</label>
             <input
               type="number"
-              name="UserCount"
-              value={form.UserCount}
+              name="userCount"
+              value={form.userCount}
               onChange={handleChange}
             />
           </div>
@@ -163,8 +161,8 @@ export default function AddServiceModal({ isOpen, onClose, onSave }) {
             <label>Promotion</label>
             <input
               type="text"
-              name="Promotion"
-              value={form.Promotion}
+              name="promotion"
+              value={form.promotion}
               onChange={handleChange}
             />
           </div>
@@ -179,18 +177,19 @@ export default function AddServiceModal({ isOpen, onClose, onSave }) {
               <option value="">-- Sélectionner --</option>
               {serviceTypes.map(st => (
                 <option key={st.id} value={st.id}>
-                  {st.Name}
+                  {st.name}
                 </option>
               ))}
             </select>
           </div>
-          {error && <p className={styles.error}>{error}</p>}
           <div className={styles.actions}>
             <button type="button" onClick={onClose}>Annuler</button>
-            <button type="submit">Ajouter</button>
+            <button type="submit" disabled={loading}>Ajouter</button>
           </div>
         </form>
       </div>
     </div>
   );
-}
+};
+
+export default AddServiceModal;

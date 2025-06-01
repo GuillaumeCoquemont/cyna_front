@@ -165,10 +165,10 @@ export default function DashboardCategories() {
         {serviceTypes.map(t => (
           <div key={t.id} className={styles.categoryCard}>
             <div className={styles.cardHeader}>
-              <span>{t.Name}</span>
+              <span>{t.name}</span>
             </div>
             <div className={styles.cardBody}>
-              <p>{t.Description}</p>
+              <p>{t.description}</p>
               <button className={styles.editBtn} onClick={() => handleOpenEditType(t)}>Modifier</button>
               <button className={styles.deleteBtn} onClick={() => handleDeleteType(t.id)}>Supprimer</button>
             </div>

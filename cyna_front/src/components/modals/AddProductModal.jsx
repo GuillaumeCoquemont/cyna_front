@@ -119,7 +119,7 @@ const ProductModal = ({ isOpen, onClose, onSave }) => {
               <option value="">Sélectionner</option>
               {categories.map(cat => (
                 <option key={cat.id} value={cat.id}>
-                  {cat.Name}
+                  {cat.name}
                 </option>
               ))}
             </select>

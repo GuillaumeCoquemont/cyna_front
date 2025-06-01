@@ -18,9 +18,13 @@ export async function fetchProduct(id) {
 }
 
 export async function updateProduct(id, data) {
+  const token = localStorage.getItem('token');
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    },
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
@@ -28,7 +32,11 @@ export async function updateProduct(id, data) {
 }
 
 export async function deleteProduct(id) {
-  const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: 'DELETE',
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return;
 }

@@ -14,11 +14,11 @@ export async function login({ email, password }) {
   return data;
 }
 
-export async function register({ email, password }) {
-  const res = await fetch(`${BASE_URL}/register`, {
+export async function register({ name, email, password }) {
+  const res = await fetch(`${BASE_URL}/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ name, email, password })
   });
   if (!res.ok) throw new Error("Échec de l'inscription");
   return res.json();

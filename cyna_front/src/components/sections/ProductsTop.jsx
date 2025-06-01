@@ -40,7 +40,7 @@ const ProductsTop = () => {
               <h3 className={styles.productTitle}>{product.name}</h3>
               <p className={styles.productDesc}>{product.description}</p>
               <p className={styles.price}>
-  ${product.price != null ? product.price.toFixed(2) : '0.00'}
+                ${Number(product.price).toFixed(2)}
 </p>
             </div>
             </div>

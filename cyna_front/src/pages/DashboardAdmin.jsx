@@ -98,6 +98,7 @@ export default function DashboardAdmin() {
     { key: 'dashboard', label: 'Dashboard' },
     { key: 'messages', label: 'Messages' },
     { key: 'produits', label: 'Produits' },
+    { key: 'services', label: 'Services' },
     { key: 'categories', label: 'Catégories' },
     { key: 'favoris', label: 'Favoris' },
     { key: 'clients',   label: 'Clients' },
@@ -112,7 +113,7 @@ export default function DashboardAdmin() {
     { key: 'liaisons-addr-upp', label: 'Adresses↔Profils' },
     { key: 'params', label: 'Paramètres' },
     { key: 'code', label: 'Code Promo' },
-    { key: 'services', label: 'Services' },
+
   ];
 
   const chartData = {

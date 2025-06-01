@@ -3,12 +3,16 @@ import React, { useState, useEffect } from 'react';
 import styles from '../../styles/components/modals/ServiceTypeModal.module.css';
 
 export default function EditServiceTypeModal({ isOpen, onClose, serviceType, onSave }) {
-  const [form, setForm] = useState({ id: '', Name: '', Description: '' });
+  const [form, setForm] = useState({ id: '', name: '', description: '' });
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (isOpen && serviceType) {
-      setForm({ id: serviceType.id, Name: serviceType.Name, Description: serviceType.Description });
+      setForm({
+        id: serviceType.id,
+        name: serviceType.name,
+        description: serviceType.description
+      });
       setError('');
     }
   }, [isOpen, serviceType]);
@@ -22,7 +26,7 @@ export default function EditServiceTypeModal({ isOpen, onClose, serviceType, onS
 
   const handleSubmit = async e => {
     e.preventDefault();
-    if (!form.Name.trim()) {
+    if (!form.name.trim()) {
       setError('Le nom est requis.');
       return;
     }
@@ -44,8 +48,8 @@ export default function EditServiceTypeModal({ isOpen, onClose, serviceType, onS
             <label>Nom *</label>
             <input
               type="text"
-              name="Name"
-              value={form.Name}
+              name="name"
+              value={form.name}
               onChange={handleChange}
               required
             />
@@ -53,8 +57,8 @@ export default function EditServiceTypeModal({ isOpen, onClose, serviceType, onS
           <div className={styles.field}>
             <label>Description</label>
             <textarea
-              name="Description"
-              value={form.Description}
+              name="description"
+              value={form.description}
               onChange={handleChange}
             />
           </div>

@@ -48,20 +48,23 @@ export default function ProductsEditor() {
     handleCloseEdit();
   };
   const handleDelete = async id => {
-    await deleteProduct(id);
-    setProducts(p => p.filter(prod => prod.id !== id));
-    setTableProducts(prev => prev.filter(prod => prod.id !== id));
+    console.log('Suppression demandée pour id :', id);
+    console.log('Produits affichés :', tableProducts);
+    try {
+      await deleteProduct(id);
+      setProducts(p => p.filter(prod => prod.id !== id));
+      setTableProducts(prev => prev.filter(prod => prod.id !== id));
+    } catch (err) {
+      console.error('Erreur suppression produit:', err);
+      alert('Erreur lors de la suppression du produit');
+    }
   };
 
   const handleOpenAdd = () => setShowAddModal(true);
   const handleCloseAdd = () => setShowAddModal(false);
   const handleAdd = async (newProdData) => {
-    // Compute next available ID based on existing products
-    const existingIds = products.map(p => p.id);
-    const nextId = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 1;
-    const payload = { ...newProdData, id: nextId };
-    await addProduct(payload);
-    load();
+    await addProduct(newProdData);
+    load(); // recharge la liste depuis la BDD
     handleCloseAdd();
   };
 

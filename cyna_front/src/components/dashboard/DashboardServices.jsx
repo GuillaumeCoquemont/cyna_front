@@ -1,76 +1,70 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../../styles/components/dashboard/DashboardServices.module.css';
-import { fetchServices, updateService, deleteService, addService } from '../../api/services';
+import {
+  fetchServices,
+  addService,
+  updateService,
+  deleteService
+} from '../../api/services';
+
 import EditServiceModal from '../modals/EditServiceModal';
 import AddServiceModal from '../modals/AddServiceModal';
 
-const DashboardServices = () => {
+export default function DashboardServices() {
   const [services, setServices] = useState([]);
-  const [allKeys, setAllKeys] = useState([]);
-
+  const [tableServices, setTableServices] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  const handleOpenEdit = (svc) => { setSelectedService(svc); setShowEditModal(true); };
-  const handleCloseEdit = () => { setSelectedService(null); setShowEditModal(false); };
-
-  const handleOpenAdd = () => setShowAddModal(true);
-  const handleCloseAdd = () => setShowAddModal(false);
-
   useEffect(() => {
-    loadServices();
+    load();
   }, []);
 
-  const loadServices = () => {
+  const load = () => {
     fetchServices()
       .then(data => {
         setServices(data);
-        setAllKeys(data.map(s => s.key));
+        setTableServices(data);
       })
       .catch(err => console.error('Erreur chargement services:', err));
   };
 
-  const handleChange = (key, field, value) => {
-    setServices(prev =>
-      prev.map(s => (s.key === key ? { ...s, [field]: value } : s))
-    );
+  const handleOpenEdit = (service) => {
+    setSelectedService(service);
+    setShowEditModal(true);
   };
-
-  const handleSave = async (key) => {
-    const updated = services.find(s => s.key === key);
-    try {
-      const saved = await updateService(key, updated);
-      setServices(prev => prev.map(s => (s.key === saved.key ? saved : s)));
-      window.alert('Service mis à jour');
-    } catch (err) {
-      console.error('Erreur mise à jour service:', err);
-      window.alert('Impossible de sauvegarder le service');
-    }
+  const handleCloseEdit = () => {
+    setSelectedService(null);
+    setShowEditModal(false);
   };
-
-  const handleDelete = async (key) => {
+  const handleUpdate = async (updatedService) => {
+    await updateService(updatedService.id, updatedService);
+    load();
+    handleCloseEdit();
+  };
+  const handleDelete = async id => {
     try {
-      await deleteService(key);
-      setServices(prev => prev.filter(s => s.key !== key));
+      await deleteService(id);
+      setServices(s => s.filter(service => service.id !== id));
+      setTableServices(prev => prev.filter(service => service.id !== id));
     } catch (err) {
       console.error('Erreur suppression service:', err);
+      alert('Erreur lors de la suppression du service');
     }
   };
 
-  const handleSaveNew = async (serviceData) => {
-    try {
-      const saved = await addService(serviceData);
-      setServices(prev => [...prev, saved]);
-      setShowAddModal(false);
-    } catch (err) {
-      console.error('Erreur ajout service :', err);
-    }
+  const handleOpenAdd = () => setShowAddModal(true);
+  const handleCloseAdd = () => setShowAddModal(false);
+  const handleAdd = async (newServiceData) => {
+    await addService(newServiceData);
+    load(); // recharge la liste depuis la BDD
+    handleCloseAdd();
   };
 
   return (
     <div className={styles.editorContainer}>
-      <h2>Gestion des services</h2>
+      <h2>Éditeur de Services</h2>
       <button onClick={handleOpenAdd} className={styles.addButton}>
         Ajouter un service
       </button>
@@ -81,15 +75,19 @@ const DashboardServices = () => {
             <th>ID</th>
             <th>Nom</th>
             <th>Description</th>
+            <th>Prix</th>
+            <th>Statut</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {services.map(s => (
+          {tableServices.map(s => (
             <tr key={s.id}>
               <td>{s.id}</td>
-              <td>{s.Name}</td>
-              <td>{s.Description}</td>
+              <td>{s.name}</td>
+              <td>{s.description}</td>
+              <td>{s.price} €</td>
+              <td>{s.status ? 'Actif' : 'Inactif'}</td>
               <td>
                 <button onClick={() => handleOpenEdit(s)}>Modifier</button>
                 <button onClick={() => handleDelete(s.id)}>Supprimer</button>
@@ -102,16 +100,13 @@ const DashboardServices = () => {
         isOpen={showEditModal}
         onClose={handleCloseEdit}
         service={selectedService}
-        onSave={handleSave}
+        onSave={handleUpdate}
       />
       <AddServiceModal
         isOpen={showAddModal}
         onClose={handleCloseAdd}
-        onSave={handleSaveNew}
-        existingKeys={allKeys}
+        onSave={handleAdd}
       />
     </div>
   );
-};
-
-export default DashboardServices;
+}

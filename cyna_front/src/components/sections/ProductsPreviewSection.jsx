@@ -68,7 +68,7 @@ const ProductsPreviewSection = () => {
               <h3 className={styles.productTitle}>{product.name}</h3>
               <p className={styles.description}>{product.description}</p>
               <div className={styles.priceContainer}>
-                <span className={styles.price}>${product.price != null ? product.price.toFixed(2) : '0.00'}</span>
+                <span className={styles.price}>${Number(product.price).toFixed(2)}</span>
                 {product.price != null && product.discount && (
                   <span className={styles.originalPrice}>
                     ${((product.price / (1 - product.discount / 100)) || 0).toFixed(2)}
