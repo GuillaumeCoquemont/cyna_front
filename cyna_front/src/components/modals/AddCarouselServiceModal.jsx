@@ -4,7 +4,7 @@ import styles from '../../styles/components/modals/CarouselModal.module.css';
 
 export default function AddCarouselServiceModal({ isOpen, onClose, onSave }) {
   const [services, setServices] = useState([]);
-  const [form, setForm] = useState({ service_id: '', order: '1' });
+  const [form, setForm] = useState({ service_id: '' });
   const [error, setError] = useState('');
 
   // Load list of services when modal opens
@@ -13,7 +13,7 @@ export default function AddCarouselServiceModal({ isOpen, onClose, onSave }) {
       fetchServices()
         .then(data => setServices(data))
         .catch(err => console.error('Erreur fetchServices:', err));
-      setForm({ service_id: '', order: '1' });
+      setForm({ service_id: '' });
       setError('');
     }
   }, [isOpen]);
@@ -32,16 +32,12 @@ export default function AddCarouselServiceModal({ isOpen, onClose, onSave }) {
       setError('Veuillez sélectionner un service');
       return;
     }
-    const payload = {
-      service_id: parseInt(form.service_id, 10),
-      order: parseInt(form.order, 10) || 1
-    };
     try {
-      await onSave(payload);
+      await onSave({ service_id: form.service_id });
       onClose();
-      setForm({ service_id: '', order: '1' });
+      setForm({ service_id: '' });
     } catch (err) {
-      setError(err.message || 'Ordre déjà utilisé');
+      setError(err.message || 'Erreur lors de l\'ajout');
     }
   };
 
@@ -55,20 +51,9 @@ export default function AddCarouselServiceModal({ isOpen, onClose, onSave }) {
             <select name="service_id" value={form.service_id} onChange={handleChange} required>
               <option value="">-- Choisir --</option>
               {services.map(s => (
-                <option key={s.id} value={s.id}>{s.Name}</option>
+                <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>
-          </label>
-          <label>
-            Ordre d'affichage
-            <input
-              type="number"
-              name="order"
-              value={form.order}
-              onChange={handleChange}
-              min="1"
-              placeholder="Ordre non utilisé"
-            />
           </label>
           {error && <p className={styles.errorMessage}>{error}</p>}
           <div className={styles.actions}>
@@ -78,5 +63,5 @@ export default function AddCarouselServiceModal({ isOpen, onClose, onSave }) {
         </form>
       </div>
     </div>
-);
+  );
 }

@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import styles from '../../styles/components/modals/CarouselModal.module.css';
 
 export default function EditCarouselItemModal({ isOpen, onClose, item, onSave }) {
-  const [form, setForm] = useState({ product_id: '', order: 1 });
+  const [form, setForm] = useState({ id: null, order: 1 });
 
   useEffect(() => {
     if (item) {
       setForm({
-        product_id: item.id, // use product id
+        id: item.id,
         order: item.order
       });
     }
@@ -37,7 +37,6 @@ export default function EditCarouselItemModal({ isOpen, onClose, item, onSave })
             Produit
             <input
               type="text"
-              value={item?.name || ''}
               disabled
               className={styles.input}
             />

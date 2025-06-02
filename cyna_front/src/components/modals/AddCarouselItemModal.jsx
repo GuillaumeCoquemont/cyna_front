@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styles from '../../styles/components/modals/CarouselModal.module.css';
 
 export default function AddCarouselItemModal({ isOpen, onClose, products, onSave }) {
-  const [form, setForm] = useState({ product_id: '', order: '1' });
+  const [form, setForm] = useState({ product_id: '' });
   const [error, setError] = useState('');
 
   if (!isOpen) return null;
@@ -22,17 +22,12 @@ export default function AddCarouselItemModal({ isOpen, onClose, products, onSave
       setError('Veuillez sélectionner un produit');
       return;
     }
-    const payload = {
-      product_id: parseInt(form.product_id, 10),
-      order: parseInt(form.order, 10) || 1
-    };
     try {
-      await onSave(payload);
+      await onSave({ product_id: form.product_id });
       onClose();
-      setForm({ product_id: '', order: '1' });
+      setForm({ product_id: '' });
     } catch (err) {
-      // Show server error message or custom text
-      setError(err.message || 'Ordre déjà utilisé');
+      setError(err.message || 'Erreur lors de l\'ajout');
     }
   };
 
@@ -49,17 +44,6 @@ export default function AddCarouselItemModal({ isOpen, onClose, products, onSave
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </select>
-          </label>
-          <label>
-            Ordre d'affichage
-            <input
-              type="number"
-              name="order"
-              value={form.order}
-              onChange={handleChange}
-              min="1"
-              placeholder="Ordre non utilisé"
-/>
           </label>
           {error && <p className={styles.errorMessage}>{error}</p>}
           <div className={styles.actions}>

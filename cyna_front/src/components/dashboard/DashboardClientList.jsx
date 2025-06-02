@@ -24,10 +24,10 @@ export default function ClientList() {
       <ul className={styles.userList}>
         {clients.map(client => (
           <li key={client.id} className={styles.userItem}>
-            <span className={styles.userName}>{client.Name}</span>
-            <span className={styles.userEmail}>{client.Email}</span>
+            <span className={styles.userName}>{client.name}</span>
+            <span className={styles.userEmail}>{client.email}</span>
             <span className={styles.userRole}>
-              {roles.find(r => r.id === client.role_id)?.Name || '—'}
+              {roles.find(r => r.id === client.role_id)?.name || '—'}
             </span>
           </li>
         ))}

@@ -25,18 +25,18 @@ const ProductsPage = () => {
         // Map services to same shape as products
         const svcNormalized = services.map(s => ({
           id: s.id,
-          name: s.Name,
-          description: s.Description,
-          price: s.Price,
+          name: s.name,
+          description: s.description,
+          price: Number(s.price),
           image: s.image,
-          category: s.Subscription ? 'Abonnement' : 'Service à la carte',
+          category: s.subscription ? 'Abonnement' : 'Service à la carte',
           type: 'service',
         }));
         const prodNormalized = products.map(p => ({
           id: p.id,
           name: p.name,
           description: p.description,
-          price: p.price,
+          price: Number(p.price),
           image: p.image,
           category: p.category || 'Produit',
           type: 'product',
@@ -68,8 +68,8 @@ const ProductsPage = () => {
   const filtered = allItems
     // recherche sur name + description
     .filter(i =>
-      i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      i.description.toLowerCase().includes(searchQuery.toLowerCase())
+      (i.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (i.description || '').toLowerCase().includes(searchQuery.toLowerCase())
     )
     // filtre catégories
     .filter(i => !selectedCategories.length || selectedCategories.includes(i.category))
@@ -158,7 +158,9 @@ const ProductsPage = () => {
                   <div className={styles.productInfo}>
                     <h3>{item.name}</h3>
                     <p>{item.description}</p>
-                    <p className={styles.price}>€{item.price.toFixed(2)}</p>
+                    <p className={styles.price}>
+                      €{typeof item.price === 'number' ? item.price.toFixed(2) : '—'}
+                    </p>
                     <button
                       className={styles.addToCartButton}
                       onClick={e => {

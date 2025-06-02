@@ -33,7 +33,7 @@ const AuthForm = () => {
       }
       try {
         await apiRegister({
-          name: formData.name,           // Ajoute cette ligne
+          name: formData.name,
           email: formData.email,
           password: formData.password
         });

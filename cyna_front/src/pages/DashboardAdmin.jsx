@@ -290,6 +290,7 @@ export default function DashboardAdmin() {
             <DashboardTeam />
           </div>
         );
+      
       case 'clients':
         return (
           <div className={styles.dashboardContent}>

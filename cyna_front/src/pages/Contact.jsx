@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styles from '../styles/pages/Contact.module.css';
+import { addMessage } from '../api/messages';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({ subject: '', name: '', email: '', message: '' });
@@ -17,18 +18,16 @@ export default function ContactPage() {
         sujet: formData.subject,
         expediteur: `${formData.name} <${formData.email}>`,
         message: formData.message,
-        date: nowDate
+        date: nowDate,
+        lu: false
       };
-      const response = await fetch('/api/messages/mails', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!response.ok) throw new Error('Erreur lors de l’envoi du message');
+      
+      await addMessage('mails', payload);
       setFormData({ subject: '', name: '', email: '', message: '' });
+      alert('Message envoyé avec succès !');
     } catch (error) {
       console.error(error);
-      alert('Échec de l’envoi, veuillez réessayer.');
+      alert('Échec de l\'envoi, veuillez réessayer.');
     }
   };
 
