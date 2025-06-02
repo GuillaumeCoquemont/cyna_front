@@ -1,90 +1,72 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from '../../styles/components/sections/ProductsPreviewSection.module.css';
-import { fetchProducts } from '../../api/products';
+import { fetchCategories } from '../../api/categories';
+import { fetchServiceTypes } from '../../api/serviceTypes';
 
 const ProductsPreviewSection = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOrder, setSortOrder] = useState(null);
 
-  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [items, setItems] = useState([]);
 
   useEffect(() => {
-    fetchProducts()
-      .then(data => setFeaturedProducts(data))
-      .catch(err => console.error('Erreur fetchProducts:', err));
+    Promise.all([
+      fetchCategories(),
+      fetchServiceTypes()
+    ])
+      .then(([categoriesData, serviceTypesData]) => {
+        const mappedCategories = categoriesData.map(cat => ({ ...cat, type: 'category' }));
+        const mappedServiceTypes = serviceTypesData.map(type => ({ ...type, type: 'serviceType' }));
+
+        setItems([...mappedCategories, ...mappedServiceTypes]);
+      })
+      .catch(err => console.error('Erreur chargement catégories/types :', err));
   }, []);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  const handleSort = (order) => {
-    setSortOrder(order);
-  };
-
-  const filteredProducts = featuredProducts
-    .filter((product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (sortOrder === "asc") return a.price - b.price;
-      if (sortOrder === "desc") return b.price - a.price;
-      return 0;
-    });
+  const filteredItems = items
+    .filter((item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   return (
     <section className={styles.previewSection}>
       <div className={styles.sectionHeader}>
-        <h2 className={styles.title}>Catégorie de produits</h2>
+        <h2 className={styles.title}>Explorer par catégorie ou type</h2>
       </div>
 
       <div className={styles.searchFilterContainer}>
         <input
           type="text"
-          placeholder="Rechercher"
+          placeholder="Rechercher par nom"
           value={searchTerm}
           onChange={handleSearchChange}
           className={styles.searchInput}
         />
-        <button onClick={() => handleSort("asc")} className={styles.filterBtn}>
-          Prix croissant
-        </button>
-        <button onClick={() => handleSort("desc")} className={styles.filterBtn}>
-          Prix décroissant
-        </button>
       </div>
 
-      <div className={styles.productsGrid}>
-        {filteredProducts.map((product) => (
-          <div key={product.id} className={styles.productCard}>
-            <div className={styles.productImage}>
-              {product.discount && (
-                <span className={styles.saleTag}>-{product.discount}%</span>
-              )}
+      <div className={styles.categoriesTypesGrid}>
+        {filteredItems.map((item) => (
+          <div key={item.id + item.type} className={styles.categoryTypeCard}>
+            <div className={styles.cardTypeLabel}>
+               {item.type === 'category' ? 'Catégorie' : 'Type de Service'}
             </div>
-            <div className={styles.productInfo}>
-              <span className={styles.category}>{product.category}</span>
-              <h3 className={styles.productTitle}>{product.name}</h3>
-              <p className={styles.description}>{product.description}</p>
-              <div className={styles.priceContainer}>
-                <span className={styles.price}>${Number(product.price).toFixed(2)}</span>
-                {product.price != null && product.discount && (
-                  <span className={styles.originalPrice}>
-                    ${((product.price / (1 - product.discount / 100)) || 0).toFixed(2)}
-                  </span>
-                )}
-              </div>
+            <div className={styles.cardContent}>
+              <h3 className={styles.itemName}>{item.name}</h3>
+              {item.description && <p className={styles.itemDescription}>{item.description}</p>}
             </div>
+            <Link
+              to={item.type === 'category' ? `/products?category=${item.id}` : `/services?type=${item.id}`}
+              className={styles.viewItemsButton}
+            >
+              Voir les offres
+              <span className={styles.arrow}>→</span>
+            </Link>
           </div>
         ))}
-      </div>
-
-      <div className={styles.ctaContainer}>
-        <Link to="/products" className={styles.viewAllButton}>
-          Voir tous nos produits
-          <span className={styles.arrow}>→</span>
-        </Link>
       </div>
     </section>
   );

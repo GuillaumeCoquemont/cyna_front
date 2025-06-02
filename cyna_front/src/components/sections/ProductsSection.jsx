@@ -10,22 +10,27 @@ import 'swiper/css/pagination';
 
 import { fetchProducts } from '../../api/products';
 import { fetchCarousel } from '../../api/carousel';
+import { fetchServices } from '../../api/services';
+import { calculateDiscountedPrice, formatPrice } from '../../utils/priceUtils';
 
 const ProductsSection = () => {
   const [slides, setSlides] = useState([]);
   const { addToCart } = useCart();
-  const location = useLocation(); // pour relancer le fetch quand on navigue
+  const location = useLocation();
 
   useEffect(() => {
     const loadSlides = () => {
-      Promise.all([fetchCarousel(), fetchProducts()])
-        .then(([carouselConfig, products]) => {
+      Promise.all([fetchCarousel(), fetchProducts(), fetchServices()])
+        .then(([carouselConfig, products, services]) => {
           const merged = carouselConfig
             .map(c => {
-              // find the matching product data by product_id
               const prod = products.find(p => p.id === c.product_id);
-              // merge product fields and apply order from carousel config
-              return prod ? { ...prod, order: c.order } : null;
+              if (prod) return { ...prod, order: c.order, type: 'product' };
+
+              const serv = services.find(s => s.id === c.service_id);
+              if (serv) return { ...serv, order: c.order, type: 'service' };
+
+              return null;
             })
             .filter(Boolean)
             .sort((a, b) => a.order - b.order);
@@ -34,9 +39,7 @@ const ProductsSection = () => {
         .catch(err => console.error('Erreur chargement carousel :', err));
     };
 
-    // Chargement initial
     loadSlides();
-    // Rechargement si on revient sur l'onglet
     window.addEventListener('focus', loadSlides);
     return () => window.removeEventListener('focus', loadSlides);
   }, [location.pathname]);
@@ -48,7 +51,7 @@ const ProductsSection = () => {
           Découvrez <span className={styles.highlight}>nos solutions 360 de cybersécurité</span> pour les PME
         </h2>
         <h4 className={styles.subtitle}>
-          Cyna s’adapte à vos besoins et vous propose un accompagnement dans la protection globale de votre SI.
+          Cyna s'adapte à vos besoins et vous propose un accompagnement dans la protection globale de votre SI.
         </h4>
       </div>
 
@@ -71,29 +74,83 @@ const ProductsSection = () => {
           }}
           className={styles.swiper}
         >
-          {slides.map(product => (
-            <SwiperSlide key={product.id}>
-              <Link to={`/product/${product.id}`} className={styles.productLink}>
-                <div className={styles.productCard}>
+          {slides.map(item => (
+            <SwiperSlide key={item.id}>
+              <Link to={item.type === 'product' ? `/product/${item.id}` : `/service/${item.id}`} className={styles.productLink}>
+                <div className={`${styles.productCard} ${item.type === 'product' ? styles['productCard--product'] : styles['productCard--service']}`}>
                   <div className={styles.productImage}>
-                    <img src={product.image} alt={product.name} />
+                    {item.image ? (
+                      <img src={item.image} alt={item.name} />
+                    ) : (
+                      <div className={styles.servicePlaceholder}>
+                        <span>{item.type === 'product' ? 'Produit' : 'Service'}</span>
+                      </div>
+                    )}
+                    {item.promoCode && (
+                      <span className={styles.saleTag}>
+                        {item.promoCode.discountType === 'percentage' 
+                          ? `-${item.promoCode.discountValue}%` 
+                          : `-${item.promoCode.discountValue}€`}
+                      </span>
+                    )}
                   </div>
                   <div className={styles.productInfo}>
-                    <h3 className={styles.productName}>{product.name}</h3>
-                    <p className={styles.productDescription}>{product.description}</p>
-                    <p className={styles.productCharacteristic}>{product.characteristic}</p>
-                    <p className={styles.productPrice}>{product.price} €</p>
-                    <p className={styles.productAvailability}>{product.availability}</p>
-                    <button
-                      className={styles.addToCartButton}
-                      onClick={e => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        addToCart(product, 1);
-                      }}
-                    >
-                      Ajouter au panier
-                    </button>
+                    <h3 className={styles.productName}>{item.name}</h3>
+                    {item.type === 'product' ? (
+                      <>
+                        <p className={styles.productDescription}>{item.description}</p>
+                        <div className={styles.priceContainer}>
+                          {item.promoCode ? (
+                            <>
+                              <span className={styles.originalPrice}>{formatPrice(item.price)}</span>
+                              <span className={styles.productPrice}>
+                                {formatPrice(calculateDiscountedPrice(item.price, item.promoCode))}
+                              </span>
+                            </>
+                          ) : (
+                            <span className={styles.productPrice}>{formatPrice(item.price)}</span>
+                          )}
+                        </div>
+                        <button
+                          className={styles.addToCartButton}
+                          onClick={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            addToCart(item, 1);
+                          }}
+                        >
+                          Ajouter au panier
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <p className={styles.serviceDescription}>
+                          {item.description}
+                        </p>
+                        <div className={styles.priceContainer}>
+                          {item.promoCode ? (
+                            <>
+                              <span className={styles.originalPrice}>{formatPrice(item.price)}</span>
+                              <span className={styles.servicePrice}>
+                                {formatPrice(calculateDiscountedPrice(item.price, item.promoCode))}
+                              </span>
+                            </>
+                          ) : (
+                            <span className={styles.servicePrice}>{formatPrice(item.price)}</span>
+                          )}
+                        </div>
+                        <button
+                          className={styles.addToCartButton}
+                          onClick={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            addToCart(item, 1);
+                          }}
+                        >
+                          Ajouter au panier
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               </Link>

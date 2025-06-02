@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchServiceTypes } from '../../api/serviceTypes';
+import { fetchPromoCodes } from '../../api/promoCodes';
 import styles from '../../styles/components/modals/ServiceModal.module.css';
 
 export default function EditServiceModal({ isOpen, onClose, onSave, service }) {
@@ -12,9 +13,12 @@ export default function EditServiceModal({ isOpen, onClose, onSave, service }) {
     subscriptionType: '',
     userCount: '',
     promotion: '',
-    service_type_id: ''
+    service_type_id: '',
+    promo_code_id: ''
   });
   const [serviceTypes, setServiceTypes] = useState([]);
+  const [promoCodes, setPromoCodes] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (service) {
@@ -27,15 +31,26 @@ export default function EditServiceModal({ isOpen, onClose, onSave, service }) {
         subscriptionType: service.subscriptionType || '',
         userCount: service.userCount || '',
         promotion: service.promotion || '',
-        service_type_id: service.service_type_id || ''
+        service_type_id: service.service_type_id || '',
+        promo_code_id: service.promo_code_id || ''
       });
     }
   }, [service]);
 
   useEffect(() => {
-    fetchServiceTypes()
-      .then(setServiceTypes)
-      .catch(() => setServiceTypes([]));
+    const fetchData = async () => {
+      try {
+        const [types, codes] = await Promise.all([
+          fetchServiceTypes(),
+          fetchPromoCodes()
+        ]);
+        setServiceTypes(types);
+        setPromoCodes(codes);
+      } catch (error) {
+        console.error('Erreur lors du chargement des données:', error);
+      }
+    };
+    fetchData();
   }, []);
 
   if (!isOpen) return null;
@@ -48,9 +63,17 @@ export default function EditServiceModal({ isOpen, onClose, onSave, service }) {
     }));
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    onSave({ ...form, id: service.id }); // Ajoute l'id pour l'update
+    setLoading(true);
+    const payload = {
+      ...form,
+      status: !!form.status,
+      subscription: !!form.subscription
+    };
+    await onSave(payload);
+    setLoading(false);
+    onClose();
   };
 
   return (
@@ -159,9 +182,26 @@ export default function EditServiceModal({ isOpen, onClose, onSave, service }) {
               ))}
             </select>
           </div>
+          <div className={styles.field}>
+            <label>Code promo</label>
+            <select
+              name="promo_code_id"
+              value={form.promo_code_id}
+              onChange={handleChange}
+            >
+              <option value="">Aucun code promo</option>
+              {promoCodes.map(code => (
+                <option key={code.id} value={code.id}>
+                  {code.code} - {code.discountType === 'percentage' ? `${code.discountValue}%` : `${code.discountValue}€`}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className={styles.actions}>
             <button type="button" onClick={onClose}>Annuler</button>
-            <button type="submit">Enregistrer</button>
+            <button type="submit" disabled={loading}>
+              {loading ? 'Enregistrement...' : 'Enregistrer'}
+            </button>
           </div>
         </form>
       </div>

@@ -57,3 +57,12 @@ export async function addProduct(data) {
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }
+
+export async function fetchAvailablePromoCodes() {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${API_BASE_URL}/api/promo-codes`, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
+  if (!res.ok) throw new Error(`Erreur ${res.status}`);
+  return res.json();
+}

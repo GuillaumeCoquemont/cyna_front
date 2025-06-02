@@ -25,9 +25,9 @@ export const CarrouselEditor = () => {
       .then(([carouselConfig, products, services]) => {
         const merged = carouselConfig.map(c => {
           const prod = products.find(p => p.id === c.product_id);
-          if (prod) return { ...prod, order: c.order, type: 'product', id: c.id }; // Vérifie que c.id existe
-          const serv = services.find(s => s.id === c.product_id);
-          if (serv) return { ...serv, order: c.order, type: 'service', id: c.id }; // Vérifie que c.id existe
+          if (prod) return { ...prod, order: c.order, type: 'product', id: c.id };
+          const serv = services.find(s => s.id === c.service_id);
+          if (serv) return { ...serv, order: c.order, type: 'service', id: c.id };
           return null;
         })
           .filter(Boolean)

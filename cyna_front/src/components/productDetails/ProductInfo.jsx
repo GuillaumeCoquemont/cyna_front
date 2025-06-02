@@ -8,14 +8,24 @@ import {
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import styles from '../../styles/components/productDetails/ProductInfo.module.css';
+import { calculateDiscountedPrice, formatPrice } from '../../utils/priceUtils';
 
 const ProductInfo = ({ product, quantity, setQuantity, addToCart }) => {
   const navigate = useNavigate();
+  const discountedPrice = calculateDiscountedPrice(product.price, product.promoCode);
+
   return (
     <div className={styles.info}>
       <h1 className={styles.title}>{product.name}</h1>
       <div className={styles.priceRating}>
-        <span className={styles.price}>{product.price}</span>
+        {product.promoCode ? (
+          <div className={styles.priceContainer}>
+            <span className={styles.originalPrice}>{formatPrice(product.price)}</span>
+            <span className={styles.price}>{formatPrice(discountedPrice)}</span>
+          </div>
+        ) : (
+          <span className={styles.price}>{formatPrice(product.price)}</span>
+        )}
         <div className={styles.rating}>
           <FaStar /> <span>{product.rating}</span> ({product.reviews} avis)
         </div>

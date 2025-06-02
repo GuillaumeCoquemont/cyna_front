@@ -6,6 +6,7 @@ import {
   updateProduct,
   deleteProduct
 } from '../../api/products';
+import { calculateDiscountedPrice, formatPrice } from '../../utils/priceUtils';
 
 import ProductEditModal from '../modals/EditProductModal';
 import AddProductModal from '../modals/AddProductModal';
@@ -43,7 +44,12 @@ export default function ProductsEditor() {
     setShowEditModal(false);
   };
   const handleUpdate = async (updatedProd) => {
-    await updateProduct(updatedProd.id, updatedProd);
+    const payload = { ...updatedProd };
+    if (payload.promoCodeId !== undefined) {
+      payload.promo_code_id = payload.promoCodeId;
+      delete payload.promoCodeId;
+    }
+    await updateProduct(updatedProd.id, payload);
     load();
     handleCloseEdit();
   };
@@ -63,7 +69,12 @@ export default function ProductsEditor() {
   const handleOpenAdd = () => setShowAddModal(true);
   const handleCloseAdd = () => setShowAddModal(false);
   const handleAdd = async (newProdData) => {
-    await addProduct(newProdData);
+    const payload = { ...newProdData };
+    if (payload.promoCodeId !== undefined) {
+      payload.promo_code_id = payload.promoCodeId;
+      delete payload.promoCodeId;
+    }
+    await addProduct(payload);
     load(); // recharge la liste depuis la BDD
     handleCloseAdd();
   };
@@ -82,6 +93,8 @@ export default function ProductsEditor() {
             <th>Nom</th>
             <th>Image</th>
             <th>Prix</th>
+            <th>Prix après remise</th>
+            <th>Code promo</th>
             <th>Stock</th>
             <th>Actions</th>
           </tr>
@@ -112,7 +125,27 @@ export default function ProductsEditor() {
                   <span>—</span>
                 )}
               </td>
-              <td>{p.price}</td>
+              <td>{formatPrice(p.price)}</td>
+              <td>
+                {p.promoCode ? (
+                  <span style={{ color: 'var(--tertiary-color)' }}>
+                    {formatPrice(calculateDiscountedPrice(p.price, p.promoCode))}
+                  </span>
+                ) : (
+                  formatPrice(p.price)
+                )}
+              </td>
+              <td>
+                {p.promoCode ? (
+                  <span>
+                    {p.promoCode.code} ({p.promoCode.discountType === 'percentage' ? 
+                      `${p.promoCode.discountValue}%` : 
+                      `${p.promoCode.discountValue}€`})
+                  </span>
+                ) : (
+                  '—'
+                )}
+              </td>
               <td>
                 {p.stock === 0 
                   ? 'Rupture de stock' 
@@ -138,5 +171,5 @@ export default function ProductsEditor() {
         onSave={handleAdd}
       />
     </div>
-);
+  );
 }

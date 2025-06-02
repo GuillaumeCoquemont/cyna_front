@@ -1,18 +1,40 @@
 import React, { useState, useEffect } from 'react';
+import { fetchCategories } from '../../api/categories';
+import { fetchAvailablePromoCodes } from '../../api/products';
 import styles from '../../styles/components/modals/EditProductModal.module.css';
 
 const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
-  const [formData, setFormData] = useState({ name: '', stock: 0, price: 0, image: '' });
+  const [formData, setFormData] = useState({
+    name: '',
+    stock: 0,
+    price: 0,
+    image: '',
+    category_id: '',
+    description: '',
+    promo_code_id: ''
+  });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [promoCodes, setPromoCodes] = useState([]);
+
+  useEffect(() => {
+    Promise.all([
+      fetchCategories().then(setCategories).catch(() => setCategories([])),
+      fetchAvailablePromoCodes().then(setPromoCodes).catch(() => setPromoCodes([]))
+    ]);
+  }, []);
 
   useEffect(() => {
     if (product) {
       setFormData({
-        name: product.name,
-        stock: product.stock,
-        price: product.price,
-        image: product.image || ''
+        name: product.name || '',
+        stock: product.stock || 0,
+        price: product.price || 0,
+        image: product.image || '',
+        category_id: product.category_id || '',
+        description: product.description || '',
+        promo_code_id: product.promo_code_id || ''
       });
       setImagePreview(product.image || null);
     }
@@ -24,7 +46,10 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'name' ? value : parseFloat(value)
+      [name]: name === 'category_id' || name === 'promo_code_id' ? Number(value)
+             : name === 'stock' ? parseInt(value, 10)
+             : name === 'price' ? parseFloat(value)
+             : value
     }));
   };
 
@@ -35,6 +60,7 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
       setImagePreview(URL.createObjectURL(file));
     }
   };
+
   const fileToBase64 = file =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -90,6 +116,7 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
               required
             />
           </div>
+
           <div className={styles['form-group']}>
             <label>Image</label>
             <input
@@ -106,6 +133,49 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
               />
             )}
           </div>
+
+          <div className={styles['form-group']}>
+            <label>Catégorie</label>
+            <select
+              name="category_id"
+              value={formData.category_id}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Sélectionner</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div className={styles['form-group']}>
+            <label>Description</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className={styles['form-group']}>
+            <label>Code Promo</label>
+            <select
+              name="promo_code_id"
+              value={formData.promo_code_id}
+              onChange={handleChange}
+            >
+              <option value="">Aucun code promo</option>
+              {promoCodes.map(promo => (
+                <option key={promo.id} value={promo.id}>
+                  {promo.code} - {promo.discountType === 'percentage' ? `${promo.discountValue}%` : `${promo.discountValue}€`}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className={styles['modal-actions']}>
             <button type="button" onClick={onClose}>Annuler</button>
             <button type="submit">Enregistrer</button>
@@ -113,8 +183,7 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
         </form>
       </div>
     </div>
-);
-
+  );
 };
 
 export default EditProductModal;

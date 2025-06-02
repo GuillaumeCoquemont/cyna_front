@@ -1,18 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { fetchCategories } from '../../api/categories';
+import { fetchAvailablePromoCodes } from '../../api/products';
 import styles from '../../styles/components/modals/ProductModal.module.css'
 
 const ProductModal = ({ isOpen, onClose, onSave }) => {
-  const [formData, setFormData] = useState({ name: '', stock: 0, price: 0, image: '', category_id: '' });
+  const [formData, setFormData] = useState({
+    name: '',
+    stock: 0,
+    price: 0,
+    image: '',
+    category_id: '',
+    description: '',
+    promo_code_id: ''
+  });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [promoCodes, setPromoCodes] = useState([]);
 
   useEffect(() => {
-    fetchCategories()
-      .then(setCategories)
-      .catch(() => setCategories([]));
+    Promise.all([
+      fetchCategories().then(setCategories).catch(() => setCategories([])),
+      fetchAvailablePromoCodes().then(setPromoCodes).catch(() => setPromoCodes([]))
+    ]);
   }, []);
+
+  console.log('Codes promo chargés :', promoCodes);
 
   if (!isOpen) return null;
 
@@ -20,7 +33,10 @@ const ProductModal = ({ isOpen, onClose, onSave }) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'name' ? value : name === 'category_id' ? Number(value) : parseFloat(value)
+      [name]: name === 'category_id' || name === 'promo_code_id' ? Number(value)
+             : name === 'stock' ? parseInt(value, 10)
+             : name === 'price' ? parseFloat(value)
+             : value
     }));
   };
 
@@ -46,8 +62,24 @@ const ProductModal = ({ isOpen, onClose, onSave }) => {
     if (imageFile) {
       payload.image = await fileToBase64(imageFile);
     }
-    onSave(payload);
-    setFormData({ name: '', stock: 0, price: 0, image: '', category_id: '' });
+    const productDataToSend = {
+      name: payload.name,
+      description: payload.description,
+      price: parseFloat(payload.price),
+      stock: parseInt(payload.stock, 10),
+      category_id: parseInt(payload.category_id, 10),
+      promo_code_id: payload.promo_code_id || null
+    };
+    onSave(productDataToSend);
+    setFormData({ 
+      name: '', 
+      stock: 0, 
+      price: 0, 
+      image: '', 
+      category_id: '', 
+      description: '', 
+      promo_code_id: '' 
+    });
     setImageFile(null);
     setImagePreview(null);
   };
@@ -125,6 +157,31 @@ const ProductModal = ({ isOpen, onClose, onSave }) => {
             </select>
           </div>
           
+          <div className={styles['form-group']}>
+            <label>Description</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className={styles['form-group']}>
+            <label>Code Promo</label>
+            <select
+              name="promo_code_id"
+              value={formData.promo_code_id}
+              onChange={handleChange}
+            >
+              <option value="">Aucun code promo</option>
+              {promoCodes.map(promo => (
+                <option key={promo.id} value={promo.id}>
+                  {promo.code} - {promo.discountType === 'percentage' ? `${promo.discountValue}%` : `${promo.discountValue}€`}
+                </option>
+              ))}
+            </select>
+          </div>
+          
           <div className={styles['modal-actions']}>
             <button type="button" onClick={onClose}>Annuler</button>
             <button type="submit">Ajouter</button>
@@ -132,8 +189,7 @@ const ProductModal = ({ isOpen, onClose, onSave }) => {
         </form>
       </div>
     </div>
-);
-
+  );
 };
 
 export default ProductModal;
