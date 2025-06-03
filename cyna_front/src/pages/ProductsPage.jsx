@@ -38,7 +38,7 @@ const ProductsPage = () => {
           description: p.description,
           price: Number(p.price),
           image: p.image,
-          category: p.category || 'Produit',
+          category: typeof p.category === 'object' && p.category ? p.category.name : (p.category || 'Produit'),
           type: 'product',
         }));
         setAllItems([...prodNormalized, ...svcNormalized]);

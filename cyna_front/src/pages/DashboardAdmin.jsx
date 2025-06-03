@@ -96,10 +96,11 @@ export default function DashboardAdmin() {
 
   const sidebarItems = [
     { key: 'dashboard', label: 'Dashboard' },
-    { key: 'messages', label: 'Messages' },
+    { key: 'categories', label: 'Catégories' },
     { key: 'produits', label: 'Produits' },
     { key: 'services', label: 'Services' },
-    { key: 'categories', label: 'Catégories' },
+    { key: 'messages', label: 'Messages' },
+    { key: 'code', label: 'Codes Promo' },
     { key: 'favoris', label: 'Favoris' },
     { key: 'clients',   label: 'Clients' },
     { key: 'ui', label: 'Carroussel' },
@@ -112,7 +113,7 @@ export default function DashboardAdmin() {
     { key: 'liaisons-svc-roles', label: 'Services↔Rôles' },
     { key: 'liaisons-addr-upp', label: 'Adresses↔Profils' },
     { key: 'params', label: 'Paramètres' },
-    { key: 'code', label: 'Code Promo' },
+
 
   ];
 

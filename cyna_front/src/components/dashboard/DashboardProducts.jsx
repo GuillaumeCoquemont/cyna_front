@@ -91,7 +91,7 @@ export default function ProductsEditor() {
           <tr>
             <th>ID</th>
             <th>Nom</th>
-            <th>Image</th>
+            <th>Description</th>
             <th>Prix</th>
             <th>Prix après remise</th>
             <th>Code promo</th>
@@ -114,17 +114,7 @@ export default function ProductsEditor() {
                   </span>
                 )}
               </td>
-              <td>
-                {p.image ? (
-                  <img
-                    src={p.image}
-                    alt={p.name}
-                    style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
-                  />
-                ) : (
-                  <span>—</span>
-                )}
-              </td>
+              <td>{p.description}</td>
               <td>{formatPrice(p.price)}</td>
               <td>
                 {p.promoCode ? (

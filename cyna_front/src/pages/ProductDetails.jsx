@@ -1,9 +1,11 @@
 // src/pages/ProductDetails.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { fetchProductById, fetchServiceById } from '../api/productDetails';
 import { useCart } from '../context/CartContext';
 import ProductGallery from '../components/productDetails/ProductGallery';
-import ProductInfo    from '../components/productDetails/ProductInfo';
-import ProductTabs    from '../components/productDetails/ProductTabs';
+import ProductInfo from '../components/productDetails/ProductInfo';
+import ProductTabs from '../components/productDetails/ProductTabs';
 import styles from '../styles/pages/ProductDetails.module.css';
 
 // Import product images
@@ -12,43 +14,49 @@ import prod2 from '../assets/images/prod2.jpg';
 import prod3 from '../assets/images/prod3.jpg';
 
 const ProductDetails = () => {
+  const { id, type } = useParams(); // type = 'product' ou 'service'
   const { addToCart } = useCart();
-  const sampleProduct = {
-    name: 'Nom du produit',
-    price: '54,98€',
-    rating: 4.5,
-    reviews: 2,
-    shortDescription: 'Courte description du produit ici.',
-    features: ['Lorem ipsum dolor sit amet, consectetuer adipi ', 'Lorem ipsum dolor sit amet, consectetuer adipi scing elit', 'Lorem ipsum dolor sit amet, consectetuer adipi scing elit, '],
-    longDescription: `Lorem ipsum dolor sit amet, consectetuer adipi scing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magn. Lorem ipsum dolor sit amet, consectetuer adipi scing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magn.`,
-    reviewsList: [
-      { author: 'Alice', comment: 'Super produit!' },
-      { author: 'Bob',   comment: 'Très bon rapport qualité/prix.' }
-    ]
-  };
-
+  const [item, setItem] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const galleryImages = [
-    prod1,
-    prod2,
-    prod3
-  ];
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchData = async () => {
+      try {
+        let data;
+        if (type === 'service') {
+          data = await fetchServiceById(id);
+        } else {
+          data = await fetchProductById(id);
+        }
+        setItem(data);
+      } catch (err) {
+        setItem(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [id, type]);
+
+  if (loading) return <div>Chargement…</div>;
+  if (!item) return <div>Produit ou service introuvable.</div>;
 
   return (
     <div className={styles.container}>
       <section className={styles.topSection}>
-        <ProductGallery images={galleryImages} />
+        <ProductGallery images={item.images || [item.image]} />
         <ProductInfo
-          product={sampleProduct}
+          product={item}
           quantity={quantity}
           setQuantity={setQuantity}
           addToCart={addToCart}
         />
       </section>
       <section className={styles.tabsSection}>
-        <ProductTabs product={sampleProduct} />
+        <ProductTabs product={item} />
       </section>
-
     </div>
   );
 };

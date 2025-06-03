@@ -6,6 +6,7 @@ import {
   updateService,
   deleteService
 } from '../../api/services';
+import { calculateDiscountedPrice, formatPrice } from '../../utils/priceUtils';
 
 import EditServiceModal from '../modals/EditServiceModal';
 import AddServiceModal from '../modals/AddServiceModal';
@@ -76,6 +77,8 @@ export default function DashboardServices() {
             <th>Nom</th>
             <th>Description</th>
             <th>Prix</th>
+            <th>Prix après remise</th>
+            <th>Code promo</th>
             <th>Statut</th>
             <th>Actions</th>
           </tr>
@@ -87,6 +90,27 @@ export default function DashboardServices() {
               <td>{s.name}</td>
               <td>{s.description}</td>
               <td>{s.price} €</td>
+              <td>
+                {s.promoCode ? (
+                  <span style={{ color: 'var(--tertiary-color)' }}>
+                    {formatPrice(calculateDiscountedPrice(s.price, s.promoCode))}
+                  </span>
+                ) : (
+                  formatPrice(s.price)
+                )}
+              </td>
+              <td>
+                {s.promoCode ? (
+                  <span>
+                    {s.promoCode.code} ({s.promoCode.discountType === 'percentage'
+                      ? `${s.promoCode.discountValue}%`
+                      : `${s.promoCode.discountValue}€`
+                    })
+                  </span>
+                ) : (
+                  '—'
+                )}
+              </td>
               <td>{s.status ? 'Actif' : 'Inactif'}</td>
               <td>
                 <button onClick={() => handleOpenEdit(s)}>Modifier</button>
