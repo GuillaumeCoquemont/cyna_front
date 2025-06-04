@@ -110,10 +110,31 @@
   color: #2c5282;
 }
 
+.statusContainer {
+  position: relative;
+}
+
 .orderStatus {
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 0.9rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  appearance: none;
+  padding-right: 24px;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  background-size: 16px;
+}
+
+.orderStatus:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.orderStatus:hover:not(:disabled) {
+  border-color: currentColor;
 }
 
 .statusDelivered {
@@ -134,6 +155,11 @@
 .statusPayment {
   background-color: #fed7d7;
   color: #c53030;
+}
+
+.statusCanceled {
+  background-color: #e2e8f0;
+  color: #4a5568;
 }
 
 .statusDefault {
@@ -186,4 +212,88 @@
   text-align: right;
   font-weight: 500;
   color: #2c5282;
+}
+
+.confirmDialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.confirmDialogContent {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 90%;
+}
+
+.confirmDialogContent h4 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.confirmDialogContent p {
+  margin: 0 0 1.5rem 0;
+  color: #666;
+  line-height: 1.5;
+}
+
+.confirmDialogContent strong {
+  color: #2c5282;
+}
+
+.confirmDialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.confirmButton {
+  background-color: #2c5282;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.confirmButton:hover:not(:disabled) {
+  background-color: #2b6cb0;
+}
+
+.confirmButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  background-color: #e2e8f0;
+  color: #4a5568;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background-color: #cbd5e0;
+}
+
+.cancelButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }

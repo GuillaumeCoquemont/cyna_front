@@ -1,15 +1,14 @@
 // src/components/dashboardClient/DashboardOrders.jsx
 import React, { useState, useEffect } from 'react';
 import styles from '../../styles/components/dashboardClient/DashboardOrders.module.css';
-import { fetchOrders } from '../../api/orders';
-import { fetchProducts } from '../../api/products';
-import { fetchServices } from '../../api/services';
+import { fetchUserOrders } from '../../api/orders';
+import { jwtDecode } from 'jwt-decode';
 
 export default function DashboardOrders() {
-  const [products, setProducts] = useState([]);
-  const [services, setServices] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [expandedOrder, setExpandedOrder] = useState(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -17,44 +16,19 @@ export default function DashboardOrders() {
         setLoading(true);
         setError(null);
         
-        const [orders, allProducts, allServices] = await Promise.all([
-          fetchOrders(),
-          fetchProducts(),
-          fetchServices()
-        ]);
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('Non connecté');
+        }
 
-        const productItems = orders.flatMap(o =>
-          o.items
-            .filter(i => i.product_id)
-            .map(i => {
-              const product = allProducts.find(p => p.id === i.product_id);
-              return {
-                ...i,
-                orderId: o.id,
-                name: product ? product.name : 'Produit inconnu',
-                quantity: i.Quantity,
-                price: i.Price
-              };
-            })
-        );
+        const decoded = jwtDecode(token);
+        if (!decoded || !decoded.userId) {
+          throw new Error('Token invalide');
+        }
 
-        const serviceItems = orders.flatMap(o =>
-          o.items
-            .filter(i => i.service_id)
-            .map(i => {
-              const service = allServices.find(s => s.id === i.service_id);
-              return {
-                ...i,
-                orderId: o.id,
-                name: service ? service.Name : 'Service inconnu',
-                quantity: i.Quantity,
-                price: i.Price
-              };
-            })
-        );
-
-        setProducts(productItems);
-        setServices(serviceItems);
+        const ordersData = await fetchUserOrders(decoded.userId);
+        console.log('Données des commandes:', ordersData); // Pour déboguer
+        setOrders(ordersData);
       } catch (err) {
         console.error('Erreur lors du chargement des données:', err);
         setError(err.message || 'Une erreur est survenue lors du chargement des données');
@@ -66,6 +40,41 @@ export default function DashboardOrders() {
     loadData();
   }, []);
 
+  const handleOrderClick = (orderId) => {
+    setExpandedOrder(expandedOrder === orderId ? null : orderId);
+  };
+
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'livré':
+        return styles.statusDelivered;
+      case 'en cours de livraison':
+        return styles.statusShipping;
+      case 'en attente de paiement':
+        return styles.statusPayment;
+      case 'en attente de confirmation':
+        return styles.statusPending;
+      default:
+        return styles.statusDefault;
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Date inconnue';
+    try {
+      return new Date(dateString).toLocaleDateString('fr-FR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      console.error('Erreur de formatage de la date:', error);
+      return 'Date invalide';
+    }
+  };
+
   if (loading) {
     return <div className={styles.loading}>Chargement en cours...</div>;
   }
@@ -76,56 +85,74 @@ export default function DashboardOrders() {
 
   return (
     <div className={styles.ordersContainer}>
-      <h3 className={styles.sectionTitle}>Mes produits</h3>
-      {products.length > 0 ? (
-        <table className={styles.ordersTable}>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nom</th>
-              <th>Quantité</th>
-              <th>Prix</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map(p => (
-              <tr key={`${p.orderId}-${p.product_id}`}>
-                <td>{p.orderId}</td>
-                <td>{p.name}</td>
-                <td>{p.quantity}</td>
-                <td>{p.price}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <h3 className={styles.sectionTitle}>Mes commandes</h3>
+      {orders.length > 0 ? (
+        <div className={styles.ordersList}>
+          {orders.map(order => (
+            <div key={order.id} className={styles.orderCard}>
+              <div 
+                className={styles.orderHeader}
+                onClick={() => handleOrderClick(order.id)}
+              >
+                <div className={styles.orderInfo}>
+                  <span className={styles.orderId}>Commande #{order.id}</span>
+                  <span className={styles.orderDate}>
+                    {formatDate(order.creationDate || order.creationdate)}
+                  </span>
+                  <span className={styles.orderTotal}>
+                    {order.totalprice || order.totalPrice || 0} €
+                  </span>
+                  <span className={`${styles.orderStatus} ${getStatusColor(order.status)}`}>
+                    {order.status || 'En cours'}
+                  </span>
+                </div>
+                <span className={styles.expandIcon}>
+                  {expandedOrder === order.id ? '▼' : '▶'}
+                </span>
+              </div>
+              
+              {expandedOrder === order.id && order.OrderItems && order.OrderItems.length > 0 && (
+                <div className={styles.orderDetails}>
+                  {order.OrderItems.map(item => (
+                    <div key={item.id} className={styles.orderItem}>
+                      {item.products && item.products.length > 0 && (
+                        <div className={styles.productsSection}>
+                          <h4>Produits</h4>
+                          <ul className={styles.itemsList}>
+                            {item.products.map(product => (
+                              <li key={product.id} className={styles.item}>
+                                <span className={styles.itemName}>{product.name}</span>
+                                <span className={styles.itemQuantity}>x{item.quantity}</span>
+                                <span className={styles.itemPrice}>{product.price} €</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {item.services && item.services.length > 0 && (
+                        <div className={styles.servicesSection}>
+                          <h4>Services</h4>
+                          <ul className={styles.itemsList}>
+                            {item.services.map(service => (
+                              <li key={service.id} className={styles.item}>
+                                <span className={styles.itemName}>{service.name}</span>
+                                <span className={styles.itemQuantity}>x{item.quantity}</span>
+                                <span className={styles.itemPrice}>{service.price} €</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       ) : (
-        <p>Aucun produit commandé</p>
-      )}
-
-      <h3 className={styles.sectionTitle}>Mes services</h3>
-      {services.length > 0 ? (
-        <table className={styles.ordersTable}>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nom</th>
-              <th>Quantité</th>
-              <th>Prix</th>
-            </tr>
-          </thead>
-          <tbody>
-            {services.map(s => (
-              <tr key={`${s.orderId}-${s.service_id}`}>
-                <td>{s.orderId}</td>
-                <td>{s.name}</td>
-                <td>{s.quantity}</td>
-                <td>{s.price}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p>Aucun service commandé</p>
+        <p>Aucune commande trouvée</p>
       )}
     </div>
   );

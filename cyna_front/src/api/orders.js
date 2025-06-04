@@ -107,6 +107,28 @@ export async function addOrder(data) {
   }
 }
 
+export const updateOrderStatus = async (orderId, status) => {
+    try {
+        const response = await fetch(`${BASE_URL}/${orderId}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ status })
+        });
+
+        if (!response.ok) {
+            throw new Error('Erreur lors de la mise à jour du statut');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Erreur:', error);
+        throw error;
+    }
+};
+
 // Optionally, you can add order-related API calls here,
 // for example to submit an order:
 // export async function submitOrder(orderData) {
