@@ -4,12 +4,14 @@ import {
   fetchProducts,
   addProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  checkProductDependencies
 } from '../../api/products';
 import { calculateDiscountedPrice, formatPrice } from '../../utils/priceUtils';
 
 import ProductEditModal from '../modals/EditProductModal';
 import AddProductModal from '../modals/AddProductModal';
+import DeleteConfirmationModal from '../modals/DeleteConfirmationModal';
 
 export default function ProductsEditor() {
   const [products, setProducts] = useState([]);
@@ -21,6 +23,12 @@ export default function ProductsEditor() {
   const [selectedProd, setSelectedProd] = useState(null);
   const [tableProducts, setTableProducts] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    product: null,
+    dependencies: null,
+    isLoading: false
+  });
 
   useEffect(() => {
     load();
@@ -53,16 +61,30 @@ export default function ProductsEditor() {
     load();
     handleCloseEdit();
   };
-  const handleDelete = async id => {
-    console.log('Suppression demandée pour id :', id);
-    console.log('Produits affichés :', tableProducts);
+  const handleDelete = async (product) => {
     try {
-      await deleteProduct(id);
-      setProducts(p => p.filter(prod => prod.id !== id));
-      setTableProducts(prev => prev.filter(prod => prod.id !== id));
+      // Ouvrir la modale avec état de chargement
+      setDeleteModal({
+        isOpen: true,
+        product,
+        dependencies: null,
+        isLoading: true
+      });
+
+      // Vérifier les dépendances
+      const dependencies = await checkProductDependencies(product.id);
+      
+      // Mettre à jour la modale avec les dépendances
+      setDeleteModal({
+        isOpen: true,
+        product,
+        dependencies,
+        isLoading: false
+      });
     } catch (err) {
-      console.error('Erreur suppression produit:', err);
-      alert('Erreur lors de la suppression du produit');
+      console.error('Erreur vérification dépendances:', err);
+      setDeleteModal({ isOpen: false, product: null, dependencies: null, isLoading: false });
+      alert('Erreur lors de la vérification des dépendances');
     }
   };
 
@@ -77,6 +99,22 @@ export default function ProductsEditor() {
     await addProduct(payload);
     load(); // recharge la liste depuis la BDD
     handleCloseAdd();
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await deleteProduct(deleteModal.product.id);
+      setProducts(p => p.filter(prod => prod.id !== deleteModal.product.id));
+      setTableProducts(prev => prev.filter(prod => prod.id !== deleteModal.product.id));
+      closeDeleteModal();
+    } catch (err) {
+      console.error('Erreur suppression produit:', err);
+      alert('Erreur lors de la suppression du produit');
+    }
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({ isOpen: false, product: null, dependencies: null, isLoading: false });
   };
 
   return (
@@ -143,7 +181,7 @@ export default function ProductsEditor() {
               </td>
               <td>
                 <button onClick={() => handleOpenEdit(p)}>Modifier</button>
-                <button onClick={() => handleDelete(p.id)}>Supprimer</button>
+                <button onClick={() => handleDelete(p)}>Supprimer</button>
               </td>
             </tr>
           ))}
@@ -159,6 +197,15 @@ export default function ProductsEditor() {
         isOpen={showAddModal}
         onClose={handleCloseAdd}
         onSave={handleAdd}
+      />
+      <DeleteConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDelete}
+        itemName={deleteModal.product?.name}
+        itemType="le produit"
+        dependencies={deleteModal.dependencies}
+        isLoading={deleteModal.isLoading}
       />
     </div>
   );

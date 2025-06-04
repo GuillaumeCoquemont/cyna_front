@@ -59,3 +59,12 @@ export async function fetchServiceTypes() {
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }
+
+export async function checkServiceDependencies(id) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${SERVICES_URL}/${id}/dependencies`, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
+  if (!res.ok) throw new Error(`Erreur ${res.status}`);
+  return res.json();
+}

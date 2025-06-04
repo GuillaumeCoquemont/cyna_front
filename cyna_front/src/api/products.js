@@ -66,3 +66,12 @@ export async function fetchAvailablePromoCodes() {
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }
+
+export async function checkProductDependencies(id) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${BASE_URL}/${id}/dependencies`, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
+  if (!res.ok) throw new Error(`Erreur ${res.status}`);
+  return res.json();
+}

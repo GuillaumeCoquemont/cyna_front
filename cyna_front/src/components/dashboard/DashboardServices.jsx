@@ -4,12 +4,14 @@ import {
   fetchServices,
   addService,
   updateService,
-  deleteService
+  deleteService,
+  checkServiceDependencies
 } from '../../api/services';
 import { calculateDiscountedPrice, formatPrice } from '../../utils/priceUtils';
 
 import EditServiceModal from '../modals/EditServiceModal';
 import AddServiceModal from '../modals/AddServiceModal';
+import DeleteConfirmationModal from '../modals/DeleteConfirmationModal';
 
 export default function DashboardServices() {
   const [services, setServices] = useState([]);
@@ -17,6 +19,12 @@ export default function DashboardServices() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    service: null,
+    dependencies: null,
+    isLoading: false
+  });
 
   useEffect(() => {
     load();
@@ -44,15 +52,44 @@ export default function DashboardServices() {
     load();
     handleCloseEdit();
   };
-  const handleDelete = async id => {
+  const handleDelete = async (service) => {
     try {
-      await deleteService(id);
-      setServices(s => s.filter(service => service.id !== id));
-      setTableServices(prev => prev.filter(service => service.id !== id));
+      setDeleteModal({
+        isOpen: true,
+        service,
+        dependencies: null,
+        isLoading: true
+      });
+
+      const dependencies = await checkServiceDependencies(service.id);
+      
+      setDeleteModal({
+        isOpen: true,
+        service,
+        dependencies,
+        isLoading: false
+      });
+    } catch (err) {
+      console.error('Erreur vérification dépendances:', err);
+      setDeleteModal({ isOpen: false, service: null, dependencies: null, isLoading: false });
+      alert('Erreur lors de la vérification des dépendances');
+    }
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await deleteService(deleteModal.service.id);
+      setServices(s => s.filter(svc => svc.id !== deleteModal.service.id));
+      setTableServices(prev => prev.filter(svc => svc.id !== deleteModal.service.id));
+      closeDeleteModal();
     } catch (err) {
       console.error('Erreur suppression service:', err);
       alert('Erreur lors de la suppression du service');
     }
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({ isOpen: false, service: null, dependencies: null, isLoading: false });
   };
 
   const handleOpenAdd = () => setShowAddModal(true);
@@ -114,7 +151,7 @@ export default function DashboardServices() {
               <td>{s.status ? 'Actif' : 'Inactif'}</td>
               <td>
                 <button onClick={() => handleOpenEdit(s)}>Modifier</button>
-                <button onClick={() => handleDelete(s.id)}>Supprimer</button>
+                <button onClick={() => handleDelete(s)}>Supprimer</button>
               </td>
             </tr>
           ))}
@@ -130,6 +167,15 @@ export default function DashboardServices() {
         isOpen={showAddModal}
         onClose={handleCloseAdd}
         onSave={handleAdd}
+      />
+      <DeleteConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDelete}
+        itemName={deleteModal.service?.name}
+        itemType="le service"
+        dependencies={deleteModal.dependencies}
+        isLoading={deleteModal.isLoading}
       />
     </div>
   );

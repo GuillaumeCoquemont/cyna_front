@@ -5,17 +5,20 @@ import {
   addCategory,
   updateCategory,
   deleteCategory,
+  checkProductCategoryDependencies
 } from '../../api/categories';
 import {
   fetchServiceTypes,
   addServiceType,
   updateServiceType,
   deleteServiceType,
+  checkServiceTypeDependencies
 } from '../../api/serviceTypes';
 import AddCategoryModal from '../modals/AddCategoryModal';
 import EditCategoryModal from '../modals/EditCategoryModal';
 import AddServiceTypeModal from '../modals/AddServiceTypeModal';
 import EditServiceTypeModal from '../modals/EditServiceTypeModal';
+import DeleteConfirmationModal from '../modals/DeleteConfirmationModal';
 
 export default function DashboardCategories() {
   const [categories, setCategories] = useState([]);
@@ -29,6 +32,22 @@ export default function DashboardCategories() {
   const [showEditTypeModal, setShowEditTypeModal] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
 
+  // Modale de suppression pour les catégories
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    category: null,
+    dependencies: null,
+    isLoading: false
+  });
+
+  // Modale de suppression pour les types de services
+  const [deleteTypeModal, setDeleteTypeModal] = useState({
+    isOpen: false,
+    serviceType: null,
+    dependencies: null,
+    isLoading: false
+  });
+
   useEffect(() => {
     fetchCategories()
       .then(setCategories)
@@ -41,14 +60,46 @@ export default function DashboardCategories() {
       .catch(console.error);
   }, []);
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (category) => {
     try {
-      await deleteCategory(id);
-      setCategories(prev => prev.filter(c => c.id !== id));
+      // Ouvrir la modale avec état de chargement
+      setDeleteModal({
+        isOpen: true,
+        category,
+        dependencies: null,
+        isLoading: true
+      });
+
+      // Vérifier les dépendances
+      const dependencies = await checkProductCategoryDependencies(category.id);
+      
+      // Mettre à jour la modale avec les dépendances
+      setDeleteModal({
+        isOpen: true,
+        category,
+        dependencies,
+        isLoading: false
+      });
     } catch (err) {
-      console.error(err);
-      window.alert('Impossible de supprimer la catégorie');
+      console.error('Erreur vérification dépendances:', err);
+      setDeleteModal({ isOpen: false, category: null, dependencies: null, isLoading: false });
+      alert('Erreur lors de la vérification des dépendances');
     }
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await deleteCategory(deleteModal.category.id);
+      setCategories(prev => prev.filter(cat => cat.id !== deleteModal.category.id));
+      closeDeleteModal();
+    } catch (err) {
+      console.error('Erreur suppression catégorie:', err);
+      alert('Erreur lors de la suppression de la catégorie');
+    }
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({ isOpen: false, category: null, dependencies: null, isLoading: false });
   };
 
   const handleOpenEdit = (category) => {
@@ -86,14 +137,49 @@ export default function DashboardCategories() {
   const handleCloseAdd = () => setShowAddModal(false);
 
   // Service type handlers
-  const handleDeleteType = async (id) => {
+  const handleDeleteType = async (serviceType) => {
     try {
-      await deleteServiceType(id);
-      setServiceTypes(prev => prev.filter(t => t.id !== id));
+      setDeleteTypeModal({
+        isOpen: true,
+        serviceType,
+        dependencies: null,
+        isLoading: true
+      });
+
+      const dependencies = await checkServiceTypeDependencies(serviceType.id);
+      
+      setDeleteTypeModal({
+        isOpen: true,
+        serviceType,
+        dependencies,
+        isLoading: false
+      });
     } catch (err) {
-      console.error(err);
-      window.alert('Impossible de supprimer le type de service');
+      console.error('Erreur vérification dépendances:', err);
+      setDeleteTypeModal({ isOpen: false, serviceType: null, dependencies: null, isLoading: false });
+      alert('Erreur lors de la vérification des dépendances');
     }
+  };
+
+  const confirmDeleteType = async () => {
+    try {
+      await deleteServiceType(deleteTypeModal.serviceType.id);
+      setServiceTypes(prev => prev.filter(type => type.id !== deleteTypeModal.serviceType.id));
+      closeDeleteTypeModal();
+    } catch (err) {
+      console.error('Erreur suppression type:', err);
+      
+      // Gérer l'erreur de suppression impossible
+      if (err.message.includes('400')) {
+        alert('❌ Suppression impossible : Ce type est encore utilisé par des services.\n\n💡 Déplacez d\'abord ces services vers un autre type.');
+      } else {
+        alert('Erreur lors de la suppression du type de service');
+      }
+    }
+  };
+
+  const closeDeleteTypeModal = () => {
+    setDeleteTypeModal({ isOpen: false, serviceType: null, dependencies: null, isLoading: false });
   };
 
   const handleOpenEditType = (type) => {
@@ -138,9 +224,9 @@ export default function DashboardCategories() {
               <span>{c.name}</span>
             </div>
             <div className={styles.cardBody}>
-              <p>{c.description}</p> {/* <-- ici, pas Description */}
+              <p>{c.description}</p>
               <button className={styles.editBtn} onClick={() => handleOpenEdit(c)}>Modifier</button>
-              <button className={styles.deleteBtn} onClick={() => handleDelete(c.id)}>Supprimer</button>
+              <button className={styles.deleteBtn} onClick={() => handleDelete(c)}>Supprimer</button>
             </div>
           </div>
         ))}
@@ -170,7 +256,7 @@ export default function DashboardCategories() {
             <div className={styles.cardBody}>
               <p>{t.description}</p>
               <button className={styles.editBtn} onClick={() => handleOpenEditType(t)}>Modifier</button>
-              <button className={styles.deleteBtn} onClick={() => handleDeleteType(t.id)}>Supprimer</button>
+              <button className={styles.deleteBtn} onClick={() => handleDeleteType(t)}>Supprimer</button>
             </div>
           </div>
         ))}
@@ -188,6 +274,28 @@ export default function DashboardCategories() {
         onSave={handleSaveEditType}
       />
       </div>
+
+      {/* Modale de suppression pour les catégories */}
+      <DeleteConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDelete}
+        itemName={deleteModal.category?.name}
+        itemType="la catégorie"
+        dependencies={deleteModal.dependencies}
+        isLoading={deleteModal.isLoading}
+      />
+
+      {/* Modale de suppression pour les types de services */}
+      <DeleteConfirmationModal
+        isOpen={deleteTypeModal.isOpen}
+        onClose={closeDeleteTypeModal}
+        onConfirm={confirmDeleteType}
+        itemName={deleteTypeModal.serviceType?.name}
+        itemType="le type de service"
+        dependencies={deleteTypeModal.dependencies}
+        isLoading={deleteTypeModal.isLoading}
+      />
     </div>
   );
 }

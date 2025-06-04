@@ -3,7 +3,7 @@ const BASE_URL = `${API_BASE_URL}/api/service-types`;
 
 /**
  * Fetch the list of service types from the backend.
- * @returns {Promise<Array<{ id: number, Name: string, Description: string }>>}
+ * @returns {Promise<Array<{ id: number, name: string, description: string }>>}
  * @throws {Error} if the response is not ok.
  */
 export async function fetchServiceTypes() {
@@ -17,7 +17,7 @@ export async function fetchServiceTypes() {
 
 /**
  * Create a new service type.
- * @param {{ Name: string, Description?: string }} data
+ * @param {{ name: string, description?: string }} data
  */
 export async function addServiceType(data) {
   const token = localStorage.getItem('token');
@@ -36,7 +36,7 @@ export async function addServiceType(data) {
 /**
  * Update an existing service type by ID.
  * @param {number} id
- * @param {{ Name: string, Description?: string }} data
+ * @param {{ name: string, description?: string }} data
  */
 export async function updateServiceType(id, data) {
   const token = localStorage.getItem('token');
@@ -63,4 +63,17 @@ export async function deleteServiceType(id) {
     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
+}
+
+/**
+ * Check dependencies before deleting a service type.
+ * @param {number} id
+ */
+export async function checkServiceTypeDependencies(id) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${BASE_URL}/${id}/dependencies`, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
+  if (!res.ok) throw new Error(`Erreur ${res.status}`);
+  return res.json();
 }

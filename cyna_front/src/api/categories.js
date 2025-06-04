@@ -48,3 +48,12 @@ export async function deleteCategory(id) {
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
 }
+
+export async function checkProductCategoryDependencies(id) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${BASE_URL}/${id}/dependencies`, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
+  if (!res.ok) throw new Error(`Erreur ${res.status}`);
+  return res.json();
+}
