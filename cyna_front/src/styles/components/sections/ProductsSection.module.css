@@ -48,6 +48,7 @@
   height: 100%;
   margin-bottom: 4rem;
   display: flex;
+  min-height: 475px;
   flex-direction: column;
   text-decoration: none;
 }

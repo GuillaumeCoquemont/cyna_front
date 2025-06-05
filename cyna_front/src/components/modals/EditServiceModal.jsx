@@ -14,7 +14,7 @@ export default function EditServiceModal({ isOpen, onClose, onSave, service }) {
     userCount: '',
     promotion: '',
     service_type_id: '',
-    promo_code_id: ''
+    promo_code_id: null
   });
   const [serviceTypes, setServiceTypes] = useState([]);
   const [promoCodes, setPromoCodes] = useState([]);
@@ -32,7 +32,7 @@ export default function EditServiceModal({ isOpen, onClose, onSave, service }) {
         userCount: service.userCount || '',
         promotion: service.promotion || '',
         service_type_id: service.service_type_id || '',
-        promo_code_id: service.promo_code_id || ''
+        promo_code_id: service.promo_code_id || null
       });
     }
   }, [service]);
@@ -59,7 +59,9 @@ export default function EditServiceModal({ isOpen, onClose, onSave, service }) {
     const { name, value, type, checked } = e.target;
     setForm(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked 
+             : name === 'promo_code_id' ? (value === '' ? null : value)
+             : value
     }));
   };
 
@@ -68,6 +70,7 @@ export default function EditServiceModal({ isOpen, onClose, onSave, service }) {
     setLoading(true);
     const payload = {
       ...form,
+      id: service?.id,
       status: !!form.status,
       subscription: !!form.subscription
     };
@@ -158,15 +161,6 @@ export default function EditServiceModal({ isOpen, onClose, onSave, service }) {
             />
           </div>
           <div className={styles.field}>
-            <label>Promotion</label>
-            <input
-              type="text"
-              name="promotion"
-              value={form.promotion}
-              onChange={handleChange}
-            />
-          </div>
-          <div className={styles.field}>
             <label>Type de service *</label>
             <select
               name="service_type_id"
@@ -186,7 +180,7 @@ export default function EditServiceModal({ isOpen, onClose, onSave, service }) {
             <label>Code promo</label>
             <select
               name="promo_code_id"
-              value={form.promo_code_id}
+              value={form.promo_code_id || ''}
               onChange={handleChange}
             >
               <option value="">Aucun code promo</option>

@@ -11,7 +11,7 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
     image: '',
     category_id: '',
     description: '',
-    promo_code_id: ''
+    promo_code_id: null
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -34,7 +34,7 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
         image: product.image || '',
         category_id: product.category_id || '',
         description: product.description || '',
-        promo_code_id: product.promo_code_id || ''
+        promo_code_id: product.promo_code_id || null
       });
       setImagePreview(product.image || null);
     }
@@ -46,7 +46,8 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'category_id' || name === 'promo_code_id' ? Number(value)
+      [name]: name === 'category_id' ? Number(value)
+             : name === 'promo_code_id' ? (value === '' ? null : Number(value))
              : name === 'stock' ? parseInt(value, 10)
              : name === 'price' ? parseFloat(value)
              : value
@@ -164,7 +165,7 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
             <label>Code Promo</label>
             <select
               name="promo_code_id"
-              value={formData.promo_code_id}
+              value={formData.promo_code_id || ''}
               onChange={handleChange}
             >
               <option value="">Aucun code promo</option>

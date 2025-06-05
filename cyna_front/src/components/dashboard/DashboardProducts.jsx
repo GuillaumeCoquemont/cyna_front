@@ -57,6 +57,7 @@ export default function ProductsEditor() {
       payload.promo_code_id = payload.promoCodeId;
       delete payload.promoCodeId;
     }
+
     await updateProduct(updatedProd.id, payload);
     load();
     handleCloseEdit();
