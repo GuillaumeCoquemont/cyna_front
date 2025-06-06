@@ -2,8 +2,32 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 24px;
+  padding: 2rem;
   background-color: var(--grey-color);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.filtersContainer {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.filtersContainer .selectWrapper {
+  min-width: 200px;
 }
 
 .newCard, .editorCard {
@@ -64,21 +88,17 @@
 }
 
 .addButton {
-  background-color: var(--blue-color);
-  color: #fff;
-  padding: 0.6rem 1.2rem;
+  padding: 10px 20px;
+  background-color: var(--tertiary-color);
+  color: white;
   border: none;
   border-radius: 4px;
-  font-size: 1rem;
-  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  display: inline-block;
-  margin-bottom: 1rem;
+  transition: background-color 0.2s ease;
 }
 
 .addButton:hover {
-  background-color: var(--blue-hover);
+  background-color: var(--tertiary-hover);
   transform: translateY(-2px);
 }
 
@@ -119,6 +139,7 @@
   border-radius: 4px;
   font-size: 0.9rem;
   cursor: pointer;
+    margin: 10px 10px;
 }
 
 .summaryTable button:first-of-type {
@@ -136,5 +157,108 @@
 }
 
 .summaryTable button:last-of-type:hover {
+  background-color: var(--rouge-hover);
+}
+
+.servicesList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.serviceCard {
+  background-color: var(--white-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.serviceCard:hover {
+  transform: translateY(-4px);
+}
+
+.serviceImage {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background-color: var(--grey-color);
+  position: relative;
+}
+
+.serviceImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.serviceInfo {
+  padding: 1.5rem;
+}
+
+.serviceInfo h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  color: var(--text-color);
+}
+
+.serviceInfo p {
+  margin: 0 0 1rem 0;
+  color: var(--text-color);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.serviceDetails {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+.price {
+  font-weight: 600;
+  color: var(--tertiary-color);
+  font-size: 1.1rem;
+}
+
+.duration {
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.serviceActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.serviceActions button {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.serviceActions button:first-child {
+  background-color: var(--blue-color);
+  color: white;
+}
+
+.serviceActions button:first-child:hover {
+  background-color: var(--blue-hover);
+}
+
+.serviceActions button:last-child {
+  background-color: var(--rouge-color);
+  color: white;
+}
+
+.serviceActions button:last-child:hover {
   background-color: var(--rouge-hover);
 }

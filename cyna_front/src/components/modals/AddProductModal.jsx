@@ -9,6 +9,7 @@ const ProductModal = ({ isOpen, onClose, onSave }) => {
     stock: 0,
     price: 0,
     image: '',
+    imageUrl: '',
     category_id: '',
     description: '',
     promo_code_id: ''
@@ -58,30 +59,39 @@ const ProductModal = ({ isOpen, onClose, onSave }) => {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    let payload = { ...formData };
-    if (imageFile) {
-      payload.image = await fileToBase64(imageFile);
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('price', formData.price);
+      formDataToSend.append('stock', formData.stock);
+      formDataToSend.append('category_id', formData.category_id);
+      formDataToSend.append('promo_code_id', formData.promo_code_id || '');
+      if (imageFile) {
+        formDataToSend.append('image', imageFile);
+      }
+      if (formData.imageUrl.trim() !== '') {
+        formDataToSend.append('imageUrl', formData.imageUrl.trim());
+      }
+
+      await onSave(formDataToSend, true);
+
+      setFormData({
+        name: '',
+        stock: 0,
+        price: 0,
+        image: '',
+        imageUrl: '',
+        category_id: '',
+        description: '',
+        promo_code_id: ''
+      });
+      setImageFile(null);
+      setImagePreview(null);
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi du produit:', error);
+      alert('Une erreur est survenue lors de l\'ajout du produit. Veuillez réessayer.');
     }
-    const productDataToSend = {
-      name: payload.name,
-      description: payload.description,
-      price: parseFloat(payload.price),
-      stock: parseInt(payload.stock, 10),
-      category_id: parseInt(payload.category_id, 10),
-      promo_code_id: payload.promo_code_id || null
-    };
-    onSave(productDataToSend);
-    setFormData({ 
-      name: '', 
-      stock: 0, 
-      price: 0, 
-      image: '', 
-      category_id: '', 
-      description: '', 
-      promo_code_id: '' 
-    });
-    setImageFile(null);
-    setImagePreview(null);
   };
 
   return (
@@ -141,20 +151,35 @@ const ProductModal = ({ isOpen, onClose, onSave }) => {
           </div>
 
           <div className={styles['form-group']}>
-            <label>Catégorie</label>
-            <select
-              name="category_id"
-              value={formData.category_id}
+            <label>Ou URL de l'image</label>
+            <input
+              type="text"
+              name="imageUrl"
+              value={formData.imageUrl}
               onChange={handleChange}
-              required
-            >
-              <option value="">Sélectionner</option>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+              placeholder=""
+            />
+          </div>
+
+          <div className={styles['form-group']}>
+            <label>Catégorie</label>
+            <div className="selectWrapper">
+              <select
+                className="select"
+                name="category_id"
+                value={formData.category_id}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Sélectionner</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+              <span className="selectIcon">▼</span>
+            </div>
           </div>
           
           <div className={styles['form-group']}>
@@ -168,18 +193,22 @@ const ProductModal = ({ isOpen, onClose, onSave }) => {
 
           <div className={styles['form-group']}>
             <label>Code Promo</label>
-            <select
-              name="promo_code_id"
-              value={formData.promo_code_id}
-              onChange={handleChange}
-            >
-              <option value="">Aucun code promo</option>
-              {promoCodes.map(promo => (
-                <option key={promo.id} value={promo.id}>
-                  {promo.code} - {promo.discountType === 'percentage' ? `${promo.discountValue}%` : `${promo.discountValue}€`}
-                </option>
-              ))}
-            </select>
+            <div className="selectWrapper">
+              <select
+                className="select"
+                name="promo_code_id"
+                value={formData.promo_code_id}
+                onChange={handleChange}
+              >
+                <option value="">Aucun code promo</option>
+                {promoCodes.map(promo => (
+                  <option key={promo.id} value={promo.id}>
+                    {promo.code} - {promo.discountType === 'percentage' ? `${promo.discountValue}%` : `${promo.discountValue}€`}
+                  </option>
+                ))}
+              </select>
+              <span className="selectIcon">▼</span>
+            </div>
           </div>
           
           <div className={styles['modal-actions']}>

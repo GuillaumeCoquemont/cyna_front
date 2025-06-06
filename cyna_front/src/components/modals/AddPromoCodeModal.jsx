@@ -113,17 +113,21 @@ const AddPromoCodeModal = ({ isOpen, onClose, onSuccess }) => {
               onChange={handleChange}
             />
           </div>
-          <div className={styles.field}>
+          <div className={styles['form-group']}>
             <label>Type de remise</label>
-            <select
-              name="discountType"
-              value={form.discountType}
-              onChange={handleChange}
-              required
-            >
-              <option value="percentage">Pourcentage (%)</option>
-              <option value="fixed">Montant fixe (€)</option>
-            </select>
+            <div className="selectWrapper">
+              <select
+                className="select"
+                name="discountType"
+                value={form.discountType}
+                onChange={handleChange}
+                required
+              >
+                <option value="percentage">Pourcentage</option>
+                <option value="fixed">Montant fixe</option>
+              </select>
+              <span className="selectIcon">▼</span>
+            </div>
           </div>
           <div className={styles.field}>
             <label>Valeur de la remise</label>

@@ -13,11 +13,15 @@ import ProductEditModal from '../modals/EditProductModal';
 import AddProductModal from '../modals/AddProductModal';
 import DeleteConfirmationModal from '../modals/DeleteConfirmationModal';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+const STATIC_URL = process.env.REACT_APP_STATIC_URL || "http://localhost:3007";
+
 export default function ProductsEditor() {
   const [products, setProducts] = useState([]);
   const [newProd, setNewProd] = useState({
     name: '', description: '', characteristic: '', image: '', price: '', availability: ''
   });
+  const [filterAvailability, setFilterAvailability] = useState('all');
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedProd, setSelectedProd] = useState(null);
@@ -51,16 +55,15 @@ export default function ProductsEditor() {
     setSelectedProd(null);
     setShowEditModal(false);
   };
-  const handleUpdate = async (updatedProd) => {
-    const payload = { ...updatedProd };
-    if (payload.promoCodeId !== undefined) {
-      payload.promo_code_id = payload.promoCodeId;
-      delete payload.promoCodeId;
+  const handleUpdate = async (updatedProd, isMultipart = false) => {
+    try {
+      await updateProduct(updatedProd, isMultipart);
+      load();
+      handleCloseEdit();
+    } catch (err) {
+      console.error('Erreur lors de la mise à jour du produit:', err);
+      alert('Erreur lors de la mise à jour du produit');
     }
-
-    await updateProduct(updatedProd.id, payload);
-    load();
-    handleCloseEdit();
   };
   const handleDelete = async (product) => {
     try {
@@ -91,13 +94,8 @@ export default function ProductsEditor() {
 
   const handleOpenAdd = () => setShowAddModal(true);
   const handleCloseAdd = () => setShowAddModal(false);
-  const handleAdd = async (newProdData) => {
-    const payload = { ...newProdData };
-    if (payload.promoCodeId !== undefined) {
-      payload.promo_code_id = payload.promoCodeId;
-      delete payload.promoCodeId;
-    }
-    await addProduct(payload);
+  const handleAdd = async (newProdData, isMultipart) => {
+    await addProduct(newProdData, isMultipart);
     load(); // recharge la liste depuis la BDD
     handleCloseAdd();
   };
@@ -118,17 +116,41 @@ export default function ProductsEditor() {
     setDeleteModal({ isOpen: false, product: null, dependencies: null, isLoading: false });
   };
 
+  const filteredProducts = tableProducts.filter(product => {
+    if (filterAvailability === 'all') return true;
+    if (filterAvailability === 'inStock') return product.stock > 0;
+    if (filterAvailability === 'outOfStock') return product.stock === 0;
+    if (filterAvailability === 'lowStock') return product.stock > 0 && product.stock < 5;
+    return true;
+  });
+
   return (
     <div className={styles.editorContainer}>
       <h2>Éditeur de Produits</h2>
-      <button onClick={handleOpenAdd} className={styles.addButton}>
-        Ajouter un produit
-      </button>
+      <div className={styles.filtersContainer}>
+        <div className="selectWrapper">
+          <select 
+            className="select"
+            value={filterAvailability}
+            onChange={(e) => setFilterAvailability(e.target.value)}
+          >
+            <option value="all">Tous les produits</option>
+            <option value="inStock">En stock</option>
+            <option value="outOfStock">Rupture de stock</option>
+            <option value="lowStock">Stock faible</option>
+          </select>
+          <span className="selectIcon">▼</span>
+        </div>
+        <button onClick={handleOpenAdd} className={styles.addButton}>
+          Ajouter un produit
+        </button>
+      </div>
       <h3>Récapitulatif des produits</h3>
       <table className={styles.summaryTable}>
         <thead>
           <tr>
             <th>ID</th>
+            <th>Image</th>
             <th>Nom</th>
             <th>Description</th>
             <th>Prix</th>
@@ -139,53 +161,61 @@ export default function ProductsEditor() {
           </tr>
         </thead>
         <tbody>
-          {tableProducts.map(p => (
-            <tr key={p.id}>
-              <td>{p.id}</td>
-              <td>
-                {p.name}
-                {p.stock > 0 && p.stock < 5 && (
-                  <span
-                    className={styles.lowStockIcon}
-                    title="Stock faible"
-                  >
-                    {'\u26A0'}
-                  </span>
-                )}
-              </td>
-              <td>{p.description}</td>
-              <td>{formatPrice(p.price)}</td>
-              <td>
-                {p.promoCode ? (
-                  <span style={{ color: 'var(--tertiary-color)' }}>
-                    {formatPrice(calculateDiscountedPrice(p.price, p.promoCode))}
-                  </span>
-                ) : (
-                  formatPrice(p.price)
-                )}
-              </td>
-              <td>
-                {p.promoCode ? (
-                  <span>
-                    {p.promoCode.code} ({p.promoCode.discountType === 'percentage' ? 
-                      `${p.promoCode.discountValue}%` : 
-                      `${p.promoCode.discountValue}€`})
-                  </span>
-                ) : (
-                  '—'
-                )}
-              </td>
-              <td>
-                {p.stock === 0 
-                  ? 'Rupture de stock' 
-                  : p.stock}
-              </td>
-              <td>
-                <button onClick={() => handleOpenEdit(p)}>Modifier</button>
-                <button onClick={() => handleDelete(p)}>Supprimer</button>
-              </td>
-            </tr>
-          ))}
+          {filteredProducts.map(p => {
+            if (p.image && p.image.startsWith('/uploads/')) {
+              const finalUrl = `${STATIC_URL}${p.image}`;
+              console.log('STATIC_URL:', STATIC_URL, 'p.image:', p.image, 'URL finale:', finalUrl);
+            } else {
+              console.log('Image distante ou non disponible:', p.image);
+            }
+            return (
+              <tr key={p.id}>
+                <td>{p.id}</td>
+                <td>
+                  {p.image
+                    ? <img
+                        src={p.image.startsWith('/uploads/') ? `${STATIC_URL}${p.image}` : p.image}
+                        alt={p.name}
+                        style={{ maxWidth: 80, maxHeight: 80, objectFit: 'cover' }}
+                      />
+                    : <span>Image non disponible</span>
+                  }
+                </td>
+                <td>{p.name}</td>
+                <td>{p.description}</td>
+                <td>{formatPrice(p.price)}</td>
+                <td>
+                  {p.promoCode ? (
+                    <span style={{ color: 'var(--tertiary-color)' }}>
+                      {formatPrice(calculateDiscountedPrice(p.price, p.promoCode))}
+                    </span>
+                  ) : (
+                    formatPrice(p.price)
+                  )}
+                </td>
+                <td>
+                  {p.promoCode ? (
+                    <span>
+                      {p.promoCode.code} ({p.promoCode.discountType === 'percentage' ? 
+                        `${p.promoCode.discountValue}%` : 
+                        `${p.promoCode.discountValue}€`})
+                    </span>
+                  ) : (
+                    '—'
+                  )}
+                </td>
+                <td>
+                  {p.stock === 0 
+                    ? 'Rupture de stock' 
+                    : p.stock}
+                </td>
+                <td>
+                  <button onClick={() => handleOpenEdit(p)}>Modifier</button>
+                  <button onClick={() => handleDelete(p)}>Supprimer</button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
       <ProductEditModal

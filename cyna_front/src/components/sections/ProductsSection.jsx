@@ -83,9 +83,14 @@ const ProductsSection = () => {
                       <img src={item.image} alt={item.name} />
                     ) : (
                       <div className={styles.servicePlaceholder}>
-                        <span>{item.type === 'product' ? 'Produit' : 'Service'}</span>
+                        <span className={styles.typeLabel}>
+                          {item.type === 'product' ? 'Produit' : 'Service'}
+                        </span>
                       </div>
                     )}
+                    <span className={styles.typeTag}>
+                      {item.type === 'product' ? 'Produit' : 'Service'}
+                    </span>
                     {item.promoCode && (
                       <span className={styles.saleTag}>
                         {item.promoCode.discountType === 'percentage' 

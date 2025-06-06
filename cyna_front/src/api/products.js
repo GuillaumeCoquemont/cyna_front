@@ -1,4 +1,4 @@
-import { API_BASE_URL } from './config';
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 const BASE_URL = `${API_BASE_URL}/api/products`;
 // src/api/products.js
 
@@ -17,16 +17,26 @@ export async function fetchProduct(id) {
   return res.json();
 }
 
-export async function updateProduct(id, data) {
+export async function updateProduct(data, isMultipart = false) {
   const token = localStorage.getItem('token');
-  const res = await fetch(`${BASE_URL}/${id}`, {
+  const id = data instanceof FormData ? data.get('id') : data.id;
+  
+  let options = {
     method: 'PUT',
     headers: {
-      'Content-Type': 'application/json',
       ...(token && { 'Authorization': `Bearer ${token}` })
     },
-    body: JSON.stringify(data),
-  });
+    body: data
+  };
+
+  // Si ce n'est pas un FormData, on envoie en JSON
+  if (!isMultipart) {
+    const { id, ...dataSansId } = data;
+    options.headers['Content-Type'] = 'application/json';
+    options.body = JSON.stringify(dataSansId);
+  }
+
+  const res = await fetch(`${BASE_URL}/${id}`, options);
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }
@@ -41,19 +51,24 @@ export async function deleteProduct(id) {
   return;
 }
 
-export async function addProduct(data) {
-  console.log('addProduct data:', data);
+export async function addProduct(data, isMultipart = false) {
   const token = localStorage.getItem('token');
-  const { id, ...dataSansId } = data;
-  console.log('addProduct envoyé:', dataSansId);
-  const res = await fetch(BASE_URL, {
+  let options = {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
       ...(token && { 'Authorization': `Bearer ${token}` })
     },
-    body: JSON.stringify(dataSansId),
-  });
+    body: data
+  };
+
+  // Si ce n'est pas un FormData, on envoie en JSON comme avant
+  if (!isMultipart) {
+    const { id, ...dataSansId } = data;
+    options.headers['Content-Type'] = 'application/json';
+    options.body = JSON.stringify(dataSansId);
+  }
+
+  const res = await fetch(BASE_URL, options);
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }

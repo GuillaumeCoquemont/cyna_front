@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../../styles/components/dashboardClient/DashboardCategories.module.css';
+import styles from '../../styles/components/dashboard/DashboardCategories.module.css';
 import {
   fetchCategories,
   addCategory,
@@ -216,63 +216,67 @@ export default function DashboardCategories() {
   return (
     <div className={styles.categoriesContainer}>
       <div className={styles.categoriesSection}>
-      <h3 className={styles.sectionTitle}>Gestion des catégories</h3>
-      <div className={styles.categoriesList}>
-        {categories.map(c => (
-          <div key={c.id} className={styles.categoryCard}>
-            <div className={styles.cardHeader}>
-              <span>{c.name}</span>
+        <div className={styles.sectionHeader}>
+          <h3 className={styles.sectionTitle}>Gestion des catégories</h3>
+          <button className={styles.addBtn} onClick={handleOpenAdd}>Ajouter une catégorie</button>
+        </div>
+        <div className={styles.categoriesList}>
+          {categories.map(c => (
+            <div key={c.id} className={styles.categoryCard}>
+              <div className={styles.cardHeader}>
+                <span>{c.name}</span>
+              </div>
+              <div className={styles.cardBody}>
+                <p>{c.description}</p>
+                <button className={styles.editBtn} onClick={() => handleOpenEdit(c)}>Modifier</button>
+                <button className={styles.deleteBtn} onClick={() => handleDelete(c)}>Supprimer</button>
+              </div>
             </div>
-            <div className={styles.cardBody}>
-              <p>{c.description}</p>
-              <button className={styles.editBtn} onClick={() => handleOpenEdit(c)}>Modifier</button>
-              <button className={styles.deleteBtn} onClick={() => handleDelete(c)}>Supprimer</button>
-            </div>
-          </div>
-        ))}
-      </div>
-      <button className={styles.addBtn} onClick={handleOpenAdd}>Ajouter une catégorie</button>
-      <AddCategoryModal
-        isOpen={showAddModal}
-        onClose={handleCloseAdd}
-        onSave={handleSaveNew}
-      />
-      <EditCategoryModal
-        isOpen={showEditModal}
-        onClose={handleCloseEdit}
-        category={selectedCategory}
-        onSave={handleSaveEdit}
-      />
+          ))}
+        </div>
+        <AddCategoryModal
+          isOpen={showAddModal}
+          onClose={handleCloseAdd}
+          onSave={handleSaveNew}
+        />
+        <EditCategoryModal
+          isOpen={showEditModal}
+          onClose={handleCloseEdit}
+          category={selectedCategory}
+          onSave={handleSaveEdit}
+        />
       </div>
 
       <div className={styles.serviceTypesSection}>
-      <h3 className={styles.sectionTitle}>Gestion des types de service</h3>
-      <div className={styles.categoriesList}>
-        {serviceTypes.map(t => (
-          <div key={t.id} className={styles.categoryCard}>
-            <div className={styles.cardHeader}>
-              <span>{t.name}</span>
+        <div className={styles.sectionHeader}>
+          <h3 className={styles.sectionTitle}>Gestion des types de service</h3>
+          <button className={styles.addBtn} onClick={() => setShowAddTypeModal(true)}>Ajouter un type de service</button>
+        </div>
+        <div className={styles.categoriesList}>
+          {serviceTypes.map(t => (
+            <div key={t.id} className={styles.categoryCard}>
+              <div className={styles.cardHeader}>
+                <span>{t.name}</span>
+              </div>
+              <div className={styles.cardBody}>
+                <p>{t.description}</p>
+                <button className={styles.editBtn} onClick={() => handleOpenEditType(t)}>Modifier</button>
+                <button className={styles.deleteBtn} onClick={() => handleDeleteType(t)}>Supprimer</button>
+              </div>
             </div>
-            <div className={styles.cardBody}>
-              <p>{t.description}</p>
-              <button className={styles.editBtn} onClick={() => handleOpenEditType(t)}>Modifier</button>
-              <button className={styles.deleteBtn} onClick={() => handleDeleteType(t)}>Supprimer</button>
-            </div>
-          </div>
-        ))}
-      </div>
-      <button className={styles.addBtn} onClick={() => setShowAddTypeModal(true)}>Ajouter un type de service</button>
-      <AddServiceTypeModal
-        isOpen={showAddTypeModal}
-        onClose={() => setShowAddTypeModal(false)}
-        onSave={handleSaveNewType}
-      />
-      <EditServiceTypeModal
-        isOpen={showEditTypeModal}
-        onClose={handleCloseEditType}
-        serviceType={selectedType}
-        onSave={handleSaveEditType}
-      />
+          ))}
+        </div>
+        <AddServiceTypeModal
+          isOpen={showAddTypeModal}
+          onClose={() => setShowAddTypeModal(false)}
+          onSave={handleSaveNewType}
+        />
+        <EditServiceTypeModal
+          isOpen={showEditTypeModal}
+          onClose={handleCloseEditType}
+          serviceType={selectedType}
+          onSave={handleSaveEditType}
+        />
       </div>
 
       {/* Modale de suppression pour les catégories */}

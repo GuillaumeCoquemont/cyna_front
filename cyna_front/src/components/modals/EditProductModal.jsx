@@ -17,6 +17,7 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
   const [imagePreview, setImagePreview] = useState(null);
   const [categories, setCategories] = useState([]);
   const [promoCodes, setPromoCodes] = useState([]);
+  const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
     Promise.all([
@@ -37,6 +38,7 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
         promo_code_id: product.promo_code_id || null
       });
       setImagePreview(product.image || null);
+      setImageUrl(product.image || '');
     }
   }, [product]);
 
@@ -59,24 +61,46 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
     if (file) {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
+      setImageUrl(''); // Réinitialiser l'URL si on upload un fichier
     }
   };
 
-  const fileToBase64 = file =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
+  const handleImageUrlChange = e => {
+    const url = e.target.value;
+    setImageUrl(url);
+    setImagePreview(url);
+    setImageFile(null); // Réinitialiser le fichier si on met une URL
+  };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let payload = { ...formData, id: product.id };
-    if (imageFile) {
-      payload.image = await fileToBase64(imageFile);
+    const formDataToSend = new FormData();
+    
+    // Ajouter les champs de base
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('description', formData.description);
+    formDataToSend.append('price', formData.price);
+    formDataToSend.append('stock', formData.stock);
+    formDataToSend.append('category_id', formData.category_id);
+    
+    // Gérer le promo_code_id
+    if (!formData.promo_code_id || formData.promo_code_id === '') {
+      formDataToSend.append('promo_code_id', 'null');
+    } else {
+      formDataToSend.append('promo_code_id', formData.promo_code_id);
     }
-    onSave(payload);
+
+    // Gérer l'image
+    if (imageFile) {
+      formDataToSend.append('image', imageFile);
+    } else if (imageUrl) {
+      formDataToSend.append('image', imageUrl);
+    }
+
+    // Ajouter l'ID du produit
+    formDataToSend.append('id', product.id);
+
+    onSave(formDataToSend, true);
   };
 
   return (
@@ -120,12 +144,21 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
 
           <div className={styles['form-group']}>
             <label>Image</label>
-            <input
-              type="file"
-              name="image"
-              accept="image/*"
-              onChange={handleImageChange}
-            />
+            <div className={styles['image-inputs']}>
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+              <div className={styles['or-divider']}>ou</div>
+              <input
+                type="url"
+                placeholder="URL de l'image"
+                value={imageUrl}
+                onChange={handleImageUrlChange}
+              />
+            </div>
             {imagePreview && (
               <img
                 src={imagePreview}
@@ -137,19 +170,23 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
 
           <div className={styles['form-group']}>
             <label>Catégorie</label>
-            <select
-              name="category_id"
-              value={formData.category_id}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Sélectionner</option>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+            <div className="selectWrapper">
+              <select
+                className="select"
+                name="category_id"
+                value={formData.category_id}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Sélectionner</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+              <span className="selectIcon">▼</span>
+            </div>
           </div>
           
           <div className={styles['form-group']}>
@@ -163,18 +200,22 @@ const EditProductModal = ({ isOpen, onClose, onSave, product }) => {
 
           <div className={styles['form-group']}>
             <label>Code Promo</label>
-            <select
-              name="promo_code_id"
-              value={formData.promo_code_id || ''}
-              onChange={handleChange}
-            >
-              <option value="">Aucun code promo</option>
-              {promoCodes.map(promo => (
-                <option key={promo.id} value={promo.id}>
-                  {promo.code} - {promo.discountType === 'percentage' ? `${promo.discountValue}%` : `${promo.discountValue}€`}
-                </option>
-              ))}
-            </select>
+            <div className="selectWrapper">
+              <select
+                className="select"
+                name="promo_code_id"
+                value={formData.promo_code_id || ''}
+                onChange={handleChange}
+              >
+                <option value="">Aucun code promo</option>
+                {promoCodes.map(promo => (
+                  <option key={promo.id} value={promo.id}>
+                    {promo.code} - {promo.discountType === 'percentage' ? `${promo.discountValue}%` : `${promo.discountValue}€`}
+                  </option>
+                ))}
+              </select>
+              <span className="selectIcon">▼</span>
+            </div>
           </div>
 
           <div className={styles['modal-actions']}>

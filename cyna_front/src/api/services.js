@@ -1,11 +1,11 @@
 import { API_BASE_URL } from './config';
-const SERVICES_URL = `${API_BASE_URL}/api/services`;
+const BASE_URL = `${API_BASE_URL}/api/services`;
 const SERVICE_TYPES_URL = `${API_BASE_URL}/api/service-types`;
 
 // GET all services
 export async function fetchServices() {
   const token = localStorage.getItem('token');
-  const res = await fetch(SERVICES_URL, {
+  const res = await fetch(BASE_URL, {
     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
@@ -13,31 +13,49 @@ export async function fetchServices() {
 }
 
 // POST add a new service
-export async function addService(data) {
+export async function addService(data, isMultipart = false) {
   const token = localStorage.getItem('token');
-  const res = await fetch(SERVICES_URL, {
+  let options = {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
       ...(token && { 'Authorization': `Bearer ${token}` })
     },
-    body: JSON.stringify(data),
-  });
+    body: data
+  };
+  if (!isMultipart) {
+    options.headers['Content-Type'] = 'application/json';
+    options.body = JSON.stringify(data);
+  }
+  const res = await fetch(BASE_URL, options);
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }
 
 // PUT update a service by key
-export async function updateService(key, data) {
+export async function updateService(keyOrData, dataOrIsMultipart, maybeIsMultipart) {
+  let id, data, isMultipart;
+  if (keyOrData instanceof FormData) {
+    id = keyOrData.get('id');
+    data = keyOrData;
+    isMultipart = dataOrIsMultipart || false;
+  } else {
+    id = keyOrData;
+    data = dataOrIsMultipart;
+    isMultipart = maybeIsMultipart || false;
+  }
   const token = localStorage.getItem('token');
-  const res = await fetch(`${SERVICES_URL}/${encodeURIComponent(key)}`, {
+  let options = {
     method: 'PUT',
     headers: {
-      'Content-Type': 'application/json',
       ...(token && { 'Authorization': `Bearer ${token}` })
     },
-    body: JSON.stringify(data),
-  });
+    body: data
+  };
+  if (!isMultipart) {
+    options.headers['Content-Type'] = 'application/json';
+    options.body = JSON.stringify(data);
+  }
+  const res = await fetch(`${BASE_URL}/${encodeURIComponent(id)}`, options);
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
   return res.json();
 }
@@ -45,7 +63,7 @@ export async function updateService(key, data) {
 // DELETE a service by key
 export async function deleteService(key) {
   const token = localStorage.getItem('token');
-  const res = await fetch(`${SERVICES_URL}/${encodeURIComponent(key)}`, {
+  const res = await fetch(`${BASE_URL}/${encodeURIComponent(key)}`, {
     method: 'DELETE',
     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
@@ -62,7 +80,7 @@ export async function fetchServiceTypes() {
 
 export async function checkServiceDependencies(id) {
   const token = localStorage.getItem('token');
-  const res = await fetch(`${SERVICES_URL}/${id}/dependencies`, {
+  const res = await fetch(`${BASE_URL}/${id}/dependencies`, {
     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);

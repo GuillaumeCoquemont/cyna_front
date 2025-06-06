@@ -6,6 +6,17 @@
   background-color: var(--grey-color);
 }
 
+.filtersContainer {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.filtersContainer .selectWrapper {
+  min-width: 200px;
+}
+
 .summaryTable {
   width: 100%;
   border-collapse: collapse;
@@ -16,6 +27,7 @@
   border: 1px solid #dee2e6;
   padding: 12px 8px;
   text-align: left;
+
 }
 
 .summaryTable th {
@@ -38,6 +50,7 @@
   border-radius: 4px;
   font-size: 0.9rem;
   cursor: pointer;
+  margin: 10px 10px;
 }
 
 .summaryTable button:first-of-type {
@@ -104,7 +117,7 @@
 
 /* Add Product button styling */
 .addButton {
-  background-color: var(--blue-color);
+  background-color: var(--tertiary-color);
   color: #fff;
   padding: 0.6rem 1.2rem;
   border: none;
@@ -118,7 +131,7 @@
 }
 
 .addButton:hover {
-  background-color: var(--blue-hover);
+  background-color: var(--tertiary-hover);
   transform: translateY(-2px);
 }
 

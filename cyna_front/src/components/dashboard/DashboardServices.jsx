@@ -7,15 +7,17 @@ import {
   deleteService,
   checkServiceDependencies
 } from '../../api/services';
-import { calculateDiscountedPrice, formatPrice } from '../../utils/priceUtils';
 
 import EditServiceModal from '../modals/EditServiceModal';
 import AddServiceModal from '../modals/AddServiceModal';
 import DeleteConfirmationModal from '../modals/DeleteConfirmationModal';
 
+const STATIC_URL = process.env.REACT_APP_STATIC_URL || process.env.REACT_APP_API_URL || 'http://localhost:3007';
+
 export default function DashboardServices() {
   const [services, setServices] = useState([]);
   const [tableServices, setTableServices] = useState([]);
+  const [filterStatus, setFilterStatus] = useState('all');
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -33,6 +35,7 @@ export default function DashboardServices() {
   const load = () => {
     fetchServices()
       .then(data => {
+        console.log('Services data:', data);
         setServices(data);
         setTableServices(data);
       })
@@ -47,8 +50,8 @@ export default function DashboardServices() {
     setSelectedService(null);
     setShowEditModal(false);
   };
-  const handleUpdate = async (updatedService) => {
-    await updateService(updatedService.id, updatedService);
+  const handleUpdate = async (updatedService, isMultipart) => {
+    await updateService(updatedService, isMultipart);
     load();
     handleCloseEdit();
   };
@@ -95,78 +98,79 @@ export default function DashboardServices() {
   const handleOpenAdd = () => setShowAddModal(true);
   const handleCloseAdd = () => setShowAddModal(false);
   const handleAdd = async (newServiceData) => {
-    await addService(newServiceData);
+    await addService(newServiceData, true);
     load(); // recharge la liste depuis la BDD
     handleCloseAdd();
   };
 
+  const filteredServices = tableServices.filter(service => {
+    if (filterStatus === 'all') return true;
+    if (filterStatus === 'active') return service.status;
+    if (filterStatus === 'inactive') return !service.status;
+    return true;
+  });
+
   return (
     <div className={styles.editorContainer}>
-      <h2>Éditeur de Services</h2>
-      <button onClick={handleOpenAdd} className={styles.addButton}>
-        Ajouter un service
-      </button>
-      <h3>Récapitulatif des services</h3>
-      <table className={styles.summaryTable}>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nom</th>
-            <th>Description</th>
-            <th>Prix</th>
-            <th>Prix après remise</th>
-            <th>Code promo</th>
-            <th>Statut</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tableServices.map(s => (
-            <tr key={s.id}>
-              <td>{s.id}</td>
-              <td>{s.name}</td>
-              <td>{s.description}</td>
-              <td>{s.price} €</td>
-              <td>
-                {s.promoCode ? (
-                  <span style={{ color: 'var(--tertiary-color)' }}>
-                    {formatPrice(calculateDiscountedPrice(s.price, s.promoCode))}
-                  </span>
-                ) : (
-                  formatPrice(s.price)
-                )}
-              </td>
-              <td>
-                {s.promoCode ? (
-                  <span>
-                    {s.promoCode.code} ({s.promoCode.discountType === 'percentage'
-                      ? `${s.promoCode.discountValue}%`
-                      : `${s.promoCode.discountValue}€`
-                    })
-                  </span>
-                ) : (
-                  '—'
-                )}
-              </td>
-              <td>{s.status ? 'Actif' : 'Inactif'}</td>
-              <td>
+      <div className={styles.sectionHeader}>
+        <h2>Éditeur de Services</h2>
+        <button className={styles.addButton} onClick={handleOpenAdd}>Ajouter un service</button>
+      </div>
+      <div className={styles.filtersContainer}>
+        <div className="selectWrapper">
+          <select 
+            className="select"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="all">Tous les services</option>
+            <option value="active">Services actifs</option>
+            <option value="inactive">Services inactifs</option>
+          </select>
+          <span className="selectIcon">▼</span>
+        </div>
+      </div>
+      <div className={styles.servicesList}>
+        {services.map(s => (
+          <div key={s.id} className={styles.serviceCard}>
+            <div className={styles.serviceImage}>
+              {s.image ? (
+                <img 
+                  src={s.image.startsWith('/uploads/') ? `${STATIC_URL}${s.image}` : s.image}
+                  alt={s.name} 
+                  onError={(e) => {
+                    console.error('Erreur de chargement de l\'image:', s.image);
+                    e.target.src = '/placeholder-image.jpg';
+                  }}
+                />
+              ) : (
+                <div className={styles.noImage}>Pas d'image</div>
+              )}
+            </div>
+            <div className={styles.serviceInfo}>
+              <h3>{s.name}</h3>
+              <p>{s.description}</p>
+              <div className={styles.serviceDetails}>
+                <span className={styles.price}>{s.price}€</span>
+              </div>
+              <div className={styles.serviceActions}>
                 <button onClick={() => handleOpenEdit(s)}>Modifier</button>
                 <button onClick={() => handleDelete(s)}>Supprimer</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <AddServiceModal
+        isOpen={showAddModal}
+        onClose={handleCloseAdd}
+        onSave={handleAdd}
+      />
       <EditServiceModal
         isOpen={showEditModal}
         onClose={handleCloseEdit}
         service={selectedService}
         onSave={handleUpdate}
-      />
-      <AddServiceModal
-        isOpen={showAddModal}
-        onClose={handleCloseAdd}
-        onSave={handleAdd}
       />
       <DeleteConfirmationModal
         isOpen={deleteModal.isOpen}

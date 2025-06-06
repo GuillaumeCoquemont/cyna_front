@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import styles from '../styles/pages/Contact.module.css';
 import { addMessage } from '../api/messages';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
+
 export default function ContactPage() {
   const [formData, setFormData] = useState({ subject: '', name: '', email: '', message: '' });
 
@@ -40,9 +43,9 @@ export default function ContactPage() {
             <h2>Nos coordonnées</h2>
             <p>Pour toute question, contactez-nous :</p>
             <ul>
-              <li><strong>Adresse :</strong> 123 Rue de l'École, 75000 Paris</li>
-              <li><strong>Téléphone :</strong> +33 1 23 45 67 89</li>
-              <li><strong>Email :</strong> contact@example.com</li>
+              <li><strong>Adresse :</strong> 11 Av. Dubonnet, 92400 Courbevoie</li>
+              <li><strong>Téléphone :</strong> <a href="tel:+33189701436">01 89 70 14 36</a></li>
+              <li><strong>Email :</strong> <a href="mailto:contact@cyna.fr">contact@cyna.fr</a></li>
               <li><strong>Horaires :</strong> Lun–Ven, 9h–18h</li>
             </ul>
             <p>Nous sommes à votre écoute du lundi au vendredi.</p>
@@ -51,14 +54,21 @@ export default function ContactPage() {
             <form className={styles.form} onSubmit={handleSubmit}>
               <label>
                 Sujet
-                <input
-                  type="text"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  placeholder="Sujet de votre demande"
-                  required
-                />
+                <div className={styles.selectWrapper}>
+                  <select
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    required
+                    className={styles.select}
+                  >
+                    <option value="">Sélectionnez un sujet</option>
+                    <option value="commande">Demande informations</option>
+                    <option value="reclamation">Ticket de support</option>
+                    <option value="autre">Autre</option>
+                  </select>
+                  <FontAwesomeIcon icon={faChevronDown} className={styles.selectIcon} />
+                </div>
               </label>
               <label>
                 Nom
@@ -90,7 +100,7 @@ export default function ContactPage() {
                   onChange={handleChange}
                   placeholder="Votre message"
                   required
-                />
+                ></textarea>
               </label>
               <button type="submit">Envoyer</button>
             </form>

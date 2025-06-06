@@ -74,7 +74,7 @@ const ProductsTop = () => {
                     <span className={styles.typeTag}>
                       {item.type === 'product' ? 'Produit' : 'Service'}
                     </span>
-                    <span className={styles.label + ' ' + styles.labelPromo}>
+                    <span className={`${styles.label} ${styles.labelPromo}`}>
                       {item.promoCode.discountType === 'percentage'
                         ? `-${item.promoCode.discountValue}%`
                         : `-${item.promoCode.discountValue}€`}

@@ -70,8 +70,8 @@ export default function TeamEditor() {
             value={m.description}
             onChange={e => handleChange(m.id, 'description', e.target.value)}
           />
-      <button onClick={() => { setSelectedMember(m); setShowEditModal(true); }}>Modifier</button>
-      <button onClick={() => handleDelete(m.id)}>Supprimer</button>
+      <button className={styles.editBtn} onClick={() => { setSelectedMember(m); setShowEditModal(true); }}>Modifier</button>
+      <button className={styles.deleteBtn} onClick={() => handleDelete(m.id)}>Supprimer</button>
         </div>
       ))}
       <AddTeamMemberModal

@@ -1,11 +1,13 @@
-
 .editorContainer {
-  padding: 20px;
-  background-color: var(--white-color);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
 }
 
 .card {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 2fr auto auto;
   align-items: center;
   gap: 10px;
   margin-bottom: 15px;
@@ -17,31 +19,28 @@
 
 .card input,
 .card textarea {
-  flex: 1;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: var(--border-radius);
   font-size: 0.9rem;
+  width: 100%;
+  height: 70px;
 }
 
 .card textarea {
   resize: vertical;
+  grid-column: 4;
 }
 
 .card button {
   padding: 8px 12px;
-  background-color: var(--tertiary-color);
   color: var(--white-color);
   border: none;
   border-radius: var(--border-radius);
   cursor: pointer;
   transition: background-color var(--transition);
+  white-space: nowrap;
 }
-
-.card button:hover {
-  background-color: var(--tertiary-hover);
-}
-
 .addButton {
   padding: 10px 20px;
   background-color: var(--tertiary-color);
@@ -51,7 +50,32 @@
   cursor: pointer;
   margin-bottom: 15px;
   transition: background-color var(--transition-duration) var(--transition-timing);
+  width: fit-content;
 }
+.addButton:hover {
+  background-color: var(--tertiary-hover);
+  transform: translateY(-2px);
+}
+
+  .editBtn {
+    background-color: var(--blue-color);
+    color: var(--white-color);
+  }
+
+  .editBtn:hover {
+    background-color: var(--blue-hover);
+    transform: translateY(-2px);
+  }
+
+  .deleteBtn {
+    background-color: var(--rouge-color);
+    color: var(--white-color);
+  }
+
+  .deleteBtn:hover {
+    background-color: var(--rouge-hover);
+    transform: translateY(-2px);
+  }
 
 .summaryTable {
   width: 100%;

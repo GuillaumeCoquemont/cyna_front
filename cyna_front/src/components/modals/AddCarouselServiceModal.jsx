@@ -46,15 +46,26 @@ export default function AddCarouselServiceModal({ isOpen, onClose, onSave }) {
       <div className={styles.modal}>
         <h3>Ajouter un service au carrousel</h3>
         <form className={styles.form} onSubmit={handleSubmit}>
-          <label>
-            Service
-            <select name="service_id" value={form.service_id} onChange={handleChange} required>
-              <option value="">-- Choisir --</option>
-              {services.map(s => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
-          </label>
+          <div className={styles['form-group']}>
+            <label>Service</label>
+            <div className="selectWrapper">
+              <select 
+                className="select"
+                name="service_id" 
+                value={form.service_id} 
+                onChange={handleChange} 
+                required
+              >
+                <option value="">Sélectionner un service</option>
+                {services.map(service => (
+                  <option key={service.id} value={service.id}>
+                    {service.name}
+                  </option>
+                ))}
+              </select>
+              <span className="selectIcon">▼</span>
+            </div>
+          </div>
           {error && <p className={styles.errorMessage}>{error}</p>}
           <div className={styles.actions}>
             <button type="button" onClick={onClose}>Annuler</button>

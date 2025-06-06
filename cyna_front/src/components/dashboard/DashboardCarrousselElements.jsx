@@ -163,7 +163,6 @@ export const CarrouselEditor = () => {
   return (
     <div className={styles.editorContainer}>
       
-
       <h2>Éditeur de Carrousel</h2>
       <button onClick={handleOpenModal} className={styles.addButton}>
         Ajouter un produit

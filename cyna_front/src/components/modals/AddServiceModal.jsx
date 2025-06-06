@@ -21,6 +21,8 @@ const AddServiceModal = ({ isOpen, onClose, onSave }) => {
   const [serviceTypes, setServiceTypes] = useState([]);
   const [promoCodes, setPromoCodes] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -36,6 +38,8 @@ const AddServiceModal = ({ isOpen, onClose, onSave }) => {
         service_type_id: '',
         promo_code_id: ''
       });
+      setImageFile(null);
+      setImageUrl('');
     }
   }, [isOpen]);
 
@@ -65,15 +69,28 @@ const AddServiceModal = ({ isOpen, onClose, onSave }) => {
     }));
   };
 
+  const handleFileChange = e => {
+    setImageFile(e.target.files[0]);
+  };
+
+  const handleImageUrlChange = e => {
+    setImageUrl(e.target.value);
+  };
+
   const handleSubmit = async e => {
     e.preventDefault();
     setLoading(true);
-    const payload = {
-      ...form,
-      status: !!form.status,
-      subscription: !!form.subscription
-    };
-    await onSave(payload);
+    const formDataToSend = new FormData();
+    Object.entries(form).forEach(([key, value]) => {
+      formDataToSend.append(key, value);
+    });
+    // Gestion image
+    if (imageFile) {
+      formDataToSend.append('image', imageFile);
+    } else if (imageUrl.trim() !== '') {
+      formDataToSend.append('image', imageUrl.trim());
+    }
+    await onSave(formDataToSend, true);
     setLoading(false);
     setForm({
       name: '',
@@ -87,6 +104,8 @@ const AddServiceModal = ({ isOpen, onClose, onSave }) => {
       service_type_id: '',
       promo_code_id: ''
     });
+    setImageFile(null);
+    setImageUrl('');
     onClose();
   };
 
@@ -127,34 +146,42 @@ const AddServiceModal = ({ isOpen, onClose, onSave }) => {
           </label>
           <label>
             Type de service
-            <select
-              name="service_type_id"
-              value={form.service_type_id}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Sélectionner un type</option>
-              {serviceTypes.map(type => (
-                <option key={type.id} value={type.id}>
-                  {type.name}
-                </option>
-              ))}
-            </select>
+            <div className="selectWrapper">
+              <select
+                className="select"
+                name="service_type_id"
+                value={form.service_type_id}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Sélectionner un type</option>
+                {serviceTypes.map(type => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
+              </select>
+              <span className="selectIcon">▼</span>
+            </div>
           </label>
           <label>
             Code promo
-            <select
-              name="promo_code_id"
-              value={form.promo_code_id}
-              onChange={handleChange}
-            >
-              <option value="">Aucun code promo</option>
-              {promoCodes.map(code => (
-                <option key={code.id} value={code.id}>
-                  {code.code} - {code.discountType === 'percentage' ? `${code.discountValue}%` : `${code.discountValue}€`}
-                </option>
-              ))}
-            </select>
+            <div className="selectWrapper">
+              <select
+                className="select"
+                name="promo_code_id"
+                value={form.promo_code_id}
+                onChange={handleChange}
+              >
+                <option value="">Aucun code promo</option>
+                {promoCodes.map(code => (
+                  <option key={code.id} value={code.id}>
+                    {code.code} - {code.discountType === 'percentage' ? `${code.discountValue}%` : `${code.discountValue}€`}
+                  </option>
+                ))}
+              </select>
+              <span className="selectIcon">▼</span>
+            </div>
           </label>
           <label>
             <input
@@ -197,6 +224,14 @@ const AddServiceModal = ({ isOpen, onClose, onSave }) => {
               </label>
             </>
           )}
+          <label>
+            Image (locale)
+            <input type="file" accept="image/*" onChange={handleFileChange} />
+          </label>
+          <label>
+            Ou URL de l'image
+            <input type="text" value={imageUrl} onChange={handleImageUrlChange} placeholder="https://..." />
+          </label>
           <div className={styles.actions}>
             <button type="button" onClick={onClose}>Annuler</button>
             <button type="submit" disabled={loading}>

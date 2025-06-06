@@ -36,15 +36,26 @@ export default function AddCarouselItemModal({ isOpen, onClose, products, onSave
       <div className={styles.modal}>
         <h3>Ajouter un produit au carrousel</h3>
         <form className={styles.form} onSubmit={handleSubmit}>
-          <label>
-            Produit
-            <select name="product_id" value={form.product_id} onChange={handleChange} required>
-              <option value="">-- Choisir --</option>
-              {products.map(p => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </select>
-          </label>
+          <div className={styles['form-group']}>
+            <label>Produit</label>
+            <div className="selectWrapper">
+              <select 
+                className="select"
+                name="product_id" 
+                value={form.product_id} 
+                onChange={handleChange} 
+                required
+              >
+                <option value="">Sélectionner un produit</option>
+                {products.map(product => (
+                  <option key={product.id} value={product.id}>
+                    {product.name}
+                  </option>
+                ))}
+              </select>
+              <span className="selectIcon">▼</span>
+            </div>
+          </div>
           {error && <p className={styles.errorMessage}>{error}</p>}
           <div className={styles.actions}>
             <button type="button" onClick={onClose}>Annuler</button>

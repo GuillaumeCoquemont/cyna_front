@@ -6,6 +6,8 @@ import { useCart } from '../context/CartContext';
 import { fetchProducts } from '../api/products';
 import { fetchServices } from '../api/services';
 
+const STATIC_URL = process.env.REACT_APP_STATIC_URL || process.env.REACT_APP_API_URL || "http://localhost:3007";
+
 const ProductsPage = () => {
   const { addToCart } = useCart();
   const [searchQuery, setSearchQuery] = useState('');
@@ -153,7 +155,26 @@ const ProductsPage = () => {
               <Link key={`${item.type}-${item.id}`} to={`/${item.type}/${item.id}`}>
                 <div className={styles.productCard}>
                   <div className={styles.productImage}>
-                    <img src={item.image} alt={item.name} />
+                    {item.image ? (
+                      <img 
+                        src={item.image && item.image.startsWith('/uploads/')
+                          ? `${STATIC_URL}${item.image}`
+                          : item.image
+                        }
+                        alt={item.name}
+                        onError={(e) => {
+                          console.error('Erreur de chargement de l\'image:', item.image);
+                          e.target.src = 'https://placehold.co/300x200?text=Image+non+disponible';
+                        }}
+                      />
+                    ) : (
+                      <div className={styles.noImage}>
+                        <img 
+                          src="https://placehold.co/300x200?text=Image+non+disponible" 
+                          alt="Image non disponible"
+                        />
+                      </div>
+                    )}
                   </div>
                   <div className={styles.productInfo}>
                     <h3>{item.name}</h3>
