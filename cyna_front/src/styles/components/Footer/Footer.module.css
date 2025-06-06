@@ -11,9 +11,9 @@
 .footerContent {
   display: grid;
   border-top: 1px solid var(--secondary-color);
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   padding: 20px 80px;
-  gap: 40px;
+  gap: 20px;
 }
 
 .footerSection h3 {

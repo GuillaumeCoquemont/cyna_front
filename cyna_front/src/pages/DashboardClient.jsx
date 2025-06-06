@@ -1,7 +1,6 @@
-
-
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import styles from '../styles/pages/DashboardClient.module.css';
 import DashboardOrders    from '../components/dashboardClient/DashboardOrders';
 import DashboardPayments  from '../components/dashboardClient/DashboardPayments';
@@ -10,7 +9,15 @@ import DashboardProfile   from '../components/dashboardClient/DashboardProfile';
 import DashboardMessages  from '../components/dashboardClient/DashboardMessagesClient';
 
 export default function DashboardClient() {
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('orders');
+
+  const handleSignOut = (e) => {
+    e.preventDefault();
+    signOut();
+    navigate('/');
+  };
 
   const sidebarItems = [
     { key: 'orders',     label: 'Mes commandes' },
@@ -52,7 +59,7 @@ export default function DashboardClient() {
             </li>
           ))}
           <li>
-            <Link to="/" onClick={() => setActiveTab('orders')}>
+            <Link to="/" onClick={handleSignOut}>
               Déconnexion
             </Link>
           </li>

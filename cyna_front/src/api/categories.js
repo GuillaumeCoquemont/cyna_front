@@ -4,12 +4,14 @@ import { API_BASE_URL } from './config';
 const BASE_URL = `${API_BASE_URL}/api/product-categories`;
 
 export async function fetchCategories() {
-  const token = localStorage.getItem('token');
-  const res = await fetch(BASE_URL, {
-    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-  });
-  if (!res.ok) throw new Error(`Erreur ${res.status}`);
-  return res.json();
+  try {
+    const res = await fetch(BASE_URL);
+    if (!res.ok) throw new Error(`Erreur ${res.status}`);
+    return res.json();
+  } catch (error) {
+    console.error('Erreur lors de la récupération des catégories:', error);
+    return [];
+  }
 }
 
 export async function addCategory(data) {

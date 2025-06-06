@@ -4,12 +4,14 @@ const SERVICE_TYPES_URL = `${API_BASE_URL}/api/service-types`;
 
 // GET all services
 export async function fetchServices() {
-  const token = localStorage.getItem('token');
-  const res = await fetch(BASE_URL, {
-    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-  });
-  if (!res.ok) throw new Error(`Erreur ${res.status}`);
-  return res.json();
+  try {
+    const res = await fetch(BASE_URL);
+    if (!res.ok) throw new Error(`Erreur ${res.status}`);
+    return res.json();
+  } catch (error) {
+    console.error('Erreur lors de la récupération des services:', error);
+    return [];
+  }
 }
 
 // POST add a new service

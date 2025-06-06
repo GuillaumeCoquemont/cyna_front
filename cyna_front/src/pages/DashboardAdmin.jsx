@@ -6,20 +6,14 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ChartData,
+  ChartOptions
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
-import React, { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import styles from '../styles/pages/DashboardAdmin.module.css';
 import { Link } from 'react-router-dom';
 import DashboardMessage from '../components/dashboard/DashboardMessage';
@@ -42,11 +36,24 @@ import DashboardAddressUserProfileLinks from '../components/dashboard/DashboardA
 import { fetchProducts } from '../api/products';
 import { fetchSalesStats } from '../api/salesStats';
 
-export default function DashboardAdmin() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+// Enregistrement des composants Chart.js
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
+export default function DashboardAdmin() {
+  const { signOut, user } = useAuth();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [productsData, setProductsData] = useState([]);
   const [monthlyStats, setMonthlyStats] = useState([]);
+  const chartRef = useRef(null);
 
   useEffect(() => {
     // load real products on mount
@@ -58,6 +65,13 @@ export default function DashboardAdmin() {
     fetchSalesStats()
       .then(data => setMonthlyStats(data))
       .catch(err => console.error('Erreur fetchSalesStats:', err));
+
+    // Nettoyage du graphique lors du démontage du composant
+    return () => {
+      if (chartRef.current) {
+        chartRef.current.destroy();
+      }
+    };
   }, []);
 
   const totalRevenue = monthlyStats.length > 0
@@ -170,7 +184,11 @@ export default function DashboardAdmin() {
               ))}
             </div>
             <div className={styles.chartContainer}>
-              <Line data={chartData} options={chartOptions} />
+              <Line 
+                ref={chartRef}
+                data={chartData} 
+                options={chartOptions}
+              />
             </div>
             <div className={styles.tableContainer}>
               <table>
@@ -308,6 +326,26 @@ export default function DashboardAdmin() {
     }
   };
 
+  const handleSignOut = async (e) => {
+    e.preventDefault();
+    console.log('Déconnexion en cours...');
+    try {
+      await signOut();
+      console.log('Déconnexion réussie');
+      navigate('/', { replace: true });
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    }
+  };
+
+  // Vérification de l'authentification
+  useEffect(() => {
+    if (!user) {
+      console.log('Utilisateur non connecté, redirection...');
+      navigate('/', { replace: true });
+    }
+  }, [user, navigate]);
+
   return (
     <div className={styles.dashboardContainer}>
       <aside className={styles.sidebar}>
@@ -323,9 +361,9 @@ export default function DashboardAdmin() {
             </li>
           ))}
           <li>
-            <Link to="/" onClick={() => setActiveTab('dashboard')}>
+            <button onClick={handleSignOut} className={styles.logoutButton}>
               Déconnexion
-            </Link>
+            </button>
           </li>
         </ul>
       </aside>

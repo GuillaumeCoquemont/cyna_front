@@ -14,7 +14,7 @@ export async function login({ email, password }) {
 
     console.log('Statut de la réponse:', response.status);
     const data = await response.json();
-    console.log('Données de réponse:', data);
+    console.log('Données de réponse complètes:', JSON.stringify(data, null, 2));
 
     if (!response.ok) {
       throw new Error(data.error || data.message || 'Échec de la connexion');
@@ -49,7 +49,7 @@ export async function register({ name, email, password }) {
 
     console.log('Statut de la réponse:', response.status);
     const data = await response.json();
-    console.log('Données de réponse:', data);
+    console.log('Données de réponse complètes:', JSON.stringify(data, null, 2));
 
     if (!response.ok) {
       throw new Error(data.error || data.message || "Échec de l'inscription");

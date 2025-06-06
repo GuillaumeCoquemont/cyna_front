@@ -1,6 +1,5 @@
 /* Reset CSS */
 :root {
-  --header-height: 80px;
   --primary-color: #302082;
   --secondary-color: #FFFFFF;
   --tertiary-color: #FF9054;
@@ -31,6 +30,7 @@
 html, body {
   height: 100%;
   overflow-x: hidden;
+  
 }
 
 body {

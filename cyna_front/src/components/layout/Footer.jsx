@@ -16,29 +16,20 @@ const Footer = () => {
     <footer className={styles.footer}>
       <div className={styles.footerContent}>
         <div className={styles.footerSection}>
-          <h3>Services</h3>
+          <h3>Navigation</h3>
           <ul>
-            <li><Link to="/categorie-1">Services 1</Link></li>
-            <li><Link to="/categorie-2">Services 2</Link></li>
-            <li><Link to="/categorie-3">Services 3</Link></li>
-            <li><Link to="/categorie-4">Services 4</Link></li>
-          </ul>
-        </div>
-        <div className={styles.footerSection}>
-          <h3>Produits</h3>
-          <ul>
-            <li><Link to="/categorie-1">Produits 1</Link></li>
-            <li><Link to="/categorie-2">Produits 2</Link></li>
-            <li><Link to="/categorie-3">Produits 3</Link></li>
-            <li><Link to="/categorie-4">Produits 4</Link></li>
-          </ul>
-        </div>
-        <div className={styles.footerSection}>
-          <h3>Entreprise</h3>
-          <ul>
+            <li><Link to="/">Accueil</Link></li>
+            <li><Link to="/products">Produits</Link></li>
             <li><Link to="/discover">Découvrir</Link></li>
-            <li><Link to="/products">Nos produits</Link></li>
-            <li><Link to="/contact">Contact us</Link></li>
+          </ul>
+        </div>
+        <div className={styles.footerSection}>
+          <h3>Contact</h3>
+          <ul>
+            <li><Link to="/contact">Contact</Link></li>
+            <li><span className={styles.phone}><a href="tel:+33659595959">+33 6 59 59 59 59</a></span></li>
+            <li><span className={styles.email}><a href="mailto:contact@cyna.fr">contact@cyna.fr</a></span></li>
+            <li><span className={styles.address}>11 Av. Dubonnet, 92400 Courbevoie</span></li>
           </ul>
         </div>
         <div className={styles.footerSection}>
@@ -59,7 +50,7 @@ const Footer = () => {
       </div>
       <div className={styles.footerBottom}>
         <div className={styles.footerLogo}>
-          <img src="/assets/logo.svg" alt="LIFT" />
+          <img src="/assets/logo.svg" alt="CYNA" />
         </div>
         <div className={styles.footerLinks}>
           <Link to="/cgu">CGU</Link>
