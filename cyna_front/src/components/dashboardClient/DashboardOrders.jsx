@@ -102,6 +102,9 @@ export default function DashboardOrders() {
                   <span className={styles.orderTotal}>
                     {order.totalprice || order.totalPrice || 0} €
                   </span>
+                  <span className={styles.paymentMethod}>
+                    {order.Payment?.method ? `Payé via ${order.Payment.method}` : 'Méthode de paiement inconnue'}
+                  </span>
                   <span className={`${styles.orderStatus} ${getStatusColor(order.status)}`}>
                     {order.status || 'En cours'}
                   </span>

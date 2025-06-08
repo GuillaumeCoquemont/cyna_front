@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import styles from '../../styles/components/dashboardClient/DashboardPayments.module.css';
 import {
   fetchPaymentMethods,
@@ -14,6 +15,11 @@ export default function DashboardPayments() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState(null);
+
+  const { user } = useAuth();
+
+  const orderId = 1; // Replace with actual logic when available
+  const amount = 2999.99; // Replace with actual amount
 
   useEffect(() => {
     fetchPaymentMethods()
@@ -126,6 +132,9 @@ export default function DashboardPayments() {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onSave={handleSaveNew}
+        userId={user?.userId}
+        orderId={orderId}
+        amount={amount}
       />
       <EditPaymentMethodModal
         isOpen={showEditModal}

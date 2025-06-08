@@ -192,6 +192,9 @@ export default function ClientList() {
                             <span className={styles.orderId}>Commande #{order.id}</span>
                             <span className={styles.orderDate}>{formatDate(order.creationDate)}</span>
                             <span className={styles.orderTotal}>{order.totalPrice} €</span>
+                            <span className={styles.paymentMethod}>
+                              Paiement: {order.Payment?.method || 'Inconnu'}
+                            </span>
                             <div className={styles.statusContainer}>
                               <select
                                 className={`${styles.orderStatus} ${getStatusColor(order.status)}`}

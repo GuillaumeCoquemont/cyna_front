@@ -163,9 +163,9 @@ const Header = () => {
               </Link>
             </>
           ) : (
-            <Link to="/auth" onClick={handleLinkClick} aria-label="Connexion">
-              <i className="fas fa-user"></i>
-            </Link>
+          <Link to="/auth" onClick={handleLinkClick} aria-label="Connexion">
+            <i className="fas fa-user"></i>
+          </Link>
           )}
           <div className={styles.cartLink} onClick={toggleCart} aria-label="Panier">
             <i className="fas fa-shopping-cart"></i>
@@ -178,9 +178,9 @@ const Header = () => {
 
         <div className={`${styles.searchBarContainer} ${isSearchVisible ? styles.visible : ''}`}>
           <div className={styles.searchWrapper}>
-            <input
-              type="text"
-              className={styles.searchBar}
+          <input
+            type="text"
+            className={styles.searchBar}
               placeholder="Rechercher des produits ou services..."
               value={searchQuery}
               onChange={handleSearchChange}

@@ -24,14 +24,7 @@ import DashboardServices from '../components/dashboard/DashboardServices';
 import DashboardTeam from '../components/dashboard/DashboardTeam';
 import DashboardCategories from '../components/dashboard/DashboardCategories';
 import ClientList from '../components/dashboard/DashboardClientList';
-import CategoryRoleLinks from '../components/dashboard/DashboardCategoryRoleLinks';
 
-import OrderItemProductLinks from '../components/dashboard/DashboardOrderItemProductLinks';
-import OrderItemServiceLinks from '../components/dashboard/DashboardOrderItemServiceLinks';
-import ServiceTypeRoleLinks from '../components/dashboard/DashboardServiceTypeRoleLinks';
-import RolePromoCodeLinks from '../components/dashboard/DashboardRolePromoCodeLinks';
-import ServiceRoleLinks from '../components/dashboard/DashboardServiceRoleLinks';
-import DashboardAddressUserProfileLinks from '../components/dashboard/DashboardAddressUserProfileLinks';
 
 import { fetchProducts } from '../api/products';
 import { fetchSalesStats } from '../api/salesStats';
@@ -119,13 +112,6 @@ export default function DashboardAdmin() {
     { key: 'clients',   label: 'Clients' },
     { key: 'ui', label: 'Carroussel' },
     { key: 'team', label: 'Team' },
-    { key: 'liaisons-categories-roles', label: 'Catégories ↔ Rôles' },
-    { key: 'liaisons-oip', label: 'Cmd↔Produits' },
-    { key: 'liaisons-ois', label: 'Cmd↔Services' },
-    { key: 'liaisons-str-roles', label: 'TypeSvc↔Rôles' },
-    { key: 'liaisons-rol-promo', label: 'Rôles↔Promo' },
-    { key: 'liaisons-svc-roles', label: 'Services↔Rôles' },
-    { key: 'liaisons-addr-upp', label: 'Adresses↔Profils' },
     { key: 'params', label: 'Paramètres' },
 
 
@@ -253,48 +239,6 @@ export default function DashboardAdmin() {
         return (
           <div className={styles.dashboardContent}>
             <DashboardCategories />
-          </div>
-        );
-      case 'liaisons-categories-roles':
-        return (
-          <div className={styles.dashboardContent}>
-            <CategoryRoleLinks />
-          </div>
-        );
-      case 'liaisons-oip':
-        return (
-          <div className={styles.dashboardContent}>
-            <OrderItemProductLinks />
-          </div>
-        );
-      case 'liaisons-ois':
-        return (
-          <div className={styles.dashboardContent}>
-            <OrderItemServiceLinks />
-          </div>
-        );
-      case 'liaisons-str-roles':
-        return (
-          <div className={styles.dashboardContent}>
-            <ServiceTypeRoleLinks />
-          </div>
-        );
-      case 'liaisons-rol-promo':
-        return (
-          <div className={styles.dashboardContent}>
-            <RolePromoCodeLinks />
-          </div>
-        );
-      case 'liaisons-svc-roles':
-        return (
-          <div className={styles.dashboardContent}>
-            <ServiceRoleLinks />
-          </div>
-        );
-      case 'liaisons-addr-upp':
-        return (
-          <div className={styles.dashboardContent}>
-            <DashboardAddressUserProfileLinks />
           </div>
         );
       case 'services':

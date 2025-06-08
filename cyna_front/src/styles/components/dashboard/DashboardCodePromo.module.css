@@ -109,7 +109,7 @@
 }
 
 .actions button[type="submit"] {
-  background-color: var(--primary-color);
+  background-color: var(--blue-color);
   color: #FFFFFF;
 }
 
@@ -124,4 +124,35 @@
 
 .actions button[type="button"]:hover {
   background-color: var(--grey-color);
+}
+
+.editBtn {
+  background-color: var(--blue-color);
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  margin-right: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.editBtn:hover {
+  background-color: var(--blue-hover);
+}
+
+.deleteBtn {
+  background-color: #e74a3b;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.deleteBtn:hover {
+  background-color: #c0392b;
 }

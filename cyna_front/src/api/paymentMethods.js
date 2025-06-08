@@ -1,5 +1,5 @@
 import { API_BASE_URL } from './config';
-const BASE_URL = `${API_BASE_URL}/api/payment-methods`;
+const BASE_URL = `${API_BASE_URL}/api/payments`;
 
 export async function fetchPaymentMethods() {
   const token = localStorage.getItem('token');
@@ -12,6 +12,7 @@ export async function fetchPaymentMethods() {
 
 export async function addPaymentMethod(data) {
   const token = localStorage.getItem('token');
+  console.log('Sending payment method data:', data);
   const res = await fetch(BASE_URL, {
     method: 'POST',
     headers: {
@@ -20,8 +21,12 @@ export async function addPaymentMethod(data) {
     },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error(`Erreur ${res.status}`);
-  return res.json();
+  const responseBody = await res.text(); // read raw text for better debugging
+  if (!res.ok) {
+    console.error('Backend returned error:', responseBody);
+    throw new Error(`Erreur ${res.status}`);
+  }
+  return JSON.parse(responseBody); // parse manually since we used .text()
 }
 
 export async function updatePaymentMethod(id, data) {

@@ -3,12 +3,15 @@ import React, { useState } from 'react';
 import { addPaymentMethod } from '../../api/paymentMethods';
 import styles from '../../styles/components/modals/PaymentModal.module.css';
 
-export default function AddPaymentMethodModal({ isOpen, onClose, onSave }) {
+export default function AddPaymentMethodModal({ isOpen, onClose, onSave, userId, orderId, amount }) {
   const [form, setForm] = useState({
     type: '',
     last4: '',
     expiry: '',
     isDefault: false,
+    user_id: userId,
+    order_id: orderId,
+    amount: amount,
   });
   const [error, setError] = useState('');
 
@@ -41,7 +44,15 @@ export default function AddPaymentMethodModal({ isOpen, onClose, onSave }) {
       setError('Erreur lors de la sauvegarde du moyen de paiement.');
       return;
     }
-    setForm({ type: '', last4: '', expiry: '', isDefault: false });
+    setForm({
+      type: '',
+      last4: '',
+      expiry: '',
+      isDefault: false,
+      user_id: userId,
+      order_id: orderId,
+      amount: amount,
+    });
     onClose();
   };
 

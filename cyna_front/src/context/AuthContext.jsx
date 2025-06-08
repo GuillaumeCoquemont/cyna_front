@@ -1,5 +1,6 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { login as apiLogin } from '../api/auth';
+import { jwtDecode } from 'jwt-decode';
 
 export const AuthContext = createContext();
 
@@ -12,8 +13,22 @@ export const useAuth = () => {
 };
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    if (token && !user) {
+      try {
+        const decoded = jwtDecode(token);
+        setUser(decoded);
+      } catch (err) {
+        console.error('Erreur lors du décodage du token:', err);
+        localStorage.removeItem('token');
+        setToken(null);
+        setUser(null);
+      }
+    }
+  }, [token, user]);
 
   const signIn = async (credentials) => {
     const data = await apiLogin(credentials);
