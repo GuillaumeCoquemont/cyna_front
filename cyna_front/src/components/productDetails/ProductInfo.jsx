@@ -32,10 +32,10 @@ const ProductInfo = ({ product, quantity, setQuantity, addToCart }) => {
       </div>
 
       <p className={styles.shortDescription}>{product.shortDescription}</p>
-      <p className={styles.longDescription}>{product.longDescription}</p>
+      <p className={styles.description}>{product.description}</p>
 
       <ul className={styles.features}>
-        {product.features.map((feat, idx) => (
+        {(product.features || []).map((feat, idx) => (
           <li key={idx}>{feat}</li>
         ))}
       </ul>

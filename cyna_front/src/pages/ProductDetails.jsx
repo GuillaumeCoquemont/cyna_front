@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchProductById, fetchServiceById } from '../api/productDetails';
+import { useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import ProductGallery from '../components/productDetails/ProductGallery';
 import ProductInfo from '../components/productDetails/ProductInfo';
@@ -14,7 +15,9 @@ import prod2 from '../assets/images/prod2.jpg';
 import prod3 from '../assets/images/prod3.jpg';
 
 const ProductDetails = () => {
-  const { id, type } = useParams(); // type = 'product' ou 'service'
+  const { id } = useParams(); // type = 'product' ou 'service'
+  const location = useLocation();
+  const type = location.pathname.includes('/service/') ? 'service' : 'product';
   const { addToCart } = useCart();
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,6 +25,7 @@ const ProductDetails = () => {
 
   useEffect(() => {
     setLoading(true);
+    console.log('ProductDetails useEffect', { id, type });
     const fetchData = async () => {
       try {
         let data;
@@ -30,8 +34,11 @@ const ProductDetails = () => {
         } else {
           data = await fetchProductById(id);
         }
+        console.log('Fetched data:', data); // Ajoute ce log
         setItem(data);
       } catch (err) {
+        console.log('id:', id, 'type:', type);
+        console.error('Erreur lors du fetch:', err); // Ajoute ce log
         setItem(null);
       } finally {
         setLoading(false);
