@@ -5,11 +5,13 @@ import styles from '../../styles/components/modals/AddAddressModal.module.css';
 export default function AddAddressModal({ isOpen, onClose, onSave }) {
   const [form, setForm] = useState({
     label: '',
-    line1: '',
+    address1: '',
+    line2: '',
     city: '',
-    zip: '',
+    postalcode: '',
+    region: '',
     country: '',
-    isDefault: false,
+    is_default: false,
   });
   const [error, setError] = useState('');
 
@@ -17,11 +19,13 @@ export default function AddAddressModal({ isOpen, onClose, onSave }) {
     if (isOpen) {
       setForm({
         label: '',
-        line1: '',
+        address1: '',
+        line2: '',
         city: '',
-        zip: '',
+        postalcode: '',
+        region: '',
         country: '',
-        isDefault: false,
+        is_default: false,
       });
       setError('');
     }
@@ -39,14 +43,24 @@ export default function AddAddressModal({ isOpen, onClose, onSave }) {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    if (!form.label.trim() || !form.line1.trim() || !form.city.trim() || !form.zip.trim() || !form.country.trim()) {
+    if (!form.address1.trim() || !form.city.trim() || !form.postalcode.trim() || !form.country.trim()) {
       setError('Tous les champs marqués * sont requis.');
       return;
     }
     setError('');
     try {
-      console.log('handleSubmit calling addAddress with:', form);
-      const saved = await addAddress(form);
+      const payload = {
+        label: form.label,
+        address1: form.address1,
+        line2: form.line2,
+        city: form.city,
+        postalcode: form.postalcode,
+        region: form.region,
+        country: form.country,
+        is_default: form.is_default,
+      };
+      console.log('handleSubmit calling addAddress with:', payload);
+      const saved = await addAddress(payload);
       console.log('API addAddress returned:', saved);
       onSave(saved);
       onClose();
@@ -62,25 +76,34 @@ export default function AddAddressModal({ isOpen, onClose, onSave }) {
         <h3>Ajouter une adresse</h3>
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.field}>
-            <label>Label *</label>
+            <label>Label</label>
             <input
               type="text"
               name="label"
               value={form.label}
               onChange={handleChange}
               placeholder="Domicile, Travail…"
-              required
             />
           </div>
           <div className={styles.field}>
             <label>Adresse ligne 1 *</label>
             <input
               type="text"
-              name="line1"
-              value={form.line1}
+              name="address1"
+              value={form.address1}
               onChange={handleChange}
               placeholder="123 Rue…"
               required
+            />
+          </div>
+          <div className={styles.field}>
+            <label>Adresse ligne 2</label>
+            <input
+              type="text"
+              name="line2"
+              value={form.line2}
+              onChange={handleChange}
+              placeholder="Complément d'adresse"
             />
           </div>
           <div className={styles.field}>
@@ -98,11 +121,21 @@ export default function AddAddressModal({ isOpen, onClose, onSave }) {
             <label>Code postal *</label>
             <input
               type="text"
-              name="zip"
-              value={form.zip}
+              name="postalcode"
+              value={form.postalcode}
               onChange={handleChange}
               placeholder="75000"
               required
+            />
+          </div>
+          <div className={styles.field}>
+            <label>Région</label>
+            <input
+              type="text"
+              name="region"
+              value={form.region}
+              onChange={handleChange}
+              placeholder="Île-de-France"
             />
           </div>
           <div className={styles.field}>
@@ -119,8 +152,8 @@ export default function AddAddressModal({ isOpen, onClose, onSave }) {
           <div className={styles.fieldCheckbox}>
             <input
               type="checkbox"
-              name="isDefault"
-              checked={form.isDefault}
+              name="is_default"
+              checked={form.is_default}
               onChange={handleChange}
               id="defaultAddress"
             />

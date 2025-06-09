@@ -13,15 +13,24 @@ export async function fetchAddresses() {
 
 export async function addAddress(data) {
   const token = localStorage.getItem('token');
+
+  console.log("🔄 Envoi des données à l'API:", data);
+
   const res = await fetch(BASE_URL, {
     method: 'POST',
     headers: {
-      'Content-Type':'application/json',
+      'Content-Type': 'application/json',
       ...(token && { 'Authorization': `Bearer ${token}` })
     },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error(`Erreur ${res.status}`);
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("❌ Réponse de l'API:", errorText);
+    throw new Error(`Erreur ${res.status}`);
+  }
+
   return res.json();
 }
 

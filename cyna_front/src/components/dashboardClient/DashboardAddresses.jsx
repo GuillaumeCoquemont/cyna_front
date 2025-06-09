@@ -45,13 +45,12 @@ export default function DashboardAddresses() {
 
   const handleSaveNew = async (newAddress) => {
     try {
-      const saved = await addAddress(newAddress);
       setAddresses(prev => {
-        if (saved.isDefault) {
-          const cleared = prev.map(a => ({ ...a, isDefault: false }));
-          return [...cleared, saved];
+        if (newAddress.is_default) {
+          const cleared = prev.map(a => ({ ...a, is_default: false }));
+          return [...cleared, newAddress];
         }
-        return [...prev, saved];
+        return [...prev, newAddress];
       });
       setShowAddModal(false);
     } catch (error) {
@@ -90,19 +89,19 @@ export default function DashboardAddresses() {
           <div key={addr.id} className={styles.addressCard}>
             <div className={styles.cardHeader}>
               <span>{addr.label}</span>
-              {addr.isDefault && (
+              {addr.is_default && (
                 <span className={styles.defaultBadge}>Par défaut</span>
               )}
             </div>
             <div className={styles.cardBody}>
               <address className={styles.addressText}>
-                {addr.line1}<br />
-                {addr.line2 && <>{addr.line2}<br /></>}
-                {addr.zip} {addr.city}<br />
+                {addr.address1}<br />
+                {addr.address2 && <>{addr.address2}<br /></>}
+                {addr.postalcode} {addr.city}<br />
                 {addr.country}
               </address>
               <div className={styles.actions}>
-                {!addr.isDefault && (
+                {!addr.is_default && (
                   <button
                     className={styles.defaultBtn}
                     onClick={() => handleMakeDefault(addr.id)}

@@ -18,9 +18,6 @@ export default function DashboardPayments() {
 
   const { user } = useAuth();
 
-  const orderId = 1; // Replace with actual logic when available
-  const amount = 2999.99; // Replace with actual amount
-
   useEffect(() => {
     fetchPaymentMethods()
       .then(setMethods)
@@ -52,19 +49,15 @@ export default function DashboardPayments() {
 
   const handleAdd = () => setShowAddModal(true);
 
-  const handleSaveNew = async (newMethod) => {
-    try {
-      const saved = await addPaymentMethod(newMethod);
-      setMethods(prev => {
-        if (saved.isDefault) {
-          const cleared = prev.map(m => ({ ...m, isDefault: false }));
-          return [...cleared, saved];
-        }
-        return [...prev, saved];
-      });
-    } catch (error) {
-      console.error(error);
-    }
+  const handleSaveNew = (newMethod) => {
+    console.log('handleSaveNew called', newMethod);
+    setMethods(prev => {
+      if (newMethod.isDefault) {
+        const cleared = prev.map(m => ({ ...m, isDefault: false }));
+        return [...cleared, newMethod];
+      }
+      return [...prev, newMethod];
+    });
   };
 
   const handleOpenEdit = (method) => {
@@ -133,8 +126,6 @@ export default function DashboardPayments() {
         onClose={() => setShowAddModal(false)}
         onSave={handleSaveNew}
         userId={user?.userId}
-        orderId={orderId}
-        amount={amount}
       />
       <EditPaymentMethodModal
         isOpen={showEditModal}

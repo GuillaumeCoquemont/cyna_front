@@ -3,15 +3,13 @@ import React, { useState } from 'react';
 import { addPaymentMethod } from '../../api/paymentMethods';
 import styles from '../../styles/components/modals/PaymentModal.module.css';
 
-export default function AddPaymentMethodModal({ isOpen, onClose, onSave, userId, orderId, amount }) {
+export default function AddPaymentMethodModal({ isOpen, onClose, onSave, userId }) {
   const [form, setForm] = useState({
     type: '',
     last4: '',
     expiry: '',
     isDefault: false,
     user_id: userId,
-    order_id: orderId,
-    amount: amount,
   });
   const [error, setError] = useState('');
 
@@ -19,7 +17,6 @@ export default function AddPaymentMethodModal({ isOpen, onClose, onSave, userId,
 
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
-    console.log(`handleChange: ${name} =`, type === 'checkbox' ? checked : value);
     setForm(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -27,33 +24,29 @@ export default function AddPaymentMethodModal({ isOpen, onClose, onSave, userId,
   };
 
   const handleSubmit = async e => {
-    console.log('handleSubmit called. Form data:', form);
     e.preventDefault();
+    console.log('handleSubmit called', form); // Pour vérifier le nombre d'appels
     if (!form.type || !form.last4 || !form.expiry) {
       setError('Tous les champs obligatoires doivent être remplis.');
       return;
     }
     setError('');
     try {
-      console.log('handleSubmit calling addPaymentMethod with:', form);
-      const savedMethod = await addPaymentMethod(form);
-      console.log('API addPaymentMethod returned:', savedMethod);
+      const { type, last4, expiry, isDefault, user_id } = form;
+      const payload = { type, last4, expiry, isDefault, user_id };
+      const savedMethod = await addPaymentMethod(payload);
       onSave(savedMethod);
+      onClose();
+      setForm({
+        type: '',
+        last4: '',
+        expiry: '',
+        isDefault: false,
+        user_id: userId,
+      });
     } catch (err) {
-      console.error('API error adding payment method:', err);
       setError('Erreur lors de la sauvegarde du moyen de paiement.');
-      return;
     }
-    setForm({
-      type: '',
-      last4: '',
-      expiry: '',
-      isDefault: false,
-      user_id: userId,
-      order_id: orderId,
-      amount: amount,
-    });
-    onClose();
   };
 
   return (
@@ -84,7 +77,7 @@ export default function AddPaymentMethodModal({ isOpen, onClose, onSave, userId,
             />
           </div>
           <div className={styles.field}>
-            <label>Date d’expiration (MM/AA)*</label>
+            <label>Date d'expiration (MM/AA)*</label>
             <input
               name="expiry"
               value={form.expiry}

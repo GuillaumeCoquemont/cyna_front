@@ -1,21 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../../styles/components/dashboardClient/DashboardProfile.module.css';
-
-const mockUser = {
-  firstName: 'Guillaume',
-  lastName: 'Coquemont',
-  email: 'guillaume@example.com',
-  phone: '+33 6 12 34 56 78'
-};
+import { fetchUserProfile, updateUserProfile, updatePassword } from '../../api/userProfiles';
 
 export default function DashboardProfile() {
-  const [user, setUser] = useState({ firstName: '', lastName: '', email: '', phone: '' });
+  const [user, setUser] = useState({ firstname: '', lastname: '', email: '', phone: '' });
   const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
   const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    // Simuler fetch des données utilisateur
-    setUser(mockUser);
+    fetchUserProfile()
+      .then(data => {
+        setUser({
+          firstname: data.firstname || '',
+          lastname: data.lastname || '',
+          email: data.email || '',
+          phone: data.phone || ''
+        });
+      })
+      .catch(err => {
+        setError("Impossible de charger le profil utilisateur.");
+        console.error(err);
+      });
   }, []);
 
   const handleChange = (e) => {
@@ -31,16 +38,22 @@ export default function DashboardProfile() {
   const handleSave = async (e) => {
     e.preventDefault();
     setIsSaving(true);
+    setError('');
+    setSuccess('');
+
     try {
-      // TODO: appel API pour sauvegarder profile
-      console.log('Profil sauvegardé', user);
+      // Mise à jour du profil
+      await updateUserProfile(user);
+      setSuccess('Profil mis à jour avec succès.');
+
+      // Mise à jour du mot de passe si nécessaire
       if (passwords.new && passwords.new === passwords.confirm) {
-        console.log('Mot de passe mis à jour');
-        // TODO: API pour mise à jour mot de passe
+        await updatePassword(passwords.current, passwords.new);
+        setSuccess('Profil et mot de passe mis à jour avec succès.');
+        setPasswords({ current: '', new: '', confirm: '' });
       }
-      // Reset passwords fields
-      setPasswords({ current: '', new: '', confirm: '' });
     } catch (err) {
+      setError(err.message || "Erreur lors de la sauvegarde du profil.");
       console.error(err);
     } finally {
       setIsSaving(false);
@@ -56,8 +69,8 @@ export default function DashboardProfile() {
             Prénom
             <input
               type="text"
-              name="firstName"
-              value={user.firstName}
+              name="firstname"
+              value={user.firstname}
               onChange={handleChange}
               required
             />
@@ -66,8 +79,8 @@ export default function DashboardProfile() {
             Nom
             <input
               type="text"
-              name="lastName"
-              value={user.lastName}
+              name="lastname"
+              value={user.lastname}
               onChange={handleChange}
               required
             />
@@ -122,6 +135,8 @@ export default function DashboardProfile() {
             />
           </label>
         </fieldset>
+        {error && <p className={styles.error}>{error}</p>}
+        {success && <p className={styles.success}>{success}</p>}
         <button type="submit" className={styles.saveBtn} disabled={isSaving}>
           {isSaving ? 'Enregistrement...' : 'Enregistrer les modifications'}
         </button>
