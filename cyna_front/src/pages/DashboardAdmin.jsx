@@ -52,6 +52,7 @@ export default function DashboardAdmin() {
   const [productSalesDetails, setProductSalesDetails] = useState([]);
   const [serviceSalesDetails, setServiceSalesDetails] = useState([]);
   const [pendingOrders, setPendingOrders] = useState([]);
+  const [servicesData, setServicesData] = useState([]);
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -106,6 +107,12 @@ export default function DashboardAdmin() {
         console.log('pendingOrders API response:', data);
         setPendingOrders(Array.isArray(data) ? data : []);
       });
+
+    fetch(`${API_BASE_URL}/api/services`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+      .then(res => res.json())
+      .then(data => setServicesData(data));
   }, []);
 
   const totalProductSales = monthlyStats.length > 0
@@ -228,6 +235,7 @@ export default function DashboardAdmin() {
               />
             </div>
             <div className={styles.tableContainer}>
+              <h3>Liste des produits</h3>
               <table className={styles.pendingOrdersTable}>
                 <thead>
                   <tr>
@@ -264,7 +272,43 @@ export default function DashboardAdmin() {
                 </tbody>
               </table>
             </div>
+            <div className={styles.tableContainer}>
+              <h3 className={styles.salesDetailsSection}>Liste des services</h3>
+              <table className={styles.pendingOrdersTable}>
+                <thead>
+                  <tr>
+                    <th>Nom service</th>
+                    <th>Prix</th>
+                    <th>Type</th>
+                    <th>Disponibilité</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {servicesData.map((s) => (
+                    <tr key={s.id} className={!s.status ? styles.unavailableService : ''}>
+                      <td>{s.name}</td>
+                      <td>
+                        {s.price ? Number(s.price).toLocaleString('fr-FR', {
+                          style: 'currency',
+                          currency: 'EUR'
+                        }) : ''}
+                      </td>
+                      <td>{s.serviceType?.name || 'N/A'}</td>
+                      <td>
+                        {s.status ? 'Disponible' : (
+                          <span className={styles.unavailableService}>
+                            Indisponible
+                            <span className={styles.unavailableIcon} title="Service indisponible">&#9888;</span>
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             <div className={styles.salesDetailsSection}>
+              <h3>Détail des ventes</h3>
               <h2>Détail des ventes par produit</h2>
               <ul className={styles.salesDetailsList}>
                 {productSalesDetails.map(p => (
