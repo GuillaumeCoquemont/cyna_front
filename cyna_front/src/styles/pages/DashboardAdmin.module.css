@@ -197,3 +197,57 @@ tbody tr {
   background-color: var(--primary-color);
   color: #FFFFFF;
 }
+
+/* Section de détail des ventes */
+.salesDetailsSection {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fc;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(80, 80, 120, 0.06);
+}
+
+.salesDetailsSection h2 {
+  margin-bottom: 1rem;
+  color: #4E73DF;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.salesDetailsList {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 2rem;
+}
+.salesDetailsList li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e3e6f0;
+  font-size: 1rem;
+}
+
+/* Tableau des commandes en attente */
+.pendingOrdersTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(80, 80, 120, 0.06);
+}
+.pendingOrdersTable th, .pendingOrdersTable td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+.pendingOrdersTable th {
+  background: #f1f3fa;
+  color: #4E73DF;
+  font-weight: 600;
+  border-bottom: 2px solid #e3e6f0;
+}
+.pendingOrdersTable tr:nth-child(even) {
+  background: #f8f9fc;
+}
+.pendingOrdersTable tr:hover {
+  background: #e9ecef;
+}

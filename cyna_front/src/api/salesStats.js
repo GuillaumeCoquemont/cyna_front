@@ -1,6 +1,6 @@
 // src/api/salesStats.js
 import { API_BASE_URL } from './config';
-const SALES_STATS_URL = `${API_BASE_URL}/api/admin`;
+const SALES_STATS_URL = `${API_BASE_URL}/api`;
 
 /**
  * Récupère les statistiques mensuelles (revenu produits vs services).

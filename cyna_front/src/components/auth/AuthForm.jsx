@@ -15,6 +15,8 @@ const AuthForm = () => {
     confirmPassword: '',
     name: ''
   });
+  const [errors, setErrors] = useState({});
+  const [globalError, setGlobalError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,30 +28,39 @@ const AuthForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setGlobalError('');
+    const newErrors = {};
+    if (!formData.email) newErrors.email = "L'email est requis";
+    if (!formData.password) newErrors.password = "Le mot de passe est requis";
+
     if (activeTab === 'register') {
+      if (!formData.name) newErrors.name = "Le nom est requis";
       if (formData.password !== formData.confirmPassword) {
-        alert('Les mots de passe ne correspondent pas');
-        return;
+        newErrors.confirmPassword = "Les mots de passe ne correspondent pas";
       }
-      try {
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      if (activeTab === 'register') {
         await apiRegister({
           name: formData.name,
           email: formData.email,
           password: formData.password
         });
-        const me = await signIn({ email: formData.email, password: formData.password });
-        const decoded = jwtDecode(me.token); 
-        if (decoded.role === 'admin') navigate('/dashboard');
-        else navigate('/dashboardClient');
-      } catch (err) {
-        console.error('Erreur lors de l\'inscription :', err);
-        alert('Échec de l\'inscription');
       }
-    } else {
       const me = await signIn({ email: formData.email, password: formData.password });
       const decoded = jwtDecode(me.token); 
       if (decoded.role === 'admin') navigate('/dashboard');
       else navigate('/dashboardClient');
+    } catch (err) {
+      console.error("Erreur d'authentification :", err);
+      const errorMessage = err?.message || "Échec de l'authentification";
+      setGlobalError(errorMessage);
     }
   };
 
@@ -82,6 +93,7 @@ const AuthForm = () => {
               onChange={handleChange}
               required
             />
+            {errors.name && <p className={styles.error}>{errors.name}</p>}
           </div>
         )}
         <div className={styles.formGroup}>
@@ -94,6 +106,7 @@ const AuthForm = () => {
             onChange={handleChange}
             required
           />
+          {errors.email && <p className={styles.error}>{errors.email}</p>}
         </div>
         <div className={styles.formGroup}>
           <label htmlFor="password">Mot de passe</label>
@@ -105,6 +118,7 @@ const AuthForm = () => {
             onChange={handleChange}
             required
           />
+          {errors.password && <p className={styles.error}>{errors.password}</p>}
         </div>
         {activeTab === 'register' && (
           <div className={styles.formGroup}>
@@ -117,12 +131,14 @@ const AuthForm = () => {
               onChange={handleChange}
               required
             />
+            {errors.confirmPassword && <p className={styles.error}>{errors.confirmPassword}</p>}
           </div>
         )}
         <button type="submit" className={styles.submitButton}>
           {activeTab === 'login' ? 'Se connecter' : "S'inscrire"}
         </button>
       </form>
+      {globalError && <div className={styles.globalError}>{globalError}</div>}
     </div>
   );
 };

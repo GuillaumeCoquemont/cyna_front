@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styles from '../../styles/components/dashboardClient/DashboardUsersClient.module.css';
 import { fetchUsers, fetchRoles } from '../../api/users';
 import { fetchUserOrders, updateOrderStatus } from '../../api/orders';
+import { API_BASE_URL } from '../../api/config';
+import ModalResetPassword from '../modals/ModalResetPassword';
 
 export default function ClientList() {
   const [clients, setClients] = useState([]);
@@ -16,6 +18,13 @@ export default function ClientList() {
     newStatus: null,
     oldStatus: null
   });
+  const [clientProfile, setClientProfile] = useState({});
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetUserId, setResetUserId] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState('');
+  const [resetError, setResetError] = useState('');
 
   const orderStatuses = [
     'En attente de confirmation',
@@ -51,13 +60,22 @@ export default function ClientList() {
 
     try {
       const orders = await fetchUserOrders(clientId);
+      const profileRes = await fetch(`${API_BASE_URL}/api/users/profile/${clientId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      const profile = await profileRes.json();
+
       setClientOrders(prev => ({
         ...prev,
         [clientId]: orders
       }));
+      setClientProfile(prev => ({
+        ...prev,
+        [clientId]: profile
+      }));
       setExpandedClient(clientId);
     } catch (error) {
-      console.error('Erreur lors du chargement des commandes:', error);
+      console.error('Erreur lors du chargement des commandes ou du profil:', error);
     }
   };
 
@@ -129,6 +147,38 @@ export default function ClientList() {
     }
   };
 
+  const openResetModal = (userId) => {
+    setResetUserId(userId);
+    setShowResetModal(true);
+    setNewPassword('');
+    setResetSuccess('');
+    setResetError('');
+  };
+
+  const handleResetPassword = async () => {
+    setResetLoading(true);
+    setResetSuccess('');
+    setResetError('');
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/users/${resetUserId}/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ newPassword })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur');
+      setResetSuccess('Mot de passe réinitialisé avec succès');
+      setShowResetModal(false);
+    } catch (err) {
+      setResetError(err.message);
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <h3 className={styles.title}>Liste des clients</h3>
@@ -160,6 +210,16 @@ export default function ClientList() {
           </div>
         </div>
       )}
+      <ModalResetPassword
+        show={showResetModal}
+        onClose={() => setShowResetModal(false)}
+        onConfirm={handleResetPassword}
+        loading={resetLoading}
+        newPassword={newPassword}
+        setNewPassword={setNewPassword}
+        error={resetError}
+        success={resetSuccess}
+      />
       <ul className={styles.userList}>
         {clients.map(client => (
           <li key={client.id} className={styles.userItem}>
@@ -176,6 +236,25 @@ export default function ClientList() {
                 {expandedClient === client.id ? '▼' : '▶'}
               </span>
             </div>
+            
+            {expandedClient === client.id && clientProfile[client.id] && (
+              <div className={styles.profileSection}>
+                <h4>Profil</h4>
+                <p><strong>Nom :</strong> {clientProfile[client.id].user?.name}</p>
+                <p><strong>Email :</strong> {clientProfile[client.id].user?.email}</p>
+                <p><strong>Téléphone :</strong> {clientProfile[client.id].user?.phone || '—'}</p>
+                {console.log('Profil client:', clientProfile[client.id])}
+                <p><strong>Adresse :</strong> {Array.isArray(clientProfile[client.id].address) && clientProfile[client.id].address.length > 0
+                  ? clientProfile[client.id].address.map(a => (
+                      <span key={a.id}>{a.label} {a.address1}, {a.city} {a.postalcode} {a.country} <br/></span>
+                    ))
+                  : '—'}
+                </p>
+                <button onClick={() => openResetModal(client.id)}>
+                  Réinitialiser le mot de passe
+                </button>
+              </div>
+            )}
             
             {expandedClient === client.id && (
               <div className={styles.ordersContainer}>

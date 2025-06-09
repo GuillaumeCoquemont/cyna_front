@@ -24,7 +24,7 @@ import DashboardServices from '../components/dashboard/DashboardServices';
 import DashboardTeam from '../components/dashboard/DashboardTeam';
 import DashboardCategories from '../components/dashboard/DashboardCategories';
 import ClientList from '../components/dashboard/DashboardClientList';
-
+import { API_BASE_URL } from '../api/config';
 
 import { fetchProducts } from '../api/products';
 import { fetchSalesStats } from '../api/salesStats';
@@ -46,6 +46,12 @@ export default function DashboardAdmin() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [productsData, setProductsData] = useState([]);
   const [monthlyStats, setMonthlyStats] = useState([]);
+  const [userCount, setUserCount] = useState(null);
+  const [orderCount, setOrderCount] = useState(null);
+  const [pendingCount, setPendingCount] = useState(null);
+  const [productSalesDetails, setProductSalesDetails] = useState([]);
+  const [serviceSalesDetails, setServiceSalesDetails] = useState([]);
+  const [pendingOrders, setPendingOrders] = useState([]);
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -59,46 +65,93 @@ export default function DashboardAdmin() {
       .then(data => setMonthlyStats(data))
       .catch(err => console.error('Erreur fetchSalesStats:', err));
 
-    // Nettoyage du graphique lors du démontage du composant
-    return () => {
-      if (chartRef.current) {
-        chartRef.current.destroy();
-      }
-    };
+    // Récupérer le nombre d'utilisateurs
+    fetch(`${API_BASE_URL}/api/users/count`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+      .then(res => res.json())
+      .then(data => setUserCount(data.count));
+
+    // Récupérer le nombre de commandes
+    fetch(`${API_BASE_URL}/api/orders/count`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+      .then(res => res.json())
+      .then(data => setOrderCount(data.count));
+
+    // Récupérer le nombre de commandes en attente
+    fetch(`${API_BASE_URL}/api/orders/pending-count`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+      .then(res => res.json())
+      .then(data => setPendingCount(data.totalPending));
+
+    fetch(`${API_BASE_URL}/api/orders/product-sales-details`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+      .then(res => res.json())
+      .then(data => setProductSalesDetails(data));
+
+    fetch(`${API_BASE_URL}/api/orders/service-sales-details`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+      .then(res => res.json())
+      .then(data => setServiceSalesDetails(data));
+
+    fetch(`${API_BASE_URL}/api/orders/pending-orders`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log('pendingOrders API response:', data);
+        setPendingOrders(Array.isArray(data) ? data : []);
+      });
   }, []);
 
-  const totalRevenue = monthlyStats.length > 0
-    ? monthlyStats.reduce((sum, m) => sum + m.totalRevenue, 0)
+  const totalProductSales = monthlyStats.length > 0
+    ? monthlyStats.reduce((sum, m) => sum + (m.productSales || 0), 0)
     : null;
-  const totalProductRevenue = monthlyStats.length > 0
-    ? monthlyStats.reduce((sum, m) => sum + m.productRevenue, 0)
-    : null;
-  const totalServiceRevenue = monthlyStats.length > 0
-    ? monthlyStats.reduce((sum, m) => sum + m.serviceRevenue, 0)
+  const totalServiceSales = monthlyStats.length > 0
+    ? monthlyStats.reduce((sum, m) => sum + (m.serviceSales || 0), 0)
     : null;
 
   const statsData = [
-    { title: 'Utilisateurs totaux', value: '40 689' },
-    { title: 'Total commandes', value: '10 293' },
+    {
+      title: 'Utilisateurs totaux',
+      value: userCount !== null && userCount !== undefined
+        ? userCount.toLocaleString('fr-FR')
+        : 'Chargement...'
+    },
+    {
+      title: 'Total commandes',
+      value: orderCount !== null && orderCount !== undefined
+        ? orderCount.toLocaleString('fr-FR')
+        : 'Chargement...'
+    },
     {
       title: 'Ventes produits',
-      value: totalProductRevenue !== null
-        ? totalProductRevenue.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+      value: totalProductSales !== null
+        ? totalProductSales.toLocaleString('fr-FR')
         : 'Chargement...'
     },
     {
       title: 'Ventes services',
-      value: totalServiceRevenue !== null
-        ? totalServiceRevenue.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+      value: totalServiceSales !== null
+        ? totalServiceSales.toLocaleString('fr-FR')
         : 'Chargement...'
     },
     {
       title: 'Total ventes',
-      value: totalRevenue !== null
-        ? totalRevenue.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+      value: (totalProductSales !== null && totalServiceSales !== null)
+        ? (totalProductSales + totalServiceSales).toLocaleString('fr-FR')
         : 'Chargement...'
     },
-    { title: 'Total Pending', value: '2 040' },
+    {
+      title: 'Total Pending',
+      value: pendingCount !== null && pendingCount !== undefined
+        ? pendingCount.toLocaleString('fr-FR')
+        : 'Chargement...'
+    },
   ];
 
   const sidebarItems = [
@@ -113,24 +166,22 @@ export default function DashboardAdmin() {
     { key: 'ui', label: 'Carroussel' },
     { key: 'team', label: 'Team' },
     { key: 'params', label: 'Paramètres' },
-
-
   ];
 
   const chartData = {
     labels: monthlyStats.map(s => s.month),
     datasets: [
       {
-        label: 'Produits (€)',
-        data: monthlyStats.map(s => s.productRevenue),
+        label: 'Produits (ventes)',
+        data: monthlyStats.map(s => s.productSales),
         fill: false,
         tension: 0.4,
         borderColor: '#4E73DF',
         backgroundColor: '#4E73DF'
       },
       {
-        label: 'Services (€)',
-        data: monthlyStats.map(s => s.serviceRevenue),
+        label: 'Services (ventes)',
+        data: monthlyStats.map(s => s.serviceSales),
         fill: false,
         tension: 0.4,
         borderColor: '#1CC88A',
@@ -177,7 +228,7 @@ export default function DashboardAdmin() {
               />
             </div>
             <div className={styles.tableContainer}>
-              <table>
+              <table className={styles.pendingOrdersTable}>
                 <thead>
                   <tr>
                     <th>Nom produit</th>
@@ -208,6 +259,43 @@ export default function DashboardAdmin() {
                       <td>
                         {p.stock > 0 ? 'En stock' : 'Rupture de stock'}
                       </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className={styles.salesDetailsSection}>
+              <h2>Détail des ventes par produit</h2>
+              <ul className={styles.salesDetailsList}>
+                {productSalesDetails.map(p => (
+                  <li key={p.productName}>{p.productName} : {p.salesCount} ventes</li>
+                ))}
+              </ul>
+              <h2>Détail des ventes par service</h2>
+              <ul className={styles.salesDetailsList}>
+                {serviceSalesDetails.map(s => (
+                  <li key={s.serviceName}>{s.serviceName} : {s.salesCount} ventes</li>
+                ))}
+              </ul>
+              <h2>Commandes en attente</h2>
+              <table className={styles.pendingOrdersTable}>
+                <thead>
+                  <tr>
+                    <th>ID Commande</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Montant</th>
+                    <th>Utilisateur</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendingOrders.map(o => (
+                    <tr key={o.id}>
+                      <td>{o.id}</td>
+                      <td>{o.creationdate ? new Date(o.creationdate).toLocaleString('fr-FR') : ''}</td>
+                      <td>{o.status}</td>
+                      <td>{o.totalprice ? o.totalprice.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }) : ''}</td>
+                      <td>{o.User ? o.User.name : ''}</td>
                     </tr>
                   ))}
                 </tbody>
