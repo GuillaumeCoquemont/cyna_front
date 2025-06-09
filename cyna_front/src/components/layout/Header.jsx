@@ -4,6 +4,7 @@ import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import CartDropdown from "./CartDropDown";
 import styles from "../../styles/components/Header/Header.module.css";
+import logo from '../../assets/images/logo.png';
 
 const Header = () => {
   const { totalItems } = useCart();
@@ -117,7 +118,9 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <nav className={styles.navbar}>
-        <div className={styles.logo}>Logo</div>
+        <div className="logo">
+          <img src={logo} alt="Logo" />
+        </div>
         <button
           className={styles.hamburgerButton}
           onClick={toggleMobileMenu}
