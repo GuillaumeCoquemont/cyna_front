@@ -1,0 +1,159 @@
+Fonctionnalités principales du site CYNA
+========================================
+
+1. **Page d'accueil**
+   - Présente l'entreprise, ses valeurs, ses offres phares et un aperçu des produits/services récents ou en promotion.
+   - Mise en avant d'un slogan, d'une image de couverture et d'un bouton d'appel à l'action (ex : "Contact").
+
+2. **Navigation principale (Header)**
+   - Barre de navigation fixe en haut de page, accessible sur toutes les pages.
+   - Liens directs vers Accueil, Produits, Découvrir, Contact.
+   - Icônes d'accès rapide : recherche, profil utilisateur, panier.
+   - Menu hamburger en mobile/tablette.
+
+3. **Barre de recherche intelligente**
+   - Champ de recherche accessible depuis le header.
+   - Suggestions instantanées de produits et services dès la saisie (recherche asynchrone).
+   - Résultats cliquables : redirection vers la fiche détaillée du produit/service.
+   - Recherche insensible à la casse et aux accents.
+
+4. **Catalogue de produits**
+   - Page listant tous les produits disponibles, avec pagination ou scroll infini.
+   - Filtres par catégorie, prix, promotions.
+   - Affichage de l'image, du nom, du prix, de la description courte, de la catégorie et du badge promo si applicable.
+   - Accès à la fiche détaillée d'un produit en cliquant dessus.
+
+5. **Catalogue de services**
+   - Page listant tous les services proposés, avec filtres par type de service et par catégorie.
+   - Affichage de l'image, du nom, du prix, de la description courte, du type, de la catégorie et du badge promo si applicable.
+   - Accès à la fiche détaillée d'un service en cliquant dessus.
+
+6. **Gestion des catégories**
+   - Ajout, modification, suppression de catégories de produits et de services via l'interface d'administration.
+   - Attribution d'une catégorie à chaque produit ou service lors de la création ou de la modification.
+   - Filtres par catégorie disponibles pour l'utilisateur sur les pages catalogue.
+
+7. **Fiches détaillées produit/service**
+   - Page dédiée à chaque produit/service : image, description complète, prix, catégorie/type, promotions, stock/disponibilité.
+   - Bouton "Ajouter au panier" (ou "Souscrire" pour un service).
+   - Affichage des promotions appliquées et du prix remisé.
+
+8. **Panier d'achat**
+   - Affichage du contenu du panier : liste des produits/services, quantités, prix unitaire, total.
+   - Modification des quantités, suppression d'un article.
+   - Calcul automatique du total avec application des promotions.
+   - Accès au récapitulatif de commande et validation.
+
+9. **Authentification utilisateur**
+   - Inscription avec email, mot de passe, confirmation.
+   - Connexion/déconnexion sécurisée.
+   - Accès à un espace personnel (profil, historique de commandes).
+   - Gestion des informations personnelles et du mot de passe.
+
+10. **Gestion des commandes**
+    - Visualisation de l'historique des commandes passées.
+    - Détail de chaque commande : produits/services achetés, date, statut, montant.
+    - Suivi de l'état de la commande (en cours, expédiée, livrée, annulée).
+
+11. **Gestion des promotions**
+    - Application automatique des codes promo valides sur les produits/services concernés.
+    - Affichage du montant remisé et du code promo utilisé.
+    - Gestion des promotions côté admin (création, modification, suppression).
+
+12. **Footer complet**
+    - Liens légaux : CGU, mentions légales, politique de confidentialité.
+    - Formulaire d'inscription à la newsletter.
+    - Icônes et liens vers les réseaux sociaux de l'entreprise.
+
+13. **Interface d'administration**
+    - Tableau de bord sécurisé réservé aux administrateurs.
+    - Gestion CRUD des produits, services, catégories, types, utilisateurs, commandes, promotions.
+    - Visualisation des statistiques de ventes, d'activité et de fréquentation.
+    - Gestion des droits utilisateurs (rôles, accès admin).
+
+14. **Responsive design**
+    - Affichage et navigation optimisés pour mobile, tablette et desktop.
+    - Menu hamburger, adaptation des grilles, tailles de police et boutons adaptés.
+
+15. **Sécurité**
+    - Authentification sécurisée (hash des mots de passe, tokens).
+    - Vérification des droits d'accès sur les routes sensibles.
+    - Validation des entrées utilisateur côté frontend et backend.
+
+Structure et architecture du projet
+=================================
+
+Le projet CYNA est organisé selon une architecture moderne en deux parties principales : un frontend (React) et un backend (Node.js/Express avec Sequelize).
+
+1. **Frontend (cyna_front)**
+   - **Technologie principale** : React.js (avec React Router, Context API, CSS Modules)
+   - **Organisation des dossiers** :
+     - `/src/components` : composants réutilisables (Header, Footer, Cart, etc.)
+     - `/src/pages` : pages principales du site (Accueil, Produits, Services, Auth, etc.)
+     - `/src/sections` : sections spécifiques réutilisables sur plusieurs pages
+     - `/src/context` : gestion des contextes globaux (authentification, panier)
+     - `/src/styles` : fichiers CSS globaux et modules CSS par composant
+     - `/src/api` : fonctions utilitaires pour les appels à l'API backend
+   - **Logique** :
+     - Séparation claire entre composants d'affichage, logique métier (context), et appels API
+     - Utilisation de la Context API pour le panier et l'authentification
+     - Navigation gérée par React Router
+     - Responsive design assuré par CSS Modules et media queries
+
+2. **Backend (cyna_backend)**
+   - **Technologie principale** : Node.js avec Express.js, Sequelize (ORM), MySQL
+   - **Organisation des dossiers** :
+     - `/src/routes` : routes Express pour chaque ressource (produits, services, catégories, users, etc.)
+     - `/src/controllers` : logique métier pour chaque ressource (CRUD, gestion des relations)
+     - `/src/models` : définitions des modèles Sequelize (Product, Service, Category, User, etc.)
+     - `/src/middlewares` : middlewares d'authentification, gestion des droits, validation
+     - `/src/utils` : fonctions utilitaires (gestion des emails, helpers divers)
+     - `/uploads` : stockage des images uploadées
+   - **Logique** :
+     - Séparation stricte entre routes, contrôleurs et modèles
+     - Authentification JWT pour les utilisateurs et les admins
+     - Gestion des rôles et des droits d'accès
+     - Validation des données côté serveur
+     - API RESTful consommée par le frontend
+
+3. **Base de données**
+   - **Technologie** : MySQL
+   - **Organisation** :
+     - Tables pour : users, products, services, categories, service_types, orders, order_items, promo_codes, etc.
+     - Relations : un produit/service appartient à une catégorie, une commande contient plusieurs produits/services, etc.
+
+4. **Principes d'architecture**
+   - **Séparation des responsabilités** : chaque couche (frontend, backend, BDD) a un rôle précis
+   - **Scalabilité** : architecture pensée pour pouvoir ajouter facilement de nouvelles fonctionnalités (ex : nouveaux types de services, modules admin)
+   - **Sécurité** : gestion des droits, validation des entrées, protection des routes sensibles
+   - **Réutilisabilité** : composants frontend modulaires, contrôleurs backend réutilisables
+   - **Facilité de maintenance** : code organisé, logique métier centralisée, conventions de nommage claires
+
+
+Scénario utilisateur (client)
+----------------------------
+1. L'utilisateur arrive sur la page d'accueil, découvre le slogan, les offres phares et les produits/services mis en avant.
+2. Il clique sur l'icône de recherche dans le header, tape "VPN" et voit s'afficher instantanément les suggestions.
+3. Il clique sur "VPN SecureConnect Pro" dans la liste des résultats : il est redirigé vers la fiche détaillée du produit.
+4. Il lit la description, vérifie le prix, la promotion, la catégorie, puis clique sur "Ajouter au panier".
+5. Il navigue dans la section "Services", filtre par type "Sécurité" ou par catégorie, et ajoute un service à son panier.
+6. Il clique sur l'icône panier, vérifie le contenu, modifie la quantité d'un produit.
+7. Il clique sur "Valider la commande" : il est invité à se connecter ou à créer un compte.
+8. Il s'inscrit, confirme son email, puis finalise la commande.
+9. Il reçoit un email de confirmation et peut consulter l'historique de ses commandes dans son espace personnel.
+10. Il se déconnecte via le menu profil.
+
+Scénario administrateur
+-----------------------
+1. L'administrateur accède à l'URL d'administration et se connecte avec ses identifiants.
+2. Il arrive sur le tableau de bord : il voit les statistiques de ventes, les commandes récentes, les produits/services les plus populaires.
+3. Il clique sur "Catégories" pour ajouter une nouvelle catégorie de produit ou de service, ou pour modifier/supprimer une catégorie existante.
+4. Lors de la création ou de la modification d'un produit ou d'un service, il attribue une catégorie à l'élément.
+5. Il clique sur "Produits", puis sur "Ajouter un produit" : il remplit le formulaire (nom, description, prix, image, catégorie, promo) et valide.
+6. Il modifie un produit existant (changement de prix, ajout d'une promotion, modification de l'image, changement de catégorie).
+7. Il supprime un produit obsolète.
+8. Il consulte la liste des utilisateurs, recherche un client, visualise ses commandes et son historique.
+9. Il crée un nouveau code promo, le configure (valeur, durée, produits concernés) et l'active.
+10. Il gère les types de services (ajout, modification, suppression).
+11. Il consulte le journal d'activité pour surveiller les actions administratives.
+12. Il se déconnecte de l'interface d'administration. 
