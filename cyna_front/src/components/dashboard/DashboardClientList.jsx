@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../../styles/components/dashboardClient/DashboardUsersClient.module.css';
+import styles from '../../styles/components/dashboard/DashboardUsersClient.module.css';
 import { fetchUsers, fetchRoles } from '../../api/users';
 import { fetchUserOrders, updateOrderStatus } from '../../api/orders';
 import { API_BASE_URL } from '../../api/config';

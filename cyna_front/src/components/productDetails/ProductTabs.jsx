@@ -27,7 +27,7 @@ const ProductTabs = ({ product }) => {
         )}
         {activeTab === 'reviews' && (
           <ul className={styles.reviewList}>
-            {product.reviewsList.map((rev, idx) => (
+            {(product.reviews || []).map((rev, idx) => (
               <li key={idx}>
                 <strong>{rev.author}</strong>: {rev.comment}
               </li>

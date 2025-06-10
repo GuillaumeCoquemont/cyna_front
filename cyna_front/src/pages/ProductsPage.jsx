@@ -14,6 +14,7 @@ const ProductsPage = () => {
   const [allItems, setAllItems] = useState([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedTypes, setSelectedTypes] = useState([]);
   const [visibleItems, setVisibleItems] = useState(6);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -62,6 +63,11 @@ const ProductsPage = () => {
     { id: '200-500',label: '€200 - €500' },
   ];
 
+  const types = [
+    { id: 'product', label: 'Produits' },
+    { id: 'service', label: 'Services' }
+  ];
+
   // catégories dynamiques
   const categories = Array.from(
     new Set(allItems.map(i => i.category))
@@ -73,6 +79,8 @@ const ProductsPage = () => {
       (i.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (i.description || '').toLowerCase().includes(searchQuery.toLowerCase())
     )
+    // filtre par type
+    .filter(i => !selectedTypes.length || selectedTypes.includes(i.type))
     // filtre catégories
     .filter(i => !selectedCategories.length || selectedCategories.includes(i.category))
     // filtre prix
@@ -97,6 +105,28 @@ const ProductsPage = () => {
     <div className={styles.productsPage}>
       <main className={styles.main}>
         <aside className={styles.sidebar}>
+
+          <div className={styles.filterSection}>
+            <h2 className={styles.filterTitle}>Type</h2>
+            <div className={styles.checkboxList}>
+              {types.map(type => (
+                <label key={type.id} className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={selectedTypes.includes(type.id)}
+                    onChange={() =>
+                      setSelectedTypes(prev =>
+                        prev.includes(type.id)
+                          ? prev.filter(t => t !== type.id)
+                          : [...prev, type.id]
+                      )
+                    }
+                  />
+                  <span>{type.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
 
           <div className={styles.filterSection}>
             <h2 className={styles.filterTitle}>Catégorie</h2>
@@ -157,6 +187,7 @@ const ProductsPage = () => {
                   <div className={styles.productImage}>
                     {item.image ? (
                       <img 
+                        loading="lazy"
                         src={item.image && item.image.startsWith('/uploads/')
                           ? `${STATIC_URL}${item.image}`
                           : item.image
@@ -169,7 +200,7 @@ const ProductsPage = () => {
                       />
                     ) : (
                       <div className={styles.noImage}>
-                        <img 
+                        <img loading="lazy"
                           src="https://placehold.co/300x200?text=Image+non+disponible" 
                           alt="Image non disponible"
                         />

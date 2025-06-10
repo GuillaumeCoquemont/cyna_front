@@ -27,7 +27,7 @@ const CartDropdown = () => {
       <ul className={styles.itemsList}>
         {cart.map(item => (
           <li key={item.id} className={styles.item}>
-            <img src={item.image} alt={item.name} className={styles.thumbnail} />
+            <img loading="lazy" src={item.image} alt={item.name} className={styles.thumbnail} />
             <span className={styles.name}>{item.name}</span>
             <div className={styles.qtyControls}>
               <button
@@ -63,10 +63,6 @@ const CartDropdown = () => {
         </span>
         <span className={styles.totalPrice}>{totalPrice}€</span>
       </div>
-
-      <Link to="/cart" className={styles.viewCart}>
-        Voir le panier complet
-      </Link>
       <button
         className={styles.buyNow}
         onClick={() => navigate('/checkout')}

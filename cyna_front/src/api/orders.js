@@ -129,6 +129,72 @@ export const updateOrderStatus = async (orderId, status) => {
     }
 };
 
+// Fetch pending orders
+export async function fetchPendingOrders() {
+    try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${BASE_URL}/pending-orders`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error(`Erreur ${res.status}: ${res.statusText}`);
+        }
+
+        return res.json();
+    } catch (error) {
+        console.error('Erreur lors de la récupération des commandes en attente:', error);
+        throw error;
+    }
+}
+
+// Fetch product sales details
+export async function fetchProductSalesDetails() {
+    try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${BASE_URL}/product-sales-details`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error(`Erreur ${res.status}: ${res.statusText}`);
+        }
+
+        return res.json();
+    } catch (error) {
+        console.error('Erreur lors de la récupération des détails de ventes produits:', error);
+        throw error;
+    }
+}
+
+// Fetch service sales details
+export async function fetchServiceSalesDetails() {
+    try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${BASE_URL}/service-sales-details`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error(`Erreur ${res.status}: ${res.statusText}`);
+        }
+
+        return res.json();
+    } catch (error) {
+        console.error('Erreur lors de la récupération des détails de ventes services:', error);
+        throw error;
+    }
+}
+
 // Optionally, you can add order-related API calls here,
 // for example to submit an order:
 // export async function submitOrder(orderData) {

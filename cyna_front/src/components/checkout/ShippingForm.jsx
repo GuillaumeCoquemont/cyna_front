@@ -42,14 +42,14 @@ export default function ShippingForm() {
       <div className={styles.tabs}>
         <button
           type="button"
-          className={activeTab === 'shipping' ? styles.activeTab : ''}
+          className={`${styles.tab} ${activeTab === 'shipping' ? styles.active : ''}`}
           onClick={() => setActiveTab('shipping')}
         >
           Adresse de livraison
         </button>
         <button
           type="button"
-          className={activeTab === 'billing' ? styles.activeTab : ''}
+          className={`${styles.tab} ${activeTab === 'billing' ? styles.active : ''}`}
           onClick={() => setActiveTab('billing')}
         >
           Adresse de facturation

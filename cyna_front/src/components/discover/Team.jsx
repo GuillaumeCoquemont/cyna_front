@@ -26,7 +26,7 @@ export default function Team() {
       <div className={styles.grid}>
         {members.map(member => (
           <div key={member.id} className={styles.card}>
-            <img src={member.avatar} alt={member.name} className={styles.avatar} />
+            <img loading="lazy" src={member.avatar} alt={member.name} className={styles.avatar} />
             <h3 className={styles.name}>{member.name}</h3>
             <p className={styles.role}>{member.role}</p>
             <p className={styles.description}>{member.description}</p>

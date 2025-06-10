@@ -112,7 +112,7 @@ const ProductsSection = () => {
                   <div className={`${styles.productCard} ${item.type === 'product' ? styles['productCard--product'] : styles['productCard--service']}`}>
                     <div className={styles.productImage}>
                       {item.image ? (
-                        <img src={item.image} alt={item.name} />
+                        <img loading="lazy" src={item.image} alt={item.name} />
                       ) : (
                         <div className={styles.servicePlaceholder}>
                           <span className={styles.typeLabel}>

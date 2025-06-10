@@ -6,11 +6,11 @@ export default function EditAddressModal({ isOpen, onClose, address, onSave }) {
   const [form, setForm] = useState({
     id: address?.id || '',
     label: address?.label || '',
-    address1: address?.address1 || '',
+    line1: address?.line1 || '',
     city: address?.city || '',
-    postalcode: address?.postalcode || '',
+    zip: address?.zip || '',
     country: address?.country || '',
-    is_default: address?.is_default || false,
+    isDefault: address?.isDefault || false,
   });
   const [error, setError] = useState('');
 
@@ -19,11 +19,11 @@ export default function EditAddressModal({ isOpen, onClose, address, onSave }) {
       setForm({
         id: address.id,
         label: address.label,
-        address1: address.address1,
+        line1: address.line1,
         city: address.city,
-        postalcode: address.postalcode,
+        zip: address.zip,
         country: address.country,
-        is_default: address.is_default,
+        isDefault: address.isDefault,
       });
     }
   }, [address]);
@@ -40,7 +40,7 @@ export default function EditAddressModal({ isOpen, onClose, address, onSave }) {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    if (!form.label.trim() || !form.address1.trim() || !form.city.trim() || !form.postalcode.trim() || !form.country.trim()) {
+    if (!form.label.trim() || !form.line1.trim() || !form.city.trim() || !form.zip.trim() || !form.country.trim()) {
       setError('Tous les champs marqués * sont requis.');
       return;
     }
@@ -77,8 +77,8 @@ export default function EditAddressModal({ isOpen, onClose, address, onSave }) {
             <label>Adresse ligne 1 *</label>
             <input
               type="text"
-              name="address1"
-              value={form.address1}
+              name="line1"
+              value={form.line1}
               onChange={handleChange}
               placeholder="123 Rue…"
               required
@@ -99,8 +99,8 @@ export default function EditAddressModal({ isOpen, onClose, address, onSave }) {
             <label>Code postal *</label>
             <input
               type="text"
-              name="postalcode"
-              value={form.postalcode}
+              name="zip"
+              value={form.zip}
               onChange={handleChange}
               placeholder="75000"
               required
@@ -121,8 +121,8 @@ export default function EditAddressModal({ isOpen, onClose, address, onSave }) {
             <input
               type="checkbox"
               id="defaultAddress"
-              name="is_default"
-              checked={form.is_default}
+              name="isDefault"
+              checked={form.isDefault}
               onChange={handleChange}
             />
             <label htmlFor="defaultAddress">Définir par défaut</label>

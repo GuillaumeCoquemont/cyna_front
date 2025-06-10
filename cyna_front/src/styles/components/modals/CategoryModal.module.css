@@ -48,7 +48,6 @@
   font-size: 0.875rem;
 }
 
-
 /* Message d’erreur */
 .error {
   color: #d32f2f;
@@ -81,10 +80,10 @@
 }
 
 .actions button[type="submit"] {
-  background: var(--tertiary-color);
+  background: var(--primary-color);
   color: #fff;
 }
 
 .actions button[type="submit"]:hover {
-  background: var(--tertiary-hover);
+  background: var(--primary-color-hover);
 }

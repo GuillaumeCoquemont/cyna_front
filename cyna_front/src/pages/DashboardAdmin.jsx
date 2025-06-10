@@ -154,7 +154,7 @@ export default function DashboardAdmin() {
         : 'Chargement...'
     },
     {
-      title: 'Total Pending',
+      title: 'Commandes en attente',
       value: pendingCount !== null && pendingCount !== undefined
         ? pendingCount.toLocaleString('fr-FR')
         : 'Chargement...'

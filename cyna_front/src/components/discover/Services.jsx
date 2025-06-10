@@ -45,7 +45,7 @@ export default function Services() {
           <p>{sec.description}</p>
         </div>
         <div className={styles.cardImage}>
-          <img src={sec.image} alt={sec.title} />
+          <img loading="lazy" src={sec.image} alt={sec.title} />
         </div>
         <div className={styles.cardFooter}>
           <a href="#">En savoir plus →</a>

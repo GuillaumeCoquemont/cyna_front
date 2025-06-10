@@ -60,8 +60,8 @@ export default function AddCategoryModal({ isOpen, onClose, onSave }) {
           </div>
           {error && <p className={styles.error}>{error}</p>}
           <div className={styles.actions}>
-            <button type="button" onClick={onClose} className={styles.cancelBtn}>Annuler</button>
-            <button type="submit" className={styles.addBtn}>Ajouter</button>
+            <button type="button" onClick={onClose}>Annuler</button>
+            <button type="submit">Ajouter</button>
           </div>
         </form>
       </div>

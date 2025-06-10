@@ -75,14 +75,4 @@
   background-color: transparent;
   color: var(--tertiary-color);
   transform: translateY(-2px);
-}
-
-.globalError {
-  color: #b00020;
-  background: #ffeaea;
-  border: 1px solid #b00020;
-  padding: 8px 12px;
-  border-radius: 4px;
-  margin-top: 2rem;
-  text-align: center;
 } 

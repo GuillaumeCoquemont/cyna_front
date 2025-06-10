@@ -7,6 +7,7 @@ import {
   deleteService,
   checkServiceDependencies
 } from '../../api/services';
+import { calculateDiscountedPrice, formatPrice } from '../../utils/priceUtils';
 
 import EditServiceModal from '../modals/EditServiceModal';
 import AddServiceModal from '../modals/AddServiceModal';
@@ -112,10 +113,7 @@ export default function DashboardServices() {
 
   return (
     <div className={styles.editorContainer}>
-      <div className={styles.sectionHeader}>
-        <h2>Éditeur de Services</h2>
-        <button className={styles.addButton} onClick={handleOpenAdd}>Ajouter un service</button>
-      </div>
+      <h2>Éditeur de Services</h2>
       <div className={styles.filtersContainer}>
         <div className="selectWrapper">
           <select 
@@ -129,38 +127,84 @@ export default function DashboardServices() {
           </select>
           <span className="selectIcon">▼</span>
         </div>
+        <button onClick={handleOpenAdd} className={styles.addButton}>
+          Ajouter un service
+        </button>
       </div>
-      <div className={styles.servicesList}>
-        {services.map(s => (
-          <div key={s.id} className={styles.serviceCard}>
-            <div className={styles.serviceImage}>
-              {s.image ? (
-                <img 
-                  src={s.image.startsWith('/uploads/') ? `${STATIC_URL}${s.image}` : s.image}
-                  alt={s.name} 
-                  onError={(e) => {
-                    console.error('Erreur de chargement de l\'image:', s.image);
-                    e.target.src = '/placeholder-image.jpg';
-                  }}
-                />
-              ) : (
-                <div className={styles.noImage}>Pas d'image</div>
-              )}
-            </div>
-            <div className={styles.serviceInfo}>
-              <h3>{s.name}</h3>
-              <p>{s.description}</p>
-              <div className={styles.serviceDetails}>
-                <span className={styles.price}>{s.price}€</span>
-              </div>
-              <div className={styles.serviceActions}>
-                <button onClick={() => handleOpenEdit(s)}>Modifier</button>
-                <button onClick={() => handleDelete(s)}>Supprimer</button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <h3>Récapitulatif des services</h3>
+      <table className={styles.summaryTable}>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Image</th>
+            <th>Nom</th>
+            <th>Description</th>
+            <th>Prix</th>
+            <th>Prix après remise</th>
+            <th>Code promo</th>
+            <th>Type</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredServices.map(s => {
+            return (
+              <tr key={s.id}>
+                <td>{s.id}</td>
+                <td>
+                  {s.image ? (
+                    <img
+                      src={s.image.startsWith('/uploads/') ? `${STATIC_URL}${s.image}` : s.image}
+                      alt={s.name}
+                      style={{ maxWidth: 80, maxHeight: 80, objectFit: 'cover' }}
+                      onError={(e) => {
+                        console.error('Erreur de chargement de l\'image:', s.image);
+                        e.target.src = '/placeholder-image.jpg';
+                      }}
+                    />
+                  ) : (
+                    <span>Image non disponible</span>
+                  )}
+                </td>
+                <td>{s.name}</td>
+                <td>{s.description}</td>
+                <td>{formatPrice(s.price)}</td>
+                <td>
+                  {s.promoCode ? (
+                    <span style={{ color: 'var(--tertiary-color)' }}>
+                      {formatPrice(calculateDiscountedPrice(s.price, s.promoCode))}
+                    </span>
+                  ) : (
+                    formatPrice(s.price)
+                  )}
+                </td>
+                <td>
+                  {s.promoCode ? (
+                    <span>
+                      {s.promoCode.code} ({(s.promoCode.discount_type || s.promoCode.discountType) === 'percentage' ? 
+                        `${s.promoCode.discount_value || s.promoCode.discountValue}%` : 
+                        `${s.promoCode.discount_value || s.promoCode.discountValue}€`})
+                    </span>
+                  ) : (
+                    '—'
+                  )}
+                </td>
+                <td>
+                  {s.subscription ? 'Abonnement' : 'Service ponctuel'}
+                </td>
+                <td>
+                  {s.status ? 'Actif' : 'Inactif'}
+                </td>
+                <td>
+                  <button onClick={() => handleOpenEdit(s)}>Modifier</button>
+                  <button onClick={() => handleDelete(s)}>Supprimer</button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
       <AddServiceModal
         isOpen={showAddModal}
         onClose={handleCloseAdd}

@@ -25,6 +25,7 @@ const App = () => {
             <Route path ="/dashboardClient" element={<DashboardClient/>} />
             <Route path="/discover" element={<Discover />} />
             <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/service/:id" element={<ProductDetails />} />
             {/* Redirect base /auth to login */}
             <Route path="/auth" element={<Navigate to="/auth/login" replace />} />
             <Route path="/auth/login" element={<AuthPage />} />

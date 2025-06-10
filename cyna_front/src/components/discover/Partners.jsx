@@ -22,7 +22,7 @@ export default function Partners() {
         <div className={styles.slideTrack}>
           {partners.concat(partners).map((src, idx) => (
             <div key={idx} className={styles.slide}>
-              <img src={src} alt={`Partner ${idx + 1}`} />
+              <img loading="lazy" src={src} alt={`Partner ${idx + 1}`} />
             </div>
           ))}
         </div>

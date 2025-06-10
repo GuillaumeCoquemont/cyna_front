@@ -1,15 +1,19 @@
 export const calculateDiscountedPrice = (price, promoCode) => {
+  console.log('calculateDiscountedPrice:', { price, promoCode });
+  
   if (!promoCode) return price;
   
   const numericPrice = parseFloat(price);
   if (isNaN(numericPrice)) return price;
 
-  if (promoCode.discountType === 'percentage') {
-    const discountedPrice = numericPrice * (1 - promoCode.discountValue / 100);
-    return discountedPrice.toFixed(2);
+  // Compatibilité camelCase et snake_case
+  const value = promoCode.discountValue ?? promoCode.discount_value;
+  if (!value) return price;
+
+  if (promoCode.discountType === 'percentage' || promoCode.discount_type === 'percentage') {
+    return numericPrice * (1 - value / 100);
   } else {
-    const discountedPrice = Math.max(0, numericPrice - promoCode.discountValue);
-    return discountedPrice.toFixed(2);
+    return Math.max(0, numericPrice - value);
   }
 };
 

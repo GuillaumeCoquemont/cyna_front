@@ -18,7 +18,7 @@ const ProductGallery = ({ images }) => {
         ))}
       </div>
       <div className={styles.mainImage}>
-        <img src={images[selected]} alt="Selected product" />
+        <img loading="lazy" src={images[selected]} alt="Selected product" />
       </div>
     </div>
   );
