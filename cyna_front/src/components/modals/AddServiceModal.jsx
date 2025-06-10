@@ -23,6 +23,7 @@ const AddServiceModal = ({ isOpen, onClose, onSave }) => {
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -40,6 +41,7 @@ const AddServiceModal = ({ isOpen, onClose, onSave }) => {
       });
       setImageFile(null);
       setImageUrl('');
+      setImagePreview(null);
     }
   }, [isOpen]);
 
@@ -70,11 +72,19 @@ const AddServiceModal = ({ isOpen, onClose, onSave }) => {
   };
 
   const handleFileChange = e => {
-    setImageFile(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+      setImageUrl(''); // Réinitialiser l'URL si on upload un fichier
+    }
   };
 
   const handleImageUrlChange = e => {
-    setImageUrl(e.target.value);
+    const url = e.target.value;
+    setImageUrl(url);
+    setImagePreview(url);
+    setImageFile(null); // Réinitialiser le fichier si on met une URL
   };
 
   const handleSubmit = async e => {
@@ -227,6 +237,13 @@ const AddServiceModal = ({ isOpen, onClose, onSave }) => {
           <label>
             Image (locale)
             <input type="file" accept="image/*" onChange={handleFileChange} />
+            {imagePreview && (
+              <img
+                src={imagePreview}
+                alt="Preview"
+                style={{ width: '100%', marginTop: '0.5rem', borderRadius: '4px' }}
+              />
+            )}
           </label>
           <label>
             Ou URL de l'image

@@ -207,7 +207,20 @@ export default function ProductsEditor() {
                 <td>
                   {p.stock === 0 
                     ? 'Rupture de stock' 
-                    : p.stock}
+                    : (
+                      <>
+                        {p.stock}
+                        {p.stock > 0 && p.stock < 5 && (
+                          <span 
+                            className={styles.lowStockIcon}
+                            title="Stock faible"
+                            style={{ display: 'inline-block' }}
+                          >
+                            {'\u26A0'}
+                          </span>
+                        )}
+                      </>
+                    )}
                 </td>
                 <td>
                   <button onClick={() => handleOpenEdit(p)}>Modifier</button>
