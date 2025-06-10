@@ -28,14 +28,193 @@
     color: var(--text-color);
   }
   
-  .reviewList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  .description {
+    line-height: 1.6;
   }
-  
-  .reviewList li {
+
+  .features {
+    margin-top: 1.5rem;
+  }
+
+  .features h4 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+  }
+
+  .features ul {
+    list-style: disc inside;
+    margin: 0;
+    padding-left: 1rem;
+  }
+
+  .features li {
+    margin-bottom: 0.25rem;
+  }
+
+  /* Styles pour les avis */
+  .reviewsContent {
+    max-width: 100%;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+  }
+
+  .error {
+    background: #fee;
+    color: #c33;
+    padding: 1rem;
+    border-radius: 4px;
     margin-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.5rem;
+    border: 1px solid #fcc;
+  }
+
+  .reviewStats {
+    background: var(--background-color);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+  }
+
+  .averageRating {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .ratingValue {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .starFilled {
+    color: #ffc107;
+    font-size: 1.2rem;
+  }
+
+  .starEmpty {
+    color: #e9ecef;
+    font-size: 1.2rem;
+  }
+
+  .ratingNumber {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+
+  .totalReviews {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .ratingDistribution {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .ratingRow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .ratingRow span:first-child {
+    min-width: 70px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .progressBar {
+    flex: 1;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progressFill {
+    height: 100%;
+    background: #ffc107;
+    transition: width 0.3s ease;
+  }
+
+  .count {
+    min-width: 30px;
+    text-align: right;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .addReviewSection {
+    margin: 1.5rem 0;
+    text-align: center;
+  }
+
+  .addReviewButton {
+    background: var(--primary-color);
+    color: var(--white-color);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease;
+  }
+
+  .addReviewButton:hover {
+    background: var(--primary-hover-color);
+  }
+
+  .loginPrompt {
+    text-align: center;
+    padding: 2rem;
+    background: var(--background-color);
+    border-radius: 8px;
+    margin: 1rem 0;
+    border: 1px solid var(--border-color);
+  }
+
+  .loginPrompt p {
+    margin: 0;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .tabs {
+      margin-top: 1rem;
+    }
+
+    .headers {
+      gap: 0.5rem;
+    }
+
+    .headers button {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    .reviewStats {
+      padding: 1rem;
+    }
+
+    .ratingRow {
+      gap: 0.5rem;
+    }
+
+    .ratingRow span:first-child {
+      min-width: 60px;
+      font-size: 0.8rem;
+    }
   }

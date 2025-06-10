@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import styles from '../styles/pages/Contact.module.css';
-import { addMessage } from '../api/messages';
+import { sendContactMessage } from '../api/contact';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({ subject: '', name: '', email: '', message: '' });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState('');
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -14,23 +16,29 @@ export default function ContactPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setSuccess('');
+    
     try {
-      // Build payload matching admin schema
-      const nowDate = new Date().toISOString().slice(0, 10);
-      const payload = {
-        sujet: formData.subject,
-        expediteur: `${formData.name} <${formData.email}>`,
-        message: formData.message,
-        date: nowDate,
-        lu: false
-      };
+      const response = await sendContactMessage({
+        subject: formData.subject,
+        name: formData.name,
+        email: formData.email,
+        message: formData.message
+      });
       
-      await addMessage('mails', payload);
       setFormData({ subject: '', name: '', email: '', message: '' });
-      alert('Message envoyé avec succès !');
+      setSuccess('Message envoyé avec succès ! Un ticket a été créé et notre équipe vous répondra bientôt.');
+      
+      // Optionnel : afficher le numéro de ticket
+      if (response.ticket) {
+        console.log('Ticket créé:', response.ticket.id);
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Erreur:', error);
       alert('Échec de l\'envoi, veuillez réessayer.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,6 +59,11 @@ export default function ContactPage() {
             <p>Nous sommes à votre écoute du lundi au vendredi.</p>
           </div>
           <div className={styles.formWrapper}>
+            {success && (
+              <div className={styles.successMessage}>
+                {success}
+              </div>
+            )}
             <form className={styles.form} onSubmit={handleSubmit}>
               <label>
                 Sujet
@@ -102,7 +115,9 @@ export default function ContactPage() {
                   required
                 ></textarea>
               </label>
-              <button type="submit">Envoyer</button>
+              <button type="submit" disabled={loading}>
+                {loading ? 'Envoi en cours...' : 'Envoyer'}
+              </button>
             </form>
           </div>
         </div>

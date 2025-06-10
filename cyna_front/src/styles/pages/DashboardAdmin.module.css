@@ -262,6 +262,148 @@ th, td {
 }
 .salesDetailsList li {
   padding: 0.5rem 0;
-  border-bottom: 1px solid #e3e6f0;
-  font-size: 1rem;
+  border-bottom: 1px solid #E3E6F0;
+}
+
+/* Styles pour les avis dans les tableaux */
+.reviewStats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.averageRating {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: var(--tertiary-color);
+  font-size: 0.9rem;
+}
+
+.reviewCount {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.noReviews {
+  color: #666;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+/* Styles pour la section des commandes */
+.allOrdersContainer {
+  margin-top: 1.5rem;
+  max-height: 600px;
+  overflow-y: auto;
+  border: 1px solid #E3E6F0;
+  border-radius: 0.5rem;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+/* Styles pour différents statuts */
+.statusBadge.en-cours,
+.statusBadge.en-attente-de-confirmation,
+.statusBadge.en-attente-de-paiement,
+.statusBadge.en-cours-de-traitement {
+  background-color: #FFF3CD;
+  color: #856404;
+  border: 1px solid #FFEAA7;
+}
+
+.statusBadge.en-cours-de-livraison {
+  background-color: #D1ECF1;
+  color: #0C5460;
+  border: 1px solid #74C0FC;
+}
+
+.statusBadge.livré,
+.statusBadge.terminé {
+  background-color: #D4F4DD;
+  color: #155724;
+  border: 1px solid #00B894;
+}
+
+.statusBadge.annulé,
+.statusBadge.échoué {
+  background-color: #F8D7DA;
+  color: #721C24;
+  border: 1px solid #E74C3C;
+}
+
+.priceCell {
+  text-align: right;
+  font-family: 'Courier New', monospace;
+}
+
+.priceCell strong {
+  color: #1cc88a;
+  font-size: 1.1rem;
+}
+
+.orderItems {
+  display: flex;
+  align-items: center;
+}
+
+.itemCount {
+  background-color: #4E73DF;
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.noItems {
+  color: var(--text-color-light);
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.noData {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-color-light);
+  font-style: italic;
+}
+
+.noData p {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+/* Indicateur de rafraîchissement */
+.refreshIndicator {
+  background-color: var(--blue-color);
+  color: var(--white-color);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+  animation: fadeInOut 0.3s ease-in-out;
+}
+
+.refreshIndicator span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-10px); }
+  100% { opacity: 1; transform: translateY(0); }
 }

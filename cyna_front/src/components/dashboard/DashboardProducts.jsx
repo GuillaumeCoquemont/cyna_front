@@ -16,7 +16,7 @@ import DeleteConfirmationModal from '../modals/DeleteConfirmationModal';
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 const STATIC_URL = process.env.REACT_APP_STATIC_URL || "http://localhost:3007";
 
-export default function ProductsEditor() {
+export default function ProductsEditor({ onProductChange }) {
   const [products, setProducts] = useState([]);
   const [newProd, setNewProd] = useState({
     name: '', description: '', characteristic: '', image: '', price: '', availability: ''
@@ -59,6 +59,9 @@ export default function ProductsEditor() {
     try {
       await updateProduct(updatedProd, isMultipart);
       load();
+      if (onProductChange) {
+        onProductChange(); // Notifie le parent pour rafraîchir le dashboard
+      }
       handleCloseEdit();
     } catch (err) {
       console.error('Erreur lors de la mise à jour du produit:', err);
@@ -97,6 +100,9 @@ export default function ProductsEditor() {
   const handleAdd = async (newProdData, isMultipart) => {
     await addProduct(newProdData, isMultipart);
     load(); // recharge la liste depuis la BDD
+    if (onProductChange) {
+      onProductChange(); // Notifie le parent pour rafraîchir le dashboard
+    }
     handleCloseAdd();
   };
 
@@ -105,6 +111,9 @@ export default function ProductsEditor() {
       await deleteProduct(deleteModal.product.id);
       setProducts(p => p.filter(prod => prod.id !== deleteModal.product.id));
       setTableProducts(prev => prev.filter(prod => prod.id !== deleteModal.product.id));
+      if (onProductChange) {
+        onProductChange(); // Notifie le parent pour rafraîchir le dashboard
+      }
       closeDeleteModal();
     } catch (err) {
       console.error('Erreur suppression produit:', err);
@@ -205,9 +214,21 @@ export default function ProductsEditor() {
                   )}
                 </td>
                 <td>
-                  {p.stock === 0 
-                    ? 'Rupture de stock' 
-                    : p.stock}
+                  {p.stock === 0 ? (
+                    <span className={styles.outOfStock}>Rupture de stock</span>
+                  ) : (
+                    <span className={styles.stockInfo}>
+                      {p.stock}
+                      {p.stock > 0 && p.stock < 5 && (
+                        <span
+                          className={styles.lowStockIcon}
+                          title="Stock faible"
+                        >
+                          {'\u26A0'}
+                        </span>
+                      )}
+                    </span>
+                  )}
                 </td>
                 <td>
                   <button onClick={() => handleOpenEdit(p)}>Modifier</button>

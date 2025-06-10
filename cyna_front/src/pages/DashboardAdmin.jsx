@@ -28,6 +28,8 @@ import { API_BASE_URL } from '../api/config';
 
 import { fetchProducts } from '../api/products';
 import { fetchSalesStats } from '../api/salesStats';
+import { fetchProductReviewStats, fetchServiceReviewStats } from '../api/reviews';
+import { fetchOrders } from '../api/orders';
 
 // Enregistrement des composants Chart.js
 ChartJS.register(
@@ -53,12 +55,84 @@ export default function DashboardAdmin() {
   const [serviceSalesDetails, setServiceSalesDetails] = useState([]);
   const [pendingOrders, setPendingOrders] = useState([]);
   const [servicesData, setServicesData] = useState([]);
+  const [productReviews, setProductReviews] = useState({});
+  const [serviceReviews, setServiceReviews] = useState({});
+  const [allOrders, setAllOrders] = useState([]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const chartRef = useRef(null);
+
+  // Fonctions de rafraîchissement pour les composants enfants
+  const refreshProducts = async () => {
+    try {
+      setIsRefreshing(true);
+      const data = await fetchProducts();
+      setProductsData(data);
+      // Récupérer les avis pour les nouveaux produits
+      data.forEach(async (product) => {
+        try {
+          const stats = await fetchProductReviewStats(product.id);
+          setProductReviews(prev => ({
+            ...prev,
+            [product.id]: stats
+          }));
+        } catch (error) {
+          console.error(`Erreur récupération avis produit ${product.id}:`, error);
+        }
+      });
+      console.log('📦 Produits rafraîchis dans le dashboard');
+    } catch (err) {
+      console.error('Erreur refreshProducts:', err);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const refreshServices = async () => {
+    try {
+      setIsRefreshing(true);
+      const response = await fetch(`${API_BASE_URL}/api/services`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      const data = await response.json();
+      setServicesData(data);
+      // Récupérer les avis pour les nouveaux services
+      data.forEach(async (service) => {
+        try {
+          const stats = await fetchServiceReviewStats(service.id);
+          setServiceReviews(prev => ({
+            ...prev,
+            [service.id]: stats
+          }));
+        } catch (error) {
+          console.error(`Erreur récupération avis service ${service.id}:`, error);
+        }
+      });
+      console.log('🛠️ Services rafraîchis dans le dashboard');
+    } catch (err) {
+      console.error('Erreur refreshServices:', err);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     // load real products on mount
     fetchProducts()
-      .then(data => setProductsData(data))
+      .then(data => {
+        setProductsData(data);
+        // Récupérer les avis pour chaque produit
+        data.forEach(async (product) => {
+          try {
+            const stats = await fetchProductReviewStats(product.id);
+            setProductReviews(prev => ({
+              ...prev,
+              [product.id]: stats
+            }));
+          } catch (error) {
+            console.error(`Erreur récupération avis produit ${product.id}:`, error);
+          }
+        });
+      })
       .catch(err => console.error('Erreur fetchProducts:', err));
 
     // load sales stats on mount
@@ -112,7 +186,29 @@ export default function DashboardAdmin() {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
       .then(res => res.json())
-      .then(data => setServicesData(data));
+      .then(data => {
+        setServicesData(data);
+        // Récupérer les avis pour chaque service
+        data.forEach(async (service) => {
+          try {
+            const stats = await fetchServiceReviewStats(service.id);
+            setServiceReviews(prev => ({
+              ...prev,
+              [service.id]: stats
+            }));
+          } catch (error) {
+            console.error(`Erreur récupération avis service ${service.id}:`, error);
+          }
+        });
+      });
+
+    // Récupérer toutes les commandes
+    fetchOrders()
+      .then(data => {
+        console.log('Toutes les commandes récupérées:', data);
+        setAllOrders(Array.isArray(data) ? data : []);
+      })
+      .catch(err => console.error('Erreur fetchOrders:', err));
   }, []);
 
   const totalProductSales = monthlyStats.length > 0
@@ -219,6 +315,11 @@ export default function DashboardAdmin() {
         return (
           <div className={styles.dashboardContent}>
             <h1>Tableau de bord</h1>
+            {isRefreshing && (
+              <div className={styles.refreshIndicator}>
+                <span>🔄 Mise à jour en cours...</span>
+              </div>
+            )}
             <div className={styles.statsContainer}>
               {statsData.map(({ title, value }) => (
                 <div key={title} className={styles.statCard}>
@@ -243,32 +344,50 @@ export default function DashboardAdmin() {
                     <th>Stock</th>
                     <th>Prix</th>
                     <th>Disponibilité</th>
+                    <th>Avis</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {productsData.map((p) => (
-                    <tr key={p.id || p.name}>
-                      <td>
-                        {p.name}
-                        {p.stock > 0 && p.stock < 5 && (
-                          <span
-                            className={styles.lowStockIcon}
-                            title="Stock faible"
-                            style={{ display: 'inline-block' }}
-                          >
-                            {'\u26A0'}
-                          </span>
-                        )}
-                      </td>
-                      <td>
-                        {p.stock === 0 ? 'Rupture de stock' : p.stock}
-                      </td>
-                      <td>{p.price}</td>
-                      <td>
-                        {p.stock > 0 ? 'En stock' : 'Rupture de stock'}
-                      </td>
-                    </tr>
-                  ))}
+                  {productsData.map((p) => {
+                    const reviewStats = productReviews[p.id];
+                    return (
+                      <tr key={p.id || p.name}>
+                        <td>
+                          {p.name}
+                          {p.stock > 0 && p.stock < 5 && (
+                            <span
+                              className={styles.lowStockIcon}
+                              title="Stock faible"
+                              style={{ display: 'inline-block' }}
+                            >
+                              {'\u26A0'}
+                            </span>
+                          )}
+                        </td>
+                        <td>
+                          {p.stock === 0 ? 'Rupture de stock' : p.stock}
+                        </td>
+                        <td>{p.price}</td>
+                        <td>
+                          {p.stock > 0 ? 'En stock' : 'Rupture de stock'}
+                        </td>
+                        <td>
+                          {reviewStats ? (
+                            <div className={styles.reviewStats}>
+                              <span className={styles.averageRating}>
+                                ⭐ {reviewStats.averageRating.toFixed(1)}
+                              </span>
+                              <span className={styles.reviewCount}>
+                                ({reviewStats.totalReviews} avis)
+                              </span>
+                            </div>
+                          ) : (
+                            <span className={styles.noReviews}>Aucun avis</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -281,29 +400,47 @@ export default function DashboardAdmin() {
                     <th>Prix</th>
                     <th>Type</th>
                     <th>Disponibilité</th>
+                    <th>Avis</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {servicesData.map((s) => (
-                    <tr key={s.id} className={!s.status ? styles.unavailableService : ''}>
-                      <td>{s.name}</td>
-                      <td>
-                        {s.price ? Number(s.price).toLocaleString('fr-FR', {
-                          style: 'currency',
-                          currency: 'EUR'
-                        }) : ''}
-                      </td>
-                      <td>{s.serviceType?.name || 'N/A'}</td>
-                      <td>
-                        {s.status ? 'Disponible' : (
-                          <span className={styles.unavailableService}>
-                            Indisponible
-                            <span className={styles.unavailableIcon} title="Service indisponible">&#9888;</span>
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                  {servicesData.map((s) => {
+                    const reviewStats = serviceReviews[s.id];
+                    return (
+                      <tr key={s.id} className={!s.status ? styles.unavailableService : ''}>
+                        <td>{s.name}</td>
+                        <td>
+                          {s.price ? Number(s.price).toLocaleString('fr-FR', {
+                            style: 'currency',
+                            currency: 'EUR'
+                          }) : ''}
+                        </td>
+                        <td>{s.serviceType?.name || 'N/A'}</td>
+                        <td>
+                          {s.status ? 'Disponible' : (
+                            <span className={styles.unavailableService}>
+                              Indisponible
+                              <span className={styles.unavailableIcon} title="Service indisponible">&#9888;</span>
+                            </span>
+                          )}
+                        </td>
+                        <td>
+                          {reviewStats ? (
+                            <div className={styles.reviewStats}>
+                              <span className={styles.averageRating}>
+                                ⭐ {reviewStats.averageRating.toFixed(1)}
+                              </span>
+                              <span className={styles.reviewCount}>
+                                ({reviewStats.totalReviews} avis)
+                              </span>
+                            </div>
+                          ) : (
+                            <span className={styles.noReviews}>Aucun avis</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -321,6 +458,7 @@ export default function DashboardAdmin() {
                   <li key={s.serviceName}>{s.serviceName} : {s.salesCount} ventes</li>
                 ))}
               </ul>
+              <h3>Commandes</h3>
               <h2>Commandes en attente</h2>
               <table className={styles.pendingOrdersTable}>
                 <thead>
@@ -335,15 +473,108 @@ export default function DashboardAdmin() {
                 <tbody>
                   {pendingOrders.map(o => (
                     <tr key={o.id}>
-                      <td>{o.id}</td>
-                      <td>{o.creationdate ? new Date(o.creationdate).toLocaleString('fr-FR') : ''}</td>
-                      <td>{o.status}</td>
-                      <td>{o.totalprice ? o.totalprice.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }) : ''}</td>
-                      <td>{o.User ? o.User.name : ''}</td>
+                      <td>#{o.id}</td>
+                      <td>
+                        {o.creationDate ? 
+                          new Date(o.creationDate).toLocaleString('fr-FR', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          }) : 
+                          'Date non disponible'
+                        }
+                      </td>
+                      <td>
+                        <span className={`${styles.statusBadge} ${styles[o.status?.toLowerCase().replace(/\s+/g, '-')]}`}>
+                          {o.status || 'Statut non défini'}
+                        </span>
+                      </td>
+                      <td className={styles.priceCell}>
+                        <strong>
+                          {o.totalPrice ? 
+                            Number(o.totalPrice).toLocaleString('fr-FR', {
+                              style: 'currency',
+                              currency: 'EUR'
+                            }) : 
+                            '0,00 €'
+                          }
+                        </strong>
+                      </td>
+                      <td>{o.User ? o.User.name : 'Utilisateur supprimé'}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              
+              <h2>Toutes les commandes</h2>
+              <div className={styles.allOrdersContainer}>
+                <table className={styles.pendingOrdersTable}>
+                  <thead>
+                    <tr>
+                      <th>ID Commande</th>
+                      <th>Date de création</th>
+                      <th>Statut</th>
+                      <th>Montant total</th>
+                      <th>Utilisateur</th>
+                      <th>Articles</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allOrders.map(order => (
+                      <tr key={order.id}>
+                        <td>#{order.id}</td>
+                        <td>
+                          {order.creationDate ? 
+                            new Date(order.creationDate).toLocaleString('fr-FR', {
+                              year: 'numeric',
+                              month: '2-digit',
+                              day: '2-digit',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            }) : 
+                            'Date non disponible'
+                          }
+                        </td>
+                        <td>
+                          <span className={`${styles.statusBadge} ${styles[order.status?.toLowerCase().replace(/\s+/g, '-')]}`}>
+                            {order.status || 'Statut non défini'}
+                          </span>
+                        </td>
+                        <td className={styles.priceCell}>
+                          <strong>
+                            {order.totalPrice ? 
+                              Number(order.totalPrice).toLocaleString('fr-FR', {
+                                style: 'currency',
+                                currency: 'EUR'
+                              }) : 
+                              '0,00 €'
+                            }
+                          </strong>
+                        </td>
+                        <td>{order.User?.name || 'Utilisateur supprimé'}</td>
+                        <td>
+                          <div className={styles.orderItems}>
+                            {order.OrderItems && order.OrderItems.length > 0 ? (
+                              <span className={styles.itemCount}>
+                                {order.OrderItems.length} article{order.OrderItems.length > 1 ? 's' : ''}
+                              </span>
+                            ) : (
+                              <span className={styles.noItems}>Aucun article</span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {allOrders.length === 0 && (
+                  <div className={styles.noData}>
+                    <p>Aucune commande trouvée</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         );
@@ -352,7 +583,7 @@ export default function DashboardAdmin() {
       case 'produits':
         return (
           <div className={styles.dashboardContent}>
-            <DashboardProducts />
+            <DashboardProducts onProductChange={refreshProducts} />
           </div>
         );
       case 'ui':
@@ -376,7 +607,7 @@ export default function DashboardAdmin() {
       case 'services':
         return (
           <div className={styles.dashboardContent}>
-            <DashboardServices />
+            <DashboardServices onServiceChange={refreshServices} />
           </div>
         );
       case 'team':

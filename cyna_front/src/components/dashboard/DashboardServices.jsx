@@ -15,7 +15,7 @@ import DeleteConfirmationModal from '../modals/DeleteConfirmationModal';
 
 const STATIC_URL = process.env.REACT_APP_STATIC_URL || process.env.REACT_APP_API_URL || 'http://localhost:3007';
 
-export default function DashboardServices() {
+export default function DashboardServices({ onServiceChange }) {
   const [services, setServices] = useState([]);
   const [tableServices, setTableServices] = useState([]);
   const [filterStatus, setFilterStatus] = useState('all');
@@ -54,6 +54,9 @@ export default function DashboardServices() {
   const handleUpdate = async (updatedService, isMultipart) => {
     await updateService(updatedService, isMultipart);
     load();
+    if (onServiceChange) {
+      onServiceChange(); // Notifie le parent pour rafraîchir le dashboard
+    }
     handleCloseEdit();
   };
   const handleDelete = async (service) => {
@@ -85,6 +88,9 @@ export default function DashboardServices() {
       await deleteService(deleteModal.service.id);
       setServices(s => s.filter(svc => svc.id !== deleteModal.service.id));
       setTableServices(prev => prev.filter(svc => svc.id !== deleteModal.service.id));
+      if (onServiceChange) {
+        onServiceChange(); // Notifie le parent pour rafraîchir le dashboard
+      }
       closeDeleteModal();
     } catch (err) {
       console.error('Erreur suppression service:', err);
@@ -101,6 +107,9 @@ export default function DashboardServices() {
   const handleAdd = async (newServiceData) => {
     await addService(newServiceData, true);
     load(); // recharge la liste depuis la BDD
+    if (onServiceChange) {
+      onServiceChange(); // Notifie le parent pour rafraîchir le dashboard
+    }
     handleCloseAdd();
   };
 

@@ -58,7 +58,7 @@ const ProductDetails = () => {
         />
       </section>
       <section className={styles.tabsSection}>
-        <ProductTabs product={item} />
+        <ProductTabs product={item} type={type} />
       </section>
     </div>
   );
