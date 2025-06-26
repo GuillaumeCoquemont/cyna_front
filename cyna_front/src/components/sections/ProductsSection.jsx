@@ -13,6 +13,9 @@ import { fetchCarousel } from '../../api/carousel';
 import { fetchServices } from '../../api/services';
 import { calculateDiscountedPrice, formatPrice } from '../../utils/priceUtils';
 
+const cleanImagePath = (path) =>
+  path ? path.replace(/^\.*\/+/, '/').replace(/\/\//g, '/') : '';
+
 const ProductsSection = () => {
   const [slides, setSlides] = useState([]);
   const [error, setError] = useState(null);
@@ -112,7 +115,21 @@ const ProductsSection = () => {
                   <div className={`${styles.productCard} ${item.type === 'product' ? styles['productCard--product'] : styles['productCard--service']}`}>
                     <div className={styles.productImage}>
                       {item.image ? (
-                        <img loading="lazy" src={item.image} alt={item.name} />
+                        <img
+                          loading="lazy"
+                          src={
+                            cleanImagePath(item.image).startsWith('/uploads/')
+                              ? `${process.env.REACT_APP_STATIC_URL || 'http://localhost:3007'}${cleanImagePath(item.image)}`
+                              : item.type === 'product'
+                                ? require(`../../assets/images/products/${cleanImagePath(item.image)}`)
+                                : require(`../../assets/images/services/${cleanImagePath(item.image)}`)
+                          }
+                          alt={item.name}
+                          onError={(e) => {
+                            console.error('Erreur de chargement de l\'image:', item.image);
+                            e.target.src = 'https://placehold.co/300x200?text=Image+non+disponible';
+                          }}
+                        />
                       ) : (
                         <div className={styles.servicePlaceholder}>
                           <span className={styles.typeLabel}>

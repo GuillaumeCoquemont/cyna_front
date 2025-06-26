@@ -27,7 +27,7 @@ const CartDropdown = () => {
       <ul className={styles.itemsList}>
         {cart.map(item => (
           <li key={item.id} className={styles.item}>
-            <img loading="lazy" src={item.image} alt={item.name} className={styles.thumbnail} />
+            <img loading="lazy" src={require(`../../assets/images/products/${item.image}`)} alt={item.name} className={styles.thumbnail} />
             <span className={styles.name}>{item.name}</span>
             <div className={styles.qtyControls}>
               <button

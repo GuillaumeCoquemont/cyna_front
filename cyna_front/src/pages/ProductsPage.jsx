@@ -186,12 +186,27 @@ const ProductsPage = () => {
                 <div className={styles.productCard}>
                   <div className={styles.productImage}>
                     {item.image ? (
-                      <img 
+                      <img
                         loading="lazy"
-                        src={item.image && item.image.startsWith('/uploads/')
+                        src={item.image.startsWith('/uploads/')
                           ? `${STATIC_URL}${item.image}`
-                          : item.image
-                        }
+                          : item.type === 'product'
+                            ? (() => {
+                                try {
+                                  return require(`../assets/images/products/${item.image}`);
+                                } catch (err) {
+                                  console.error(`Image introuvable : ${item.image}`, err);
+                                  return 'https://placehold.co/300x200?text=Image+non+disponible';
+                                }
+                              })()
+                            : (() => {
+                                try {
+                                  return require(`../assets/images/services/${item.image}`);
+                                } catch (err) {
+                                  console.error(`Image introuvable : ${item.image}`, err);
+                                  return 'https://placehold.co/300x200?text=Image+non+disponible';
+                                }
+                              })()}
                         alt={item.name}
                         onError={(e) => {
                           console.error('Erreur de chargement de l\'image:', item.image);
@@ -200,8 +215,9 @@ const ProductsPage = () => {
                       />
                     ) : (
                       <div className={styles.noImage}>
-                        <img loading="lazy"
-                          src="https://placehold.co/300x200?text=Image+non+disponible" 
+                        <img
+                          loading="lazy"
+                          src="https://placehold.co/300x200?text=Image+non+disponible"
                           alt="Image non disponible"
                         />
                       </div>

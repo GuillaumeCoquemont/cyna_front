@@ -171,6 +171,7 @@ export default function ProductsEditor({ onProductChange }) {
         </thead>
         <tbody>
           {filteredProducts.map(p => {
+            console.log('Produit:', p.name, 'Image:', p.image, 'Type:', p.type);
             if (p.image && p.image.startsWith('/uploads/')) {
               const finalUrl = `${STATIC_URL}${p.image}`;
               console.log('STATIC_URL:', STATIC_URL, 'p.image:', p.image, 'URL finale:', finalUrl);
@@ -181,14 +182,28 @@ export default function ProductsEditor({ onProductChange }) {
               <tr key={p.id}>
                 <td>{p.id}</td>
                 <td>
-                  {p.image
-                    ? <img
-                        src={p.image.startsWith('/uploads/') ? `${STATIC_URL}${p.image}` : p.image}
-                        alt={p.name}
-                        style={{ maxWidth: 80, maxHeight: 80, objectFit: 'cover' }}
-                      />
-                    : <span>Image non disponible</span>
-                  }
+                  {p.image ? (
+                    <img
+                      src={p.image.startsWith('/uploads/')
+                        ? `${STATIC_URL}${p.image}`
+                        : (() => {
+                            try {
+                              return require(`../../assets/images/products/${p.image}`);
+                            } catch (err) {
+                              console.error(`Image introuvable : ${p.image}`, err);
+                              return 'https://placehold.co/80x80?text=Image+non+disponible';
+                            }
+                          })()}
+                      alt={p.name}
+                      style={{ maxWidth: 80, maxHeight: 80, objectFit: 'cover' }}
+                      onError={(e) => {
+                        console.error('Erreur de chargement de l\'image:', p.image);
+                        e.target.src = 'https://placehold.co/80x80?text=Image+non+disponible';
+                      }}
+                    />
+                  ) : (
+                    <span>Image non disponible</span>
+                  )}
                 </td>
                 <td>{p.name}</td>
                 <td>{p.description}</td>

@@ -164,12 +164,21 @@ export default function DashboardServices({ onServiceChange }) {
                 <td>
                   {s.image ? (
                     <img
-                      src={s.image.startsWith('/uploads/') ? `${STATIC_URL}${s.image}` : s.image}
+                      src={s.image.startsWith('/uploads/')
+                        ? `${STATIC_URL}${s.image}`
+                        : (() => {
+                            try {
+                              return require(`../../assets/images/services/${s.image}`);
+                            } catch (err) {
+                              console.error(`Image introuvable : ${s.image}`, err);
+                              return 'https://placehold.co/80x80?text=Image+non+disponible';
+                            }
+                          })()}
                       alt={s.name}
                       style={{ maxWidth: 80, maxHeight: 80, objectFit: 'cover' }}
                       onError={(e) => {
                         console.error('Erreur de chargement de l\'image:', s.image);
-                        e.target.src = '/placeholder-image.jpg';
+                        e.target.src = 'https://placehold.co/80x80?text=Image+non+disponible';
                       }}
                     />
                   ) : (

@@ -23,7 +23,7 @@ export default function CartSummary({ items }) {
           return (
             <li key={`${item.id}-${index}`} className={styles.item}>
               {/* Structure pour desktop */}
-              <img loading="lazy" src={item.image} alt={item.name} className={styles.thumb} />
+              <img loading="lazy" src={require(`../../assets/images/products/${item.image}`)} alt={item.name} className={styles.thumb} />
               <span className={styles.name}>{item.name}</span>
               <span className={styles.unit}>{item.price}€</span>
               <div className={styles.qtyControls}>

@@ -63,7 +63,22 @@ const ProductsTop = () => {
                 <div className={`${styles.productCard} ${item.type === 'product' ? styles['productCard--product'] : styles['productCard--service']}`}>
                   <div className={styles.productImage}>
                     {item.image ? (
-                      <img loading="lazy" src={item.image} alt={item.name} className={styles.productImageTag} />
+                      <img
+                        loading="lazy"
+                        src={
+                          item.image && item.image.startsWith('/uploads/')
+                            ? `${process.env.REACT_APP_STATIC_URL || 'http://localhost:3007'}${item.image}`
+                            : item.type === 'product'
+                              ? require(`../../assets/images/products/${item.image}`)
+                              : require(`../../assets/images/services/${item.image}`)
+                        }
+                        alt={item.name}
+                        className={styles.productImageTag}
+                        onError={(e) => {
+                          console.error('Erreur de chargement de l\'image:', item.image);
+                          e.target.src = 'https://placehold.co/300x200?text=Image+non+disponible';
+                        }}
+                      />
                     ) : (
                       <div className={styles.servicePlaceholder}>
                         <span className={styles.typeLabel}>

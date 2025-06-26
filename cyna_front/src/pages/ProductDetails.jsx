@@ -43,13 +43,29 @@ const ProductDetails = () => {
     fetchData();
   }, [id, type]);
 
+  const cleanImagePath = (path) =>
+    path ? path.replace(/^\.*\/+/, '/').replace(/\/\//g, '/') : '';
+
   if (loading) return <div>Chargement…</div>;
   if (!item) return <div>Produit ou service introuvable.</div>;
 
   return (
     <div className={styles.container}>
       <section className={styles.topSection}>
-        <ProductGallery images={item.images || [item.image]} />
+        <ProductGallery
+          images={
+            (item.images && item.images.length > 0
+              ? item.images
+              : [item.image]
+            ).map(img => {
+              const imgPath = cleanImagePath(img);
+              if (imgPath.startsWith('/uploads/')) {
+                return `${process.env.REACT_APP_STATIC_URL || 'http://localhost:3007'}${imgPath}`;
+              }
+              return require(`../assets/images/${type === 'product' ? 'products' : 'services'}/${imgPath}`);
+            })
+          }
+        />
         <ProductInfo
           product={item}
           quantity={quantity}

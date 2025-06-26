@@ -10,6 +10,8 @@ import { fetchProducts } from '../../api/products';
 import { fetchCarousel } from '../../api/carousel';
 import { fetchServices } from '../../api/services';
 
+const STATIC_URL = process.env.REACT_APP_STATIC_URL || 'http://localhost:3007';
+
 export const CarrouselEditor = () => {
   const [elements, setElements] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
@@ -25,9 +27,9 @@ export const CarrouselEditor = () => {
       .then(([carouselConfig, products, services]) => {
         const merged = carouselConfig.map(c => {
           const prod = products.find(p => p.id === c.product_id);
-          if (prod) return { ...prod, order: c.order, type: 'product', id: c.id };
+          if (prod) return { ...prod, order: c.order, type: 'product', id: c.id, image: cleanImagePath(prod.image) };
           const serv = services.find(s => s.id === c.service_id);
-          if (serv) return { ...serv, order: c.order, type: 'service', id: c.id };
+          if (serv) return { ...serv, order: c.order, type: 'service', id: c.id, image: cleanImagePath(serv.image) };
           return null;
         })
           .filter(Boolean)
@@ -160,6 +162,8 @@ export const CarrouselEditor = () => {
     setShowEditModal(false);
   };
 
+  const cleanImagePath = (path) => path.replace(/^\.+\/\//, '/').replace(/\/\//g, '/');
+
   return (
     <div className={styles.editorContainer}>
       
@@ -186,15 +190,49 @@ export const CarrouselEditor = () => {
               <td>{item.id}</td>
               <td>{item.name}</td>
               <td>
-                {item.image ? (
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
-                  />
-                ) : (
-                  <span>—</span>
-                )}
+                {item.image ? (() => {
+                  const imgPath = cleanImagePath(item.image);
+                  // Si l'image vient des uploads dynamiques
+                  if (imgPath.startsWith('/uploads/')) {
+                    return (
+                      <img
+                        src={`${STATIC_URL}${imgPath}`}
+                        alt={item.name}
+                        style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
+                        onError={e => {
+                          console.error('Erreur de chargement de l\'image:', item.image);
+                          e.target.src = 'https://placehold.co/50x50?text=Image+non+disponible';
+                        }}
+                      />
+                    );
+                  }
+                  // Sinon, image locale (assets)
+                  try {
+                    const localSrc = item.type === 'product'
+                      ? require(`../../assets/images/products/${imgPath}`)
+                      : require(`../../assets/images/services/${imgPath}`);
+                    return (
+                      <img
+                        src={localSrc}
+                        alt={item.name}
+                        style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
+                        onError={e => {
+                          console.error('Erreur de chargement de l\'image:', item.image);
+                          e.target.src = 'https://placehold.co/50x50?text=Image+non+disponible';
+                        }}
+                      />
+                    );
+                  } catch (err) {
+                    console.error(`Image introuvable : ${item.image}`, err);
+                    return (
+                      <img
+                        src="https://placehold.co/50x50?text=Image+non+disponible"
+                        alt="Image non disponible"
+                        style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
+                      />
+                    );
+                  }
+                })() : <span>—</span>}
               </td>
               <td>{item.order}</td>
               <td>
