@@ -1,5 +1,5 @@
 // Configuration de l'API
-const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3006';
+const BASE_URL = process.env.REACT_APP_API_URL;// || 'http://localhost:3006';
 
 // Fonction utilitaire pour les requêtes
 const fetchWithAuth = async (endpoint, options = {}) => {
