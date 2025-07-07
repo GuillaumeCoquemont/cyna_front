@@ -1,6 +1,4 @@
 import { API_BASE_URL } from './config';
-//const BASE_URL = `${API_BASE_URL}/api/services`;
-//const SERVICE_TYPES_URL = `${API_BASE_URL}/api/service-types`;
 const BASE_URL = `${API_BASE_URL}/services`;
 const SERVICE_TYPES_URL = `${API_BASE_URL}/service-types`;
 

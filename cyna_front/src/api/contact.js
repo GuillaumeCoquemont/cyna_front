@@ -4,7 +4,7 @@ const URL = `${API_BASE_URL}/contact`;
 
 // Envoyer un message de contact (public)
 export const sendContactMessage = async (contactData) => {
-  const response = await fetch(`${API_BASE_URL}/api/contact`, {
+  const response = await fetch(`${API_BASE_URL}/contact`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -28,7 +28,7 @@ export const fetchContactTickets = async () => {
     throw new Error('Vous devez être connecté pour voir les tickets de contact');
   }
   
-  const response = await fetch(`${API_BASE_URL}/api/contact/tickets`, {
+  const response = await fetch(`${API_BASE_URL}/contact/tickets`, {
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'

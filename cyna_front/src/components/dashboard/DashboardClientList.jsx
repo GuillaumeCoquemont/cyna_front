@@ -60,7 +60,7 @@ export default function ClientList() {
 
     try {
       const orders = await fetchUserOrders(clientId);
-      const profileRes = await fetch(`${API_BASE_URL}/api/users/profile/${clientId}`, {
+      const profileRes = await fetch(`${API_BASE_URL}/users/profile/${clientId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       const profile = await profileRes.json();
@@ -160,7 +160,7 @@ export default function ClientList() {
     setResetSuccess('');
     setResetError('');
     try {
-      const res = await fetch(`${API_BASE_URL}/api/users/${resetUserId}/reset-password`, {
+      const res = await fetch(`${API_BASE_URL}/users/${resetUserId}/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

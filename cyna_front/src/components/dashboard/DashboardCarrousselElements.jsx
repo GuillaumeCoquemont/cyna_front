@@ -61,7 +61,7 @@ export const CarrouselEditor = () => {
       return;
     }
     try {
-      const response = await fetch(`${API_BASE_URL}/api/carousel/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/carousel/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ order }),
@@ -82,7 +82,7 @@ export const CarrouselEditor = () => {
 
   const handleDelete = async (id) => {
     try {
-      await fetch(`${API_BASE_URL}/api/carousel/${id}`, { method: 'DELETE' });
+      await fetch(`${API_BASE_URL}/carousel/${id}`, { method: 'DELETE' });
       setElements(prev => prev.filter(el => el.id !== id));
     } catch (err) {
       console.error('Erreur suppression du carousel item:', err);
@@ -101,7 +101,7 @@ export const CarrouselEditor = () => {
         product_id: parseInt(newItem.product_id, 10)
       };
 
-      const response = await fetch(`${API_BASE_URL}/api/carousel`, {
+      const response = await fetch(`${API_BASE_URL}/carousel`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -130,7 +130,7 @@ export const CarrouselEditor = () => {
         service_id: parseInt(newItem.service_id, 10)
       };
 
-      const response = await fetch(`${API_BASE_URL}/api/carousel`, {
+      const response = await fetch(`${API_BASE_URL}/carousel`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

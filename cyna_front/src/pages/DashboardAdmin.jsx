@@ -90,7 +90,7 @@ export default function DashboardAdmin() {
   const refreshServices = async () => {
     try {
       setIsRefreshing(true);
-      const response = await fetch(`${API_BASE_URL}/api/services`, {
+      const response = await fetch(`${API_BASE_URL}/services`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await response.json();
@@ -141,39 +141,39 @@ export default function DashboardAdmin() {
       .catch(err => console.error('Erreur fetchSalesStats:', err));
 
     // Récupérer le nombre d'utilisateurs
-    fetch(`${API_BASE_URL}/api/users/count`, {
+    fetch(`${API_BASE_URL}/users/count`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
       .then(res => res.json())
       .then(data => setUserCount(data.count));
 
     // Récupérer le nombre de commandes
-    fetch(`${API_BASE_URL}/api/orders/count`, {
+    fetch(`${API_BASE_URL}/orders/count`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
       .then(res => res.json())
       .then(data => setOrderCount(data.count));
 
     // Récupérer le nombre de commandes en attente
-    fetch(`${API_BASE_URL}/api/orders/pending-count`, {
+    fetch(`${API_BASE_URL}/orders/pending-count`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
       .then(res => res.json())
       .then(data => setPendingCount(data.totalPending));
 
-    fetch(`${API_BASE_URL}/api/orders/product-sales-details`, {
+    fetch(`${API_BASE_URL}/orders/product-sales-details`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
       .then(res => res.json())
       .then(data => setProductSalesDetails(data));
 
-    fetch(`${API_BASE_URL}/api/orders/service-sales-details`, {
+    fetch(`${API_BASE_URL}/orders/service-sales-details`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
       .then(res => res.json())
       .then(data => setServiceSalesDetails(data));
 
-    fetch(`${API_BASE_URL}/api/orders/pending-orders`, {
+    fetch(`${API_BASE_URL}/orders/pending-orders`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
       .then(res => res.json())
@@ -182,7 +182,7 @@ export default function DashboardAdmin() {
         setPendingOrders(Array.isArray(data) ? data : []);
       });
 
-    fetch(`${API_BASE_URL}/api/services`, {
+    fetch(`${API_BASE_URL}/services`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
       .then(res => res.json())
