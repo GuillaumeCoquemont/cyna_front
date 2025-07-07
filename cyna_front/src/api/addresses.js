@@ -1,6 +1,6 @@
 import { API_BASE_URL } from './config';
 
-const BASE_URL = `${API_BASE_URL}/api/addresses`;
+const BASE_URL = `${API_BASE_URL}/addresses`;
 
 export async function fetchAddresses() {
   const token = localStorage.getItem('token');

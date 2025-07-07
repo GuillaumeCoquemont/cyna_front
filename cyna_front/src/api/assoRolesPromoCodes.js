@@ -1,6 +1,6 @@
 // src/api/assoRolesPromoCodes.js
 import { API_BASE_URL } from './config';
-const URL = `${API_BASE_URL}/api/asso-roles-promocodes`;
+const URL = `${API_BASE_URL}/asso-roles-promocodes`;
 
 /**
  * Récupère toutes les associations role_id ↔ promo_code_id

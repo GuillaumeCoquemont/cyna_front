@@ -1,6 +1,6 @@
 // src/api/assoCategoryProductsRoles.js
 import { API_BASE_URL } from './config';
-const URL = `${API_BASE_URL}/api/asso-categoryproducts-roles`;
+const URL = `${API_BASE_URL}/asso-categoryproducts-roles`;
 
 /**
  * Récupère toutes les associations category_id ↔ role_id

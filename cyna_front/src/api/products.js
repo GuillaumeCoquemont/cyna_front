@@ -1,5 +1,7 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL;
-const BASE_URL = `${API_BASE_URL}/api/products`;
+import { API_BASE_URL } from './config';
+
+const BASE_URL = `${API_BASE_URL}/products`;
+
 // src/api/products.js
 
 export async function fetchProducts() {
@@ -77,7 +79,7 @@ export async function addProduct(data, isMultipart = false) {
 
 export async function fetchAvailablePromoCodes() {
   const token = localStorage.getItem('token');
-  const res = await fetch(`${API_BASE_URL}/api/promo-codes`, {
+  const res = await fetch(`${BASE_URL}/promo-codes`, {
     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);

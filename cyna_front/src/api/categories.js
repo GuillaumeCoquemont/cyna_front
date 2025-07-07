@@ -1,11 +1,10 @@
 // src/api/categories.js
-
 import { API_BASE_URL } from './config';
-const BASE_URL = `${API_BASE_URL}/api/product-categories`;
+const URL = `${API_BASE_URL}/product-categories`;
 
 export async function fetchCategories() {
   try {
-    const res = await fetch(BASE_URL);
+    const res = await fetch(URL);
     if (!res.ok) throw new Error(`Erreur ${res.status}`);
     return res.json();
   } catch (error) {
@@ -16,7 +15,7 @@ export async function fetchCategories() {
 
 export async function addCategory(data) {
   const token = localStorage.getItem('token');
-  const res = await fetch(BASE_URL, {
+  const res = await fetch(URL, {
     method: 'POST',
     headers: {
       'Content-Type':'application/json',
@@ -30,7 +29,7 @@ export async function addCategory(data) {
 
 export async function updateCategory(id, data) {
   const token = localStorage.getItem('token');
-  const res = await fetch(`${BASE_URL}/${id}`, {
+  const res = await fetch(`${URL}/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type':'application/json',
@@ -44,7 +43,7 @@ export async function updateCategory(id, data) {
 
 export async function deleteCategory(id) {
   const token = localStorage.getItem('token');
-  const res = await fetch(`${BASE_URL}/${id}`, {
+  const res = await fetch(`${URL}/${id}`, {
     method: 'DELETE',
     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
@@ -53,7 +52,7 @@ export async function deleteCategory(id) {
 
 export async function checkProductCategoryDependencies(id) {
   const token = localStorage.getItem('token');
-  const res = await fetch(`${BASE_URL}/${id}/dependencies`, {
+  const res = await fetch(`${URL}/${id}/dependencies`, {
     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);

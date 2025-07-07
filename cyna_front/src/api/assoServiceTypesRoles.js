@@ -1,6 +1,6 @@
 // src/api/assoServiceTypesRoles.js
 import { API_BASE_URL } from './config';
-const URL = `${API_BASE_URL}/api/asso-servicetypes-roles`;
+const URL = `${API_BASE_URL}/asso-servicetypes-roles`;
 
 /**
  * Récupère toutes les associations service_type_id ↔ role_id

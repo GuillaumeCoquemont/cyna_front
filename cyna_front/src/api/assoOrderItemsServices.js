@@ -1,6 +1,6 @@
 // src/api/assoOrderItemsServices.js
 import { API_BASE_URL } from './config';
-const URL = `${API_BASE_URL}/api/asso-orderitems-services`;
+const URL = `${API_BASE_URL}/asso-orderitems-services`;
 
 /**
  * Récupère toutes les associations order_item_id ↔ service_id

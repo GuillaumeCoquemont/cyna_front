@@ -1,5 +1,5 @@
 import { API_BASE_URL } from './config';
-const BASE_URL = `${API_BASE_URL}/api/team`;
+const BASE_URL = `${API_BASE_URL}/team`;
 
 export async function fetchTeam() {
   const token = localStorage.getItem('token');

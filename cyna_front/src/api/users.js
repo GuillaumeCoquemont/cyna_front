@@ -1,7 +1,7 @@
 // src/api/users.js
 import { API_BASE_URL } from './config';
-const USERS_URL = `${API_BASE_URL}/api/users`;
-const ROLES_URL = `${API_BASE_URL}/api/roles`;
+const USERS_URL = `${API_BASE_URL}/users`;
+const ROLES_URL = `${API_BASE_URL}/roles`;
 
 export async function fetchUsers() {
   const token = localStorage.getItem('token');

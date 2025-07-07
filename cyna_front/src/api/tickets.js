@@ -1,9 +1,11 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3007';
+import { API_BASE_URL } from './config';
+
+const BASE_URL = `${API_BASE_URL}/tickets`;
 
 // Récupérer tous les tickets (admin)
 export const fetchAllTickets = async () => {
   const token = localStorage.getItem('token');
-  const response = await fetch(`${API_BASE_URL}/api/tickets`, {
+  const response = await fetch(`${BASE_URL}`, {
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -25,7 +27,7 @@ export const fetchUserTickets = async () => {
     throw new Error('Vous devez être connecté pour voir vos tickets');
   }
   
-  const response = await fetch(`${API_BASE_URL}/api/tickets/my-tickets`, {
+  const response = await fetch(`${BASE_URL}/my-tickets`, {
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -43,7 +45,7 @@ export const fetchUserTickets = async () => {
 // Récupérer un ticket par ID
 export const fetchTicketById = async (ticketId) => {
   const token = localStorage.getItem('token');
-  const response = await fetch(`${API_BASE_URL}/api/tickets/${ticketId}`, {
+  const response = await fetch(`${BASE_URL}/${ticketId}`, {
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -65,7 +67,7 @@ export const createTicket = async (ticketData) => {
     throw new Error('Vous devez être connecté pour créer un ticket');
   }
   
-  const response = await fetch(`${API_BASE_URL}/api/tickets`, {
+  const response = await fetch(`${BASE_URL}`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -90,7 +92,7 @@ export const updateTicket = async (ticketId, updateData) => {
     throw new Error('Vous devez être connecté pour modifier un ticket');
   }
   
-  const response = await fetch(`${API_BASE_URL}/api/tickets/${ticketId}`, {
+  const response = await fetch(`${BASE_URL}/${ticketId}`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -115,7 +117,7 @@ export const deleteTicket = async (ticketId) => {
     throw new Error('Vous devez être connecté pour supprimer un ticket');
   }
   
-  const response = await fetch(`${API_BASE_URL}/api/tickets/${ticketId}`, {
+  const response = await fetch(`${BASE_URL}/${ticketId}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -134,7 +136,7 @@ export const deleteTicket = async (ticketId) => {
 // Récupérer les statistiques des tickets (admin)
 export const fetchTicketStats = async () => {
   const token = localStorage.getItem('token');
-  const response = await fetch(`${API_BASE_URL}/api/tickets/stats`, {
+  const response = await fetch(`${BASE_URL}/stats`, {
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'

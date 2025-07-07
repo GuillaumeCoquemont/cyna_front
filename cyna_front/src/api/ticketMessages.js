@@ -1,4 +1,6 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3007';
+import { API_BASE_URL } from './config';
+
+const BASE_URL = `${API_BASE_URL}/ticket`;
 
 // Récupérer tous les messages d'un ticket
 export const fetchTicketMessages = async (ticketId) => {
@@ -8,7 +10,7 @@ export const fetchTicketMessages = async (ticketId) => {
     throw new Error('Vous devez être connecté pour voir les messages');
   }
   
-  const response = await fetch(`${API_BASE_URL}/api/ticket/${ticketId}/messages`, {
+  const response = await fetch(`${BASE_URL}/${ticketId}/messages`, {
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -31,7 +33,7 @@ export const addTicketMessage = async (ticketId, message) => {
     throw new Error('Vous devez être connecté pour envoyer un message');
   }
   
-  const response = await fetch(`${API_BASE_URL}/api/ticket/${ticketId}/messages`, {
+  const response = await fetch(`${BASE_URL}/${ticketId}/messages`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -56,7 +58,7 @@ export const deleteTicketMessage = async (messageId) => {
     throw new Error('Vous devez être connecté pour supprimer un message');
   }
   
-  const response = await fetch(`${API_BASE_URL}/api/messages/${messageId}`, {
+  const response = await fetch(`${BASE_URL}/messages/${messageId}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${token}`,

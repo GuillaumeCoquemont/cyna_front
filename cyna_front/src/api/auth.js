@@ -1,9 +1,10 @@
-const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3007';
+import { API_BASE_URL } from './config';
+const AUTH_URL = `${API_BASE_URL}/auth/`;
 
 export async function login({ email, password }) {
   try {
-    console.log('Tentative de connexion à:', `${BASE_URL}/api/auth/login`);
-    const response = await fetch(`${BASE_URL}/api/auth/login`, {
+    console.log('Tentative de connexion à:', `${AUTH_URL}login`);
+    const response = await fetch(`${AUTH_URL}login`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
@@ -37,8 +38,8 @@ export async function login({ email, password }) {
 
 export async function register({ name, email, password }) {
   try {
-    console.log('Tentative d\'inscription à:', `${BASE_URL}/api/auth/signup`);
-    const response = await fetch(`${BASE_URL}/api/auth/signup`, {
+    console.log('Tentative d\'inscription à:', `${AUTH_URL}signup`);
+    const response = await fetch(`${AUTH_URL}signup`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',

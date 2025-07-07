@@ -1,9 +1,11 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3007';
+import { API_BASE_URL } from './config';
+
+const BASE_URL = `${API_BASE_URL}/reviews`;
 
 // Récupérer tous les avis
 export const fetchAllReviews = async () => {
   const token = localStorage.getItem('token');
-  const response = await fetch(`${API_BASE_URL}/api/reviews`, {
+  const response = await fetch(`${BASE_URL}`, {
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -19,7 +21,7 @@ export const fetchAllReviews = async () => {
 
 // Récupérer les avis d'un produit
 export const fetchProductReviews = async (productId) => {
-  const response = await fetch(`${API_BASE_URL}/api/reviews/product/${productId}`);
+  const response = await fetch(`${BASE_URL}/product/${productId}`);
   
   if (!response.ok) {
     throw new Error(`Erreur ${response.status}: ${response.statusText}`);
@@ -30,7 +32,7 @@ export const fetchProductReviews = async (productId) => {
 
 // Récupérer les avis d'un service
 export const fetchServiceReviews = async (serviceId) => {
-  const response = await fetch(`${API_BASE_URL}/api/reviews/service/${serviceId}`);
+  const response = await fetch(`${BASE_URL}/service/${serviceId}`);
   
   if (!response.ok) {
     throw new Error(`Erreur ${response.status}: ${response.statusText}`);
@@ -41,7 +43,7 @@ export const fetchServiceReviews = async (serviceId) => {
 
 // Récupérer les statistiques d'avis d'un produit
 export const fetchProductReviewStats = async (productId) => {
-  const response = await fetch(`${API_BASE_URL}/api/reviews/product/${productId}/stats`);
+  const response = await fetch(`${BASE_URL}/product/${productId}/stats`);
   
   if (!response.ok) {
     throw new Error(`Erreur ${response.status}: ${response.statusText}`);
@@ -52,7 +54,7 @@ export const fetchProductReviewStats = async (productId) => {
 
 // Récupérer les statistiques d'avis d'un service
 export const fetchServiceReviewStats = async (serviceId) => {
-  const response = await fetch(`${API_BASE_URL}/api/reviews/service/${serviceId}/stats`);
+  const response = await fetch(`${BASE_URL}/service/${serviceId}/stats`);
   
   if (!response.ok) {
     throw new Error(`Erreur ${response.status}: ${response.statusText}`);
@@ -69,7 +71,7 @@ export const createReview = async (reviewData) => {
     throw new Error('Vous devez être connecté pour laisser un avis');
   }
   
-  const response = await fetch(`${API_BASE_URL}/api/reviews`, {
+  const response = await fetch(`${BASE_URL}`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -94,7 +96,7 @@ export const updateReview = async (reviewId, reviewData) => {
     throw new Error('Vous devez être connecté pour modifier un avis');
   }
   
-  const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}`, {
+  const response = await fetch(`${BASE_URL}/${reviewId}`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -119,7 +121,7 @@ export const deleteReview = async (reviewId) => {
     throw new Error('Vous devez être connecté pour supprimer un avis');
   }
   
-  const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}`, {
+  const response = await fetch(`${BASE_URL}/${reviewId}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${token}`,

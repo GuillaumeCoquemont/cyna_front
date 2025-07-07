@@ -1,13 +1,13 @@
 // src/api/userProfiles.js
 import { API_BASE_URL } from './config';
-const URL = `${API_BASE_URL}/api/user-profiles`;
+const BASE_URL = `${API_BASE_URL}/user-profiles`;
 
 /**
  * Récupère la liste des profils utilisateurs (admin)
  */
 export async function fetchUserProfiles() {
   const token = localStorage.getItem('token');
-  const res = await fetch(URL, {
+  const res = await fetch(BASE_URL, {
     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
@@ -19,7 +19,7 @@ export async function fetchUserProfiles() {
  */
 export async function fetchUserProfile() {
   const token = localStorage.getItem('token');
-  const res = await fetch(`${API_BASE_URL}/api/profile`, {
+  const res = await fetch(`${API_BASE_URL}/profile`, {
     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
   if (!res.ok) throw new Error(`Erreur ${res.status}`);
@@ -31,7 +31,7 @@ export async function fetchUserProfile() {
  */
 export async function updateUserProfile(data) {
   const token = localStorage.getItem('token');
-  const res = await fetch(`${API_BASE_URL}/api/profile`, {
+  const res = await fetch(`${API_BASE_URL}/profile`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ export async function updateUserProfile(data) {
  */
 export async function updatePassword(currentPassword, newPassword) {
   const token = localStorage.getItem('token');
-  const res = await fetch(`${API_BASE_URL}/api/profile/password`, {
+  const res = await fetch(`${API_BASE_URL}/profile/password`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

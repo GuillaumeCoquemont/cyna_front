@@ -1,4 +1,6 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3007';
+
+import { API_BASE_URL } from './config';
+const URL = `${API_BASE_URL}/contact`;
 
 // Envoyer un message de contact (public)
 export const sendContactMessage = async (contactData) => {

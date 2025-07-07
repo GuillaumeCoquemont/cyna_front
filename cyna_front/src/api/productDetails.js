@@ -1,9 +1,10 @@
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3007';
+import { API_BASE_URL } from './config';
+const BASE_URL = `${API_BASE_URL}/orders`;
 
 export const fetchProductById = async (id) => {
   try {
-    console.log('fetchProductById URL:', `${API_URL}/api/details/product/${id}`);
-    const response = await fetch(`${API_URL}/api/details/product/${id}`);
+    console.log('fetchProductById URL:', `${BASE_URL}/details/product/${id}`);
+    const response = await fetch(`${BASE_URL}/details/product/${id}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -15,8 +16,8 @@ export const fetchProductById = async (id) => {
 
 export const fetchServiceById = async (id) => {
   try {
-    console.log('fetchServiceById URL:', `${API_URL}/api/details/service/${id}`);
-    const response = await fetch(`${API_URL}/api/details/service/${id}`);
+    console.log('fetchServiceById URL:', `${BASE_URL}/details/service/${id}`);
+    const response = await fetch(`${BASE_URL}/details/service/${id}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

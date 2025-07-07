@@ -1,6 +1,6 @@
 // src/api/promoCodes.js
 import { API_BASE_URL } from './config';
-const URL = `${API_BASE_URL}/api/promo-codes`;
+const URL = `${API_BASE_URL}/promo-codes`;
 
 /**
  * Récupère la liste des codes promo

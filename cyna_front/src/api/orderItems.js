@@ -1,6 +1,6 @@
 // src/api/orderItems.js
 import { API_BASE_URL } from './config';
-const URL = `${API_BASE_URL}/api/order-items`;
+const URL = `${API_BASE_URL}/order-items`;
 
 /**
  * Récupère la liste des order items

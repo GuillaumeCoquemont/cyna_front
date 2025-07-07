@@ -2,9 +2,9 @@
 
 import { API_BASE_URL } from './config';
 
-const BASE_URL = `${API_BASE_URL}/api/orders`;
-const CLIENT_PRODUCTS_URL = `${API_BASE_URL}/api/products`;
-const CLIENT_SERVICES_URL = `${API_BASE_URL}/api/services`;
+const BASE_URL = `${API_BASE_URL}/orders`;
+const CLIENT_PRODUCTS_URL = `${API_BASE_URL}/products`;
+const CLIENT_SERVICES_URL = `${API_BASE_URL}/services`;
 
 // Fetch the list of client-facing products
 export async function fetchClientProducts() {

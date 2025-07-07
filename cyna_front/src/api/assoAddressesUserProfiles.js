@@ -1,6 +1,6 @@
 // src/api/assoAddressesUserProfiles.js
 import { API_BASE_URL } from './config';
-const URL = `${API_BASE_URL}/api/asso-addresses-user-profiles`;
+const URL = `${API_BASE_URL}/asso-addresses-user-profiles`;
 
 /**
  * Récupère toutes les associations address_id ↔ user_profile_id
