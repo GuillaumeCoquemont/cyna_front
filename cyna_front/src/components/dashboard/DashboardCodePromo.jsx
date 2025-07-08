@@ -87,18 +87,18 @@ const DashboardCodePromo = () => {
         <tbody>
           {codes.map((c) => (
             <tr key={c.id}>
-              <td>{c.code}</td>
-              <td>{c.description || '-'}</td>
-              <td>{formatDiscount(c)}</td>
-              <td>
+              <td data-label="Code">{c.code}</td>
+              <td data-label="Description">{c.description || '-'}</td>
+              <td databa-label="Réduction">{formatDiscount(c)}</td>
+              <td data-label="Validité">
                 {c.startDate && c.endDate ? (
                   `${formatDate(c.startDate)} - ${formatDate(c.endDate)}`
                 ) : (
                   'Non définie'
                 )}
               </td>
-              <td>{getStatus(c)}</td>
-              <td>
+              <td data-label="Statut">{getStatus(c)}</td>
+              <td data-label="Actions">
                 <button onClick={() => handleEdit(c)} className={styles.editBtn}>Modifier</button>
                 <button onClick={() => handleDelete(c.id)} className={styles.deleteBtn}>Supprimer</button>
               </td>

@@ -32,6 +32,54 @@
 .table {
   width: 100%;
   border-collapse: collapse;
+  font-size: 1rem;
+  min-width: 600px;
+}
+
+@media (max-width: 900px) {
+  .table {
+    font-size: 9.95rem;
+    min-width: 400px;
+  }
+}
+
+@media (max-width: 700px) {
+  .table, .table thead, .table tbody, .table th, .table td, .table tr {
+    display: block;
+    width: 100%;
+  }
+  .table thead {
+    display: none;
+  }
+  .table tr {
+    margin-bottom: 1.2em;
+    border-bottom: 1px solid #eee;
+  }
+  .table td {
+    position: relative;
+    padding-left: 50%;
+    min-height: 40px;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+    background: #fff;
+  }
+  .table td:before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 48%;
+    padding-left: 10px;
+    font-weight: bold;
+    white-space: nowrap;
+    content: attr(data-label);
+    color: #888;
+    background: #f9f9f9;
+    border-right: 1px solid #eee;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+  }
 }
 
 .table thead {
